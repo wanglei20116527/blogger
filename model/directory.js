@@ -71,7 +71,7 @@ class Directory {
 								where user=? and parentDirectory is null and deleteTime is null`;
 			let params = [user.id];
 
-			database.execute(
+			database.executeSql(
 							connection, 
 							sql, 
 							params
@@ -104,7 +104,7 @@ class Directory {
 								where user=? and parentDirectory=? and deleteTime is null`;
 			let params = [user.id, directory.id];
 
-			database.execute(
+			database.executeSql(
 							connection, 
 							sql, 
 							params

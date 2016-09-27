@@ -77,7 +77,7 @@ class Picture {
 								where user=? and directory=? and deleteTime is null`;
 			let params = [user.id, directory.id];
 
-			database.execute(
+			database.executeSql(
 							connection, 
 							sql, 
 							params

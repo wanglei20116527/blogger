@@ -69,7 +69,7 @@ class Category {
 								where user=? and deleteTime is null`;
 			let params = [user.id];
 
-			database.execute(
+			database.executeSql(
 							connection, 
 							sql, 
 							params

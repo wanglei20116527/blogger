@@ -114,14 +114,37 @@ let database = {
 
 	executeTemplate: function (callback) {
 		return new Promise((resolve, reject)=>{
-			// this.getConnection().then(conn=>{
-			// 	this.beginTransaction(conn)
-			// 		.then()
-			// 		.catch(err=>{
+			this.getConnection()
+				.then(conn=>{
+					conn.beginTransaction(err=>{
+						if (err) {
+							conn.release();
+							reject(err);
+							return;
+						}
 
-			// 		});
+						callback(conn).then(ret=>{
+							conn.commit(err=>{
+								if (err) {
+									conn.rollback(()=>{
+										conn.release();
+										reject(err);
+									});
+									return;
+								}
 
-			// }).catch(reject);
+								conn.release();
+								resolve(ret);
+							});
+						}).catch(err=>{
+							conn.rollback(()=>{
+								conn.release();
+								reject(err);
+							});
+						});
+					});
+				})
+				.catch(reject);
 		});
 	},
 

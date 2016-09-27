@@ -1,26 +1,9 @@
-let express = require("express");
-let router  = express.Router();
+const express  = require("express");
+const userCtrl = require("../controller/userCtrl");
 
-router.post("/login", (req, res)=>{
-	console.log(req.session);
-	req.session.cookie.maxAge = 60 * 1000;
-	req.session.user = {
-		name: "wanglei"
-	};
+let router = express.Router();
 
-	res.json({
-		info: "wanglei is cool"
-	});
-});
-
-router.post("/logout", (req, res)=>{
-	req.session.destroy(err=>{
-		if (err) {
-			
-		} else {
-
-		}
-	});
-});
+router.post("/login" , userCtrl.login);
+router.post("/logout", userCtrl.logout);
 
 module.exports = router; 
