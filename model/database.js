@@ -93,7 +93,7 @@ let database = {
 		});
 	},
 
-	execute: function (connection, sql, params) {
+	executeSql: function (connection, sql, params) {
 		params = params || [];
 
 		return new Promise((resolve, reject)=>{
@@ -109,6 +109,19 @@ let database = {
 			} catch (err) {
 				reject(err);
 			}
+		});
+	},
+
+	executeTemplate: function (callback) {
+		return new Promise((resolve, reject)=>{
+			// this.getConnection().then(conn=>{
+			// 	this.beginTransaction(conn)
+			// 		.then()
+			// 		.catch(err=>{
+
+			// 		});
+
+			// }).catch(reject);
 		});
 	},
 
@@ -135,7 +148,7 @@ let database = {
 
 					let [sql, params] = generateInsertData(tableName, fields, valueObj);
 
-					let p = this.execute(connection, sql, params);
+					let p = this.executeSql(connection, sql, params);
 					promises.push(p);
 				}
 
@@ -169,7 +182,7 @@ let database = {
 
 					let [sql, params] = generateUpdateData(tableName, valueObj.id, fields, valueObj);
 
-					let p = this.execute(connection, sql, params);
+					let p = this.executeSql(connection, sql, params);
 					promises.push(p);
 				}
 
@@ -204,7 +217,7 @@ let database = {
 
 					let [sql, params] = generateUpdateData(tableName, valueObj.id, fields, valueObj);
 
-					let p = this.execute(connection, sql, params);
+					let p = this.executeSql(connection, sql, params);
 					promises.push(p);
 				}
 

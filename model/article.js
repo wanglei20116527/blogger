@@ -74,7 +74,7 @@ class Article {
 								where author=? and deleteTime is null`;
 			let params = [user.id];
 
-			database.execute(
+			database.executeSql(
 						connection, 
 						sql, 
 						params)
@@ -101,7 +101,7 @@ class Article {
 								where author=? and isPublish=? and deleteTime is null`;
 			let params = [user.id, 1];
 
-			database.execute(
+			database.executeSql(
 						connection, 
 						sql, 
 						params)

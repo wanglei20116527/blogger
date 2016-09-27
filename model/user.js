@@ -53,7 +53,7 @@ class User {
 		let params = [name, password];
 
 		return new Promise((resolve, reject)=>{
-			database.execute(connection, sql, params).then(users=>{
+			database.executeSql(connection, sql, params).then(users=>{
 				if (!users || users.length <= 0) {
 					resolve(null);
 					return;
@@ -66,4 +66,4 @@ class User {
 	}
 }
 
-module.exports = User;
+module.exports = new User();
