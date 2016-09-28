@@ -19,6 +19,7 @@ function initApp () {
 		secret: "wl breath hn",
 		resave: false,
 		maxAge: 100 * 1000,
+		httpOnly: false,
 		saveUninitialized: false,
 	}));
 	app.use(bodyParser.json());

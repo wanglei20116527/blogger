@@ -1,50 +1,29 @@
+const config      = require("../config").backend;
 const userService = require("../service/userService");
 const hashService = require("../service/hashService");
 
 const DEFAULT_LOGIN = {
-	captcha: null,
 	failCount: 0,
 };
 
+const LOGIN_CONFIG = config.login;
+
 module.exports = {
-	updateCaptcha: function (req, res) {
-		try {
-			let {
-				text,
-				buffer
-			} = captchaService.getNewCaptcha();
-
-			let login = req.session.login = req.session.login || DEFAULT_LOGIN;
-
-			login.captcha = text;
-			
-			res.end(buffer);
-			
-		} catch (err) {
-			res.json({
-				success: false,
-				error: {
-					code: err.code,
-					message: err.stack
-				}
-			});
-		}
-	},
-
 	checkCaptcha: function (req, res, next) {
 		let {
 			captcha
 		} = req.body;
 
-		let login = req.session.login = req.session.login || DEFAULT_LOGIN;
+		let session = req.session;
+		let login   = session.login = session.login || DEFAULT_LOGIN;
 
 		if (login.failCount <= 3 
-				|| login.captcha != null && login.captcha === captcha) {
+				|| session.captcha != null && session.captcha === captcha) {
 			next();
 			return;
 		}
 
-		login.captcha = null;
+		session.captcha = null;
 		login.failCount++;
 
 		res.json({
@@ -62,12 +41,13 @@ module.exports = {
 			password
 		} = req.body;
 
-		let login = req.session.login = req.session.login || DEFAULT_LOGIN;
+		let session = req.session;
+		let login   = session.login = session.login || DEFAULT_LOGIN;
 
 		userService .getUserByNameAndPassword(username, password)
 					.then(user=>{
 						if (user == null) {
-							login.captcha = null;
+							session.captcha = null;
 							login.failCount++;
 
 							res.json({
@@ -80,7 +60,7 @@ module.exports = {
 							return;
 						}
 
-						req.login.user = user;
+						req.body.user = user;
 
 						next();
 					})
@@ -97,20 +77,34 @@ module.exports = {
 
 	loginSuccess: function (req, res) {
 		try {
-			let {
-				remember
-			} = req.body;
+			let remember = req.body.remember;
+			let session  = req.session;
+			let user     = req.body.user|| {};
+			let token    = hashService.hash(`${user.name}-${user.password}-${Date.now()}`);
 
-			let {
-				user
-			} = req.session.login;
-
-			let token = hashService.hash(`${user.name}-${password}-${Date.now()}`);
-
-			res.session.user = {
+			session.user = {
 				token: token,
 				user: user
 			};
+
+			if (remember) {
+				let maxAge = LOGIN_CONFIG.session.maxAge;
+
+				res.cookie("_token", token, {
+					httpOnly: false,
+					maxAge: maxAge
+				});
+
+				session.maxAge = maxAge;
+				session.cookie.maxAge = maxAge;
+			}			
+
+			session.captcha = null;
+			session.login   = null;
+
+			res.json({
+				success: true
+			});
 
 		} catch (err) {
 			res.json({
