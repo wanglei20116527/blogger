@@ -46,6 +46,10 @@ class User {
 		});
 	}
 
+	static getUserByName (connection, name, user) {
+
+	}
+
 	static getUserByNameAndPassword (connection, name, password) {
 		let sql = `select * from ${TABLENAME} 
 				   			where name=? and password=? and deleteTime is null`;

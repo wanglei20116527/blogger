@@ -1,8 +1,22 @@
 {
-	"database": {
-		"host": "127.0.0.1",
-		"user": "root",
-		"password": "",
-		"database": "blog"
+	"backend": {
+		"database": {
+			"host": "127.0.0.1",
+			"user": "root",
+			"password": "",
+			"database": "blog"
+		},
+
+		"captcha": {
+			"width": 256,
+			"height": 60,
+			"offset": 40,
+			"quality": 100,
+			"fontSize": 57
+		},
+
+		"login": {
+			
+		},
 	}
 }

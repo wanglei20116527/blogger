@@ -5,7 +5,7 @@ let database = {
 		return new Promise((resolve, reject)=>{
 			try {
 				let mysql  = require("mysql");
-				let config = require("../config.json").database;
+				let config = require("../config.json").backend.database;
 				_pool = mysql.createPool(config);
 				resolve();
 			} catch (err) {

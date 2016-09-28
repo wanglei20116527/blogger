@@ -1,9 +1,15 @@
-const express  = require("express");
-const userCtrl = require("../controller/userCtrl");
+const express     = require("express");
+const captchaCtrl = require("../controller/captchaCtrl"); 
+const loginCtrl   = require("../controller/userCtrl");
+const logoutCtrl  = require("../controller/logoutCtrl");
 
 let router = express.Router();
 
-router.post("/login" , userCtrl.login);
-router.post("/logout", userCtrl.logout);
+router.get("/captcha", 	captchaCtrl.updateCaptcha);
+
+router.post("/login", 	loginCtrl.checkCaptcha, 
+						loginCtrl.login);
+
+router.post("/logout", logoutCtrl.logout);
 
 module.exports = router; 
