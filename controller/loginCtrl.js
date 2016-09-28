@@ -68,7 +68,7 @@ module.exports = {
 						res.json({
 							success: false,
 							error: {
-								code: err.code,
+								code: 190000,
 								message: err.stack
 							}
 						});
@@ -88,16 +88,22 @@ module.exports = {
 			};
 
 			if (remember) {
+				// set cookie lifetime to 10 days
 				let maxAge = LOGIN_CONFIG.session.maxAge;
 
 				res.cookie("_token", token, {
-					httpOnly: false,
+					httpOnly: true,
 					maxAge: maxAge
 				});
 
 				session.maxAge = maxAge;
 				session.cookie.maxAge = maxAge;
-			}			
+			} else {
+				// set cookie lifetime to session
+				res.cookie("_token", token, {
+					httpOnly: true,
+				});
+			}		
 
 			session.captcha = null;
 			session.login   = null;
@@ -110,7 +116,7 @@ module.exports = {
 			res.json({
 				success: false,
 				error: {
-					code: err.code,
+					code: 190000,
 					message: err.stack
 				}
 			})

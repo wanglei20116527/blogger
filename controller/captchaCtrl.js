@@ -16,19 +16,10 @@ module.exports = {
 			res.json({
 				success: false,
 				error: {
-					code: err.code,
+					code: 190000,
 					message: err.stack
 				}
 			});
 		}
-	},
-
-	getCaptchaText: function (req, res) {
-		res.json({
-			success: true,
-			data: {
-				captcha: req.session.captcha || "",
-			}
-		});
-	},
+	}
 };

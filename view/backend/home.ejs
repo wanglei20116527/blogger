@@ -1,0 +1,35 @@
+<!doctype html>
+
+<html ng-app="Backend">
+	<head>
+		<meta charset="utf-8">
+	</head>
+
+	<body ng-controller="mainCtrol">
+		<header>
+			<h1 ng-bind="info"></h1>
+		</header>
+		
+		<aside>
+			<nav>
+				<ul>
+					<li><a href="#!/index">Home</a></li>
+					<li><a href="#!/article">Article</a></li>
+					<li><a href="#!/category">Category</a></li>
+					<li><a href="#!/picture">Picture</a></li>
+					<li><a href="#!/profile">Profile</a></li>
+				</ul>
+			</nav>
+		</aside>
+
+		<div>
+			<div ng-view></div>
+		</div>
+		
+		<footer></footer>
+		<script type="text/javascript" src="/backend/static/angular.min.js"></script>
+		<script type="text/javascript" src="/backend/static/angular-route.min.js"></script>
+		<script type="text/javascript" src="/backend/static/src/app.js"></script>
+		<script type="text/javascript" src="/backend/static/src/controllers/main.controller.js"></script>
+	</body>
+</html>

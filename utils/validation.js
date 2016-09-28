@@ -6,4 +6,12 @@ module.exports = {
 	checkPassword: function (password) {
 		return true;
 	}
+
+	checkEmail: function (email) {
+		return true;
+	},
+
+	checkPhone: function (password) {
+		return true;
+	},
 };
