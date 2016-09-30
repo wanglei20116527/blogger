@@ -5,16 +5,26 @@ angular.module("Backend", ["ngRoute"]).config([
 	function ($locationProvider, $routeProvider) {
 		$locationProvider.hashPrefix('!');
 
-		$routeProvider.when("/index", {
-			template: "index"
+		$routeProvider.when("/", {
+			controller  : "indexCtrl",
+			controllerAs: "indexCtrl",
+			templateUrl : "/backend/static/templates/index.template.html"
+
 		}).when("/picture", {
-			template: "picture"
-		}).when("/category", {
-			template: "category"
+			controller  : "pictureCtrl",
+			controllerAs: "pictureCtrl",
+			templateUrl : "/backend/static/templates/picture.template.html"
+
 		}).when("/article", {
-			template: "article"
+			controller  : "articleCtrl",
+			controllerAs: "articleCtrl",
+			templateUrl : "/backend/static/templates/article.template.html"
+			
 		}).when("/profile", {
-			template: "profile"
-		}).otherwise("/index");
+			controller  : "profileCtrl",
+			controllerAs: "profileCtrl",
+			templateUrl : "/backend/static/templates/profile.template.html"
+
+		}).otherwise("/");
 	}
 ]);

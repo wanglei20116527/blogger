@@ -1,0 +1,79 @@
+.image-cropper {
+  cursor: move;
+  -webkit-user-select: none;
+  user-select: none; }
+  .image-cropper .ic-mask,
+  .image-cropper .ic-clipper {
+    background: transparent; }
+  .image-cropper .ic-dragbar {
+    position: absolute;
+    z-index: 4;
+    background: url("/backend/static/image/ic-dragbar.gif"); }
+    .image-cropper .ic-dragbar.top {
+      top: 0;
+      width: 100%;
+      height: 1px;
+      cursor: s-resize; }
+    .image-cropper .ic-dragbar.right {
+      right: 0;
+      width: 1px;
+      height: 100%;
+      cursor: n-resize; }
+    .image-cropper .ic-dragbar.bottom {
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      cursor: n-resize; }
+    .image-cropper .ic-dragbar.left {
+      left: 0;
+      width: 1px;
+      height: 100%;
+      cursor: e-resize; }
+  .image-cropper .ic-handle {
+    position: absolute;
+    z-index: 2;
+    display: inline-block;
+    box-sizing: border-box;
+    width: 8px;
+    height: 8px;
+    margin: auto;
+    background: #333;
+    border: 1px solid #eee; }
+    .image-cropper .ic-handle.top {
+      left: 0;
+      right: 0;
+      top: -4px;
+      cursor: s-resize; }
+    .image-cropper .ic-handle.top-right {
+      right: -4px;
+      top: -4px;
+      cursor: sw-resize; }
+    .image-cropper .ic-handle.right {
+      right: -4px;
+      top: 0;
+      bottom: 0;
+      cursor: w-resize; }
+    .image-cropper .ic-handle.right-bottom {
+      right: -4px;
+      bottom: -4px;
+      cursor: nw-resize; }
+    .image-cropper .ic-handle.bottom {
+      left: 0;
+      right: 0;
+      bottom: -4px;
+      cursor: n-resize; }
+    .image-cropper .ic-handle.bottom-left {
+      left: -4px;
+      bottom: -4px;
+      cursor: ne-resize; }
+    .image-cropper .ic-handle.left {
+      left: -4px;
+      top: 0;
+      bottom: 0;
+      cursor: e-resize; }
+    .image-cropper .ic-handle.left-top {
+      left: -4px;
+      top: -4px;
+      cursor: se-resize; }
+
+/*# sourceMappingURL=main.css.map */
