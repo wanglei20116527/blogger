@@ -1,6 +1,7 @@
 angular.module("Backend").directive("imageCropper", [
 	"$timeout",
-	function ($timeout) {
+	"$window",
+	function ($timeout, $window) {
 		return {
 			restrict: 'E',
 			scope: {
@@ -23,7 +24,6 @@ angular.module("Backend").directive("imageCropper", [
 					background: config.background
 				};
 				angular.element(imageCropper).css(imageCropperStyle);
-
 
 
 				var wrapper      = element[0].querySelector(".ic-wrapper");
@@ -55,39 +55,13 @@ angular.module("Backend").directive("imageCropper", [
 					left: 0,
 				};
 
-				// scope.$watch("image.width", function (newVal, oldVal) {
-				// 	if (newVal == oldVal) {
-				// 		return;
-				// 	}
-				// 	updateSize(newVal, scope.image.height);
-				// 	$timeout(updateMask);
-				// });
-
-				// scope.$watch("image.height", function (newVal, oldVal) {
-				// 	if (newVal == oldVal) {
-				// 		return;
-				// 	}
-
-				// 	updateSize(scope.image.width, newVal);
-				// 	$timeout(updateMask);
-				// });
-
-				// scope.$watch("image.source", function (newVal, oldVal) {
-				// 	if (newVal == oldVal) {
-				// 		return;
-				// 	}
-
-				// 	updateSize(newVal, scope.image.height);
-				// 	updateImage(newVal, sourceCanvas);
-				// 	$timeout(updateMask);
-				// });
-
-
 				updateStyle(scope.image.width, scope.image.height);
 				updateImage(scope.image.source, sourceCanvas);
 				updateMask();
 
-				initClipperEvents();
+				initEvents();
+
+				window.test = $window;
 
 				function updateStyle (width, height) {
 					var rect = calculateWrapperRect(width, height);
@@ -190,7 +164,6 @@ angular.module("Backend").directive("imageCropper", [
 				function updateImage (imageUrl, canvas) {
 					var image = new Image();
 					image.src = imageUrl;
-					console.log();
 
 					image.onload = function () {
 						var context = canvas.getContext("2d");
@@ -198,9 +171,14 @@ angular.module("Backend").directive("imageCropper", [
 					}
 				}
 
-				function initClipperEvents () {
+				function initEvents () {
+					initClipperDragEvents();
+					initClipperResizeEvents();
+				}
+
+				function initClipperDragEvents () {
 					var $clipper   = angular.element(clipper);
-					var dragStart  = false;
+					// var dragStart  = false; 
 					var startPoint = {
 						x: 0,
 						y: 0
@@ -214,19 +192,32 @@ angular.module("Backend").directive("imageCropper", [
 							&& event.offsetY > 10 
 							&& event.offsetX < clipperWidth - 10 
 							&& event.offsetY < clipperHeight - 10) {
-							dragStart = true;
 							startPoint = {
 								x: event.screenX,
 								y: event.screenY
 							};
+							enableDraggable();
 						}
 					});
 
-					$clipper.on("mousemove", function (event) {
-						if (!dragStart) {
-							return;
-						}
- 
+					function enableDraggable () {
+						var windowEl = angular.element($window);
+						windowEl.on("mousemove", dragging);
+						windowEl.on("mouseup"  , disableDraggable);
+					}
+
+					function disableDraggable () {
+						var windowEl = angular.element($window);
+						windowEl.off("mousemove", dragging);
+						windowEl.off("mouseup"  , disableDraggable);
+
+						startPoint = {
+							x: 0,
+							y: 0
+						};
+					}
+
+					function dragging (event) {
 						var wrapperSize  = {
 							width : parseInt(wrapperStyle.width),
 							height: parseInt(wrapperStyle.height)
@@ -273,31 +264,207 @@ angular.module("Backend").directive("imageCropper", [
 									position.y, 
 									clipperSize.width, 
 									clipperSize.height);
+					}
+				}
+
+				function initClipperResizeEvents () {
+					var $clipper = angular.element(clipper);
+					var $handles = angular.element(clipper.querySelectorAll(".ic-handle"));
+					
+					var minSize  = {
+						width : 64,
+						height: 64,
+					};
+
+					var direction  = null; 
+					var startPoint = {
+						x: 0, 
+						y: 0
+					};
+
+					$handles.on("mousedown", function (event) {
+						direction  = event.target.className.replace("ic-handle", "").trim(); 
+						startPoint = {
+							x: event.screenX,
+							y: event.screenY
+						};
+
+						initResizable();
 					});
 
-					$clipper.on("mouseup", function () {
-						dragStart = false;
-						startPoint = {
-							x: 0,
-							y: 0
+					function resize (event) {
+						var wrapperSize = {
+							width:  parseInt(wrapperStyle.width),
+							height: parseInt(wrapperStyle.height)
 						};
-					});
 
-					$clipper.on("mouseleave", function () {
-						dragStart = false;
-						startPoint = {
-							x: 0,
-							y: 0
+						var clipperRect = {
+							top   : parseInt(clipperStyle.top),
+							left  : parseInt(clipperStyle.left),
+							width : parseInt(clipperStyle.width),
+							height: parseInt(clipperStyle.height)
 						};
-					});
 
-					$clipper.on("mousecancel", function () {
-						dragStart = false;
+						var offset = {
+							x: event.screenX - startPoint.x,
+							y: event.screenY - startPoint.y
+						};
+
+						switch (direction) {
+							case "left-top":
+								if (clipperRect.left + offset.x < 0 
+										|| clipperRect.top + offset.y < 0) {
+									offset.x = -clipperRect.left;
+									offset.y = -clipperRect.top;
+									offset.x = offset.y = Math.max(offset.x, offset.y);
+								
+								} else if (clipperRect.width - offset.x <= minSize.width 
+											|| clipperRect.height - offset.y <= minSize.height) {
+									offset.x = clipperRect.width  - minSize.width;
+									offset.y = clipperRect.height - minSize.height;
+									offset.x = offset.y = Math.min(offset.x, offset.y);
+								} else {
+									offset.x = offset.y = parseInt((offset.x + offset.y) / 2);
+								}
+
+								clipperRect.top    += offset.y;
+								clipperRect.left   += offset.x;
+								clipperRect.width  -= offset.x;
+								clipperRect.height -= offset.y;
+								break;
+
+							case "top":
+								if (clipperRect.top + offset.y < 0 
+										|| clipperRect.left + offset.y <= 0) {
+									offset.y = -Math.min(clipperRect.top, clipperRect.left);
+
+								} else if (clipperRect.height - offset.y <= minSize.height 
+										|| clipperRect.width  - offset.y <= minSize.width) {
+									offset.y = clipperRect.height - minSize.height;
+									offset.x = clipperRect.width  - minSize.width;
+
+									offset.y = Math.min(offset.y, offset.x);
+								}
+
+								offset.x = offset.y;
+
+								clipperRect.top    += offset.y;
+								clipperRect.left   += offset.x;
+								clipperRect.width  -= offset.x;
+								clipperRect.height -= offset.y;
+								break;
+
+							case "top-right":
+								if (clipperRect.top + offset.y < 0
+										|| clipperRect.left + clipperRect.width + offset.x >= wrapperSize.width) {
+									offset.x = wrapperSize.width - clipperRect.left - clipperRect.width;
+									offset.y = clipperRect.top;
+									offset.x = offset.y = Math.min(offset.x, offset.y);
+									offset.y = -offset.y;
+
+								} else if (clipperRect.height - offset.y <= minSize.height
+										|| clipperRect.width  + offset.x <= minSize.width) {
+									offset.y = clipperRect.height - minSize.height;
+									offset.x = clipperRect.width  - minSize.width;
+									offset.x = offset.y = Math.min(offset.x, offset.y);
+									offset.x = -offset.x;
+								
+								} else {
+									offset.x = offset.y = parseInt((offset.y - offset.x) / 2);
+									offset.x = -offset.x;
+								}
+
+								clipperRect.top    += offset.y;
+								clipperRect.width  += offset.x;
+								clipperRect.height -= offset.y;
+								break;
+
+							case "right":
+							case "right-bottom":
+							case "bottom":
+								if (clipperRect.left + clipperRect.width + offset.x >= wrapperSize.width
+										|| clipperRect.top + clipperRect.height + offset.y >= wrapperSize.height) {
+									offset.x = wrapperSize.width  - clipperRect.left - clipperRect.width;
+									offset.y = wrapperSize.height - clipperRect.top  - clipperRect.height;
+									offset.x = offset.y = Math.min(offset.x, offset.y);
+								
+								} else if (clipperRect.width  + offset.x <= minSize.width 
+										|| clipperRect.height + offset.y <= minSize.height) {
+									offset.x = minSize.width  - clipperRect.width;
+									offset.y = minSize.height - clipperRect.height;
+									offset.x = offset.y = Math.max(offset.x, offset.y);
+
+								} else {
+									offset.x = offset.y = parseInt((offset.x + offset.y) / 2)
+								}
+
+								offset.y = offset.x;
+
+								clipperRect.width  += offset.x;
+								clipperRect.height += offset.y;
+								break;
+
+							case "bottom-left":
+							case "left":
+								if (clipperRect.left + offset.x <= 0
+										|| clipperRect.top + clipperRect.height + offset.y >= wrapperSize.height) {
+									offset.x = clipperRect.left;
+									offset.y = wrapperSize.height - clipperRect.top - clipperRect.height;
+									offset.y = Math.min(offset.x, offset.y);
+									offset.x = -offset.y;
+								
+								} else if (clipperRect.width  - offset.x <= minSize.width
+										|| clipperRect.height + offset.y <= minSize.height) {
+									offset.x = clipperRect.width  - minSize.width;
+									offset.y = clipperRect.height - minSize.height;
+									offset.x = Math.min(offset.x, offset.y);
+									offset.y = -offset.x;
+
+								} else {
+									offset.x = parseInt((offset.x - offset.y) / 2);
+									offset.y = -offset.x;
+								}
+
+								clipperRect.left   += offset.x;
+								clipperRect.width  -= offset.x;
+								clipperRect.height += offset.y;
+								break;
+						}
+
+						clipperStyle.top    = clipperRect.top    + "px";
+						clipperStyle.left   = clipperRect.left   + "px";
+						clipperStyle.width  = clipperRect.width  + "px";
+						clipperStyle.height = clipperRect.height + "px";
+						angular.element(clipper).css(clipperStyle);
+
+						updateMask(	clipperRect.left, 
+									clipperRect.top, 
+									clipperRect.width, 
+									clipperRect.height);
+
+						startPoint.x = event.screenX;
+						startPoint.y = event.screenY;
+					}
+
+					function initResizable() {
+						var windowEl = angular.element($window);
+
+						windowEl.on("mousemove", resize);
+						windowEl.on("mouseup"  , stopResizable);
+					}
+
+					function stopResizable() {
+						direction  = null;
 						startPoint = {
 							x: 0,
-							y: 0
+							y: 0,
 						};
-					});
+
+						var windowEl = angular.element($window);
+
+						windowEl.off("mousemove", resize);
+						windowEl.off("mouseup"  , stopResizable);
+					}
 				}
 			}
 		};
