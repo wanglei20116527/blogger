@@ -6,8 +6,8 @@ const checkLoginFilter = require("../../filter/checkLoginFilter");
 
 let router  = express.Router();
 
-// router.post("/"      , 	checkLoginFilter,
-// 						userCtrl.update);
+router.get("/", checkLoginFilter,
+				userCtrl.getUser);
 
 router.post("/login" ,  loginCtrl.checkCaptcha, 
 						loginCtrl.checkNameAndPassword,

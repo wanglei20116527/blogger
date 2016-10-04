@@ -14,7 +14,6 @@ router.get("/home"  , renderCtrl.renderHomePage);
 router.get("/captcha", 	captchaCtrl.updateCaptcha);
 
 // user route
-
 router.use("/user", userRouter);
 
 

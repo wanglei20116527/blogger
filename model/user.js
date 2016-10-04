@@ -8,7 +8,8 @@ const FIELDS    = [
 	"email",
 	"phone",
 	"about",
-	"photo"
+	"photo",
+	"home"
 ];
 
 class User {

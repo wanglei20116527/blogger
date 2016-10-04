@@ -8,10 +8,15 @@ module.exports = {
 				user
 			} = req.session.user;
 
+			let tUser = Object.assign({}, user);
+
+			delete tUser.password;
+			delete tUser.home;
+
 			res.json({
 				success: true,
 				data: {
-					user: user
+					user: tUser
 				}
 			});
 		} catch (err) {

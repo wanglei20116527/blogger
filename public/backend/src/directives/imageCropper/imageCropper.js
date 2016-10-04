@@ -64,7 +64,10 @@ angular.module("Backend").directive("imageCropper", [
 				window.test = $window;
 
 				function updateStyle (width, height) {
+					console.log("width: " + width + " height: " + height);
 					var rect = calculateWrapperRect(width, height);
+					console.log(rect);
+					console.log("\n\n");
 
 					wrapperStyle.top    = rect.top    + "px";
 					wrapperStyle.left   = rect.left   + "px";
@@ -100,21 +103,6 @@ angular.module("Backend").directive("imageCropper", [
 					angular.element(clipper).css(clipperStyle);
 				}
 
-				function updateMask (x, y, width, height) {
-					x      = x != null ? x : parseInt(clipperStyle.left);
-					y      = y != null ? y : parseInt(clipperStyle.top);
-					width  = width  != null ? width  : parseInt(clipperStyle.width);
-					height = height != null ? height : parseInt(clipperStyle.height);
-
-					var context = maskCanvas.getContext("2d");
-					context.save();
-					context.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-					context.fillStyle = "#fff";
-					context.globalAlpha = 0.4;
-					context.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
-					context.clearRect(x, y, width, height);
-					context.restore();
-				}
 
 				function calculateWrapperRect (width, height) {
 					var style = {
@@ -147,11 +135,11 @@ angular.module("Backend").directive("imageCropper", [
 					} else {
 						if (width > height) {
 							style.width  = config.width;
-							style.height = parseInt(width / config.width * height);
+							style.height = parseInt(config.width / width * height);
 							style.top    = (config.height - style.height) / 2;
 							style.left   = 0;
 						} else {
-							style.width  = parseInt(height / config.height * width);
+							style.width  = parseInt(config.height / height * width);
 							style.height = config.height;
 							style.top    = 0;
 							style.left   = (config.width - style.width) / 2; 
@@ -159,6 +147,22 @@ angular.module("Backend").directive("imageCropper", [
 					}
 
 					return style;
+				}
+
+				function updateMask (x, y, width, height) {
+					x      = x != null ? x : parseInt(clipperStyle.left);
+					y      = y != null ? y : parseInt(clipperStyle.top);
+					width  = width  != null ? width  : parseInt(clipperStyle.width);
+					height = height != null ? height : parseInt(clipperStyle.height);
+
+					var context = maskCanvas.getContext("2d");
+					context.save();
+					context.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+					context.fillStyle = "#fff";
+					context.globalAlpha = 0.4;
+					context.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+					context.clearRect(x, y, width, height);
+					context.restore();
 				}
 
 				function updateImage (imageUrl, canvas) {

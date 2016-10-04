@@ -1,0 +1,32 @@
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+.clearfix {
+	*zoom: 1;
+}
+
+.clearfix:before,
+.clearfix:after {
+	content: " ";
+	display: table;
+}
+
+.clearfix:after {
+	clear: both;
+}
+
+.btn {
+	cursor: pointer;
+	border: none;
+	outline: none;
+	background: transparent;
+
+	&.active {
+		outline: none;
+	}
+}
