@@ -1,11 +1,23 @@
 angular.module("Backend").controller("mainCtrol", [
+	"$rootScope",
 	"$scope",
 	"User",
-	function ($scope, User) {
+	function ($rootScope, $scope, User) {
+		$rootScope.$on("pageChanged", function (event, args) {
+			$scope.activePage = args.page;
+		});
+
 		$scope.user = {};
+		$scope.activePage = "index";
 		$scope.collapseMenuBar = false;
 
 		$scope.logout = function () {
+			User.logout().then(function(){
+				// todo redirct to login page 
+				// or other things
+			}).catch(function(err){
+				console.error(err);
+			});
 		};
 
 		$scope.toogleMenuBar = function () {
@@ -19,7 +31,6 @@ angular.module("Backend").controller("mainCtrol", [
 
 			User.get().then(function (user) {
 				$scope.user = user;
-				console.log(user);
 			}).catch(function (err) {
 				console.error(err);
 			});

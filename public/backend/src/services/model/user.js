@@ -2,13 +2,18 @@ angular.module("Backend").service("User", [
 	"$http",
 	"$q",
 	function ($http, $q) {
-		var url = "/backend/user";
+		var BASE_URL = "/backend/user";
 
 		this.update = function (user) {
 		};
 
+		this.updatePassword = function (oP, nP, cP) {
+		};
+
 		this.get = function () {
 			return new $q(function (resolve, reject){
+				var url = BASE_URL;
+
 				$http.get(url).then(function(ret){
 					ret = ret.data;
 					
@@ -32,12 +37,28 @@ angular.module("Backend").service("User", [
 							user[key] = defaultData[key];
 						}
 					}
-					console.log(user);
 					resolve(user);
-				}).catch(function(err){
-					reject(err);
-				});	
+				}).catch(reject);	
 			});	
+		};
+
+		this.logout = function () {
+			return new $q(function(resolve, reject){
+				var url = BASE_URL + "/logout";
+
+				$http.post(url).then(function(ret){
+					ret = ret.data;
+
+					if (!ret.success) {
+						var errMsg = ret.error.message;
+						reject(new Error(errMsg)); 
+						return;
+					}
+
+					resolve();
+
+				}).catch(reject);
+			});
 		};
 	}
 ]);

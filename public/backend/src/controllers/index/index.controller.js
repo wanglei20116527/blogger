@@ -1,5 +1,10 @@
 angular.module("Backend").controller("indexCtrl", [
-	function () {
+	"$rootScope",
+	function ($rootScope) {
+		$rootScope.$emit("pageChanged", {
+			page: "index",
+		});
+		
 		this.info = "index controller";
 	}
 ]);

@@ -1,0 +1,253 @@
+.image-cropper-dialog {
+	position: absolute;
+	z-index: 100;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	background-color: rgba(0, 0, 0, .4);
+	-webkit-user-select: none;
+			user-select: none;
+
+	& > .wrapper {
+		display: inline-block;
+		width: 75rem;
+		margin-top: 10rem;
+	    border-radius: 2px;
+	    background-color: $white;
+	    box-shadow: 0 0 4px 0 rgba(0,0,0,.4);
+
+		.dialog-header {
+			padding: 1.4rem 2.4rem;
+    		border-bottom: 1px solid rgba(0,0,0, 0.1);
+			
+			& > .title {
+				font-weight: 400;
+    			font-size: 1.6rem;
+			}
+		}
+
+		.dialog-body {
+			position: relative;
+    		padding: 2rem 4rem;
+    		border-bottom: 1px solid rgba(0,0,0,.1);
+
+    		.image-cropper-wrapper {
+    			position: relative;
+			    z-index: 10;
+			    padding-right: 5.5rem;
+			    border-right: 1px solid rgba(0,0,0,.1);
+
+				.image-cropper {
+					cursor: move;
+
+					.ic-dragbar {
+						position: absolute;
+						z-index: 4;
+						background: url("/backend/static/image/ic-dragbar.gif");
+
+						&.top {
+							top: 0;
+							width: 100%;
+							height: 1px;
+							cursor: s-resize;
+						}
+
+						&.right {
+							right: 0;
+							width: 1px;
+							height: 100%;
+							cursor: n-resize;
+						}
+
+						&.bottom {
+							bottom: 0;
+							width: 100%;
+							height: 1px;
+							cursor: n-resize;
+						}
+
+						&.left {
+							left: 0;
+							width: 1px;
+							height: 100%;
+							cursor: e-resize;
+						}
+					}
+
+					.ic-handle {
+						position: absolute;
+						z-index: 2;
+						display: inline-block;
+						box-sizing: border-box;
+						width: 8px;
+						height:8px;
+						margin: auto;
+						background: #333;
+						border: 1px solid #eee;
+
+						&.top {
+							left: 0;
+							right: 0;
+							top: -4px;
+							cursor: s-resize;
+						}
+
+						&.top-right {
+							right: -4px;
+							top: -4px;
+							cursor: sw-resize;
+						}
+
+						&.right {
+							right: -4px;
+							top: 0;
+							bottom: 0;
+							cursor: w-resize;
+						}
+
+						&.right-bottom {
+							right: -4px;
+							bottom: -4px;
+							cursor: nw-resize;
+						}
+
+						&.bottom {
+							left: 0;
+							right: 0;
+							bottom: -4px;
+							cursor: n-resize;
+						}
+
+						&.bottom-left {
+							left: -4px;
+							bottom: -4px;
+							cursor: ne-resize;
+						}
+
+						&.left {
+							left: -4px;
+							top: 0;
+							bottom: 0;
+							cursor: e-resize;
+						}
+
+						&.left-top {
+							left: -4px;
+							top: -4px;
+							cursor: se-resize;
+						}
+					}
+				}
+			}
+
+			.image-preview {
+				margin-left: 5rem;
+
+				& > .title {
+					margin-bottom: 4rem;
+					font-weight: 400;
+				    font-size: 1.2rem;
+				    text-align: left;
+				    color: $grey;
+				}
+
+				.image-preview-body {
+					.preview-image {
+						margin-left: 3rem;
+
+						&:first-child {
+							margin-left: 0;
+						}
+
+						.preview-image-desc {
+							margin-top: 2rem;
+    						color: $grey;
+						}
+
+						.image-wrapper {
+							position: relative;
+							height: 10rem;
+
+							.inner-wrapper {
+							    position: absolute;
+							    margin: auto;
+							    left: 0;
+							    right: 0;
+							    top: 0;
+							    bottom: 0;
+							    overflow: hidden;
+							    border-radius: 50%;
+
+							    canvas {
+							    	width: 100%;
+							    	height: 100%;
+							    }
+							}
+						}
+
+						&.large {
+							.image-wrapper {
+								$width: 10rem;
+								width: $width;
+
+								.inner-wrapper {
+									width: $width;
+									height: $width;
+								}
+							}
+						}
+
+						&.medium {
+							.image-wrapper {
+								$width: 6.4rem;
+								width: $width;
+
+								.inner-wrapper {
+									width: $width;
+									height: $width;
+								}
+							}
+						}
+
+						&.small {
+							.image-wrapper {
+								$width: 3.2rem;
+								width: $width;
+
+								.inner-wrapper {
+									width: $width;
+									height: $width;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.dialog-footer {
+			& > .btn-group {
+				padding: 1.4rem 2.4rem;
+				
+				.btn {
+					padding: 0.8rem 1.5rem;
+					border-radius: 2px;
+				    font-size: 1.6rem;
+				    color: $white;
+				  
+				    &.btn-cancel {
+				    	margin-right: 1.5rem;
+				    	background-color: $grey;
+				    }
+
+				    &.btn-confirm {
+				    	background-color: $blue;
+				    }
+				}
+			}
+			
+		}
+	}
+}

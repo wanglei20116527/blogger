@@ -1,0 +1,101 @@
+<div class="dialog image-cropper-dialog">
+	<div class="wrapper">
+
+		<div class="dialog-header clearfix">
+			<h4 class="title fl">Upload Photo</h4>	
+			<button class="btn btn-close icon iconfont fr"
+					ng-click="close()">
+					&#xe61c;
+			</button>
+		</div>
+				
+		<div class="dialog-body clearfix">
+			<div class="image-cropper-wrapper fl">
+				<div class="image-cropper">
+					<div class="ic-wrapper">
+						<canvas class="ic-source"></canvas>
+						<canvas class="ic-mask"></canvas>
+							
+						<div class="ic-clipper">
+							<div class="ic-dragbar top"></div>
+							<div class="ic-dragbar right"></div>
+							<div class="ic-dragbar bottom"></div>
+							<div class="ic-dragbar left"></div>
+							<div class="ic-handle left-top"></div>
+							<div class="ic-handle top"></div>
+							<div class="ic-handle top-right"></div>
+							<div class="ic-handle right"></div>
+							<div class="ic-handle right-bottom"></div>
+							<div class="ic-handle bottom"></div>
+							<div class="ic-handle bottom-left"></div>
+							<div class="ic-handle left"></div>
+						</div>
+					</div>
+				</div>	
+			</div>
+					
+			<div class="image-preview fl">
+				<h4 class="title">最佳尺寸100×100，可以上传高质量图片进行裁切</h4>
+
+				<div class="image-preview-body clearfix">
+					<div class="preview-image large fl">
+						<div class="image-wrapper">
+							<div class="inner-wrapper">
+								<canvas 
+									class="preview-canvas-l"
+									width="100" 
+									height="100">
+								</canvas>
+							</div>
+						</div>
+
+						<p class="preview-image-desc">100*100</p>
+					</div>
+
+					<div class="preview-image medium fl">
+						<div class="image-wrapper">
+							<div class="inner-wrapper">
+								<canvas 
+									class="preview-canvas-m"
+									width="64" 
+									height="64">
+								</canvas>
+							</div>
+						</div>
+
+						<p class="preview-image-desc">64*64</p>
+					</div>
+
+					<div class="preview-image small fl">
+						<div class="image-wrapper">
+							<div class="inner-wrapper">
+								<canvas 
+									class="preview-canvas-s"
+									width="32" 
+									height="32">
+								</canvas>
+							</div>
+						</div>
+
+						<p class="preview-image-desc">32*32</p>
+					</div>	
+				</div>
+			</div>
+		</div>
+
+		<div class="dialog-footer clearfix">
+			<div class="btn-group fr">
+				<button class="btn btn-cancel" 
+						ng-click="close()">
+					cancel
+				</button>
+
+				<button class="btn btn-confirm"
+						ng-click="confirm()">
+						upload
+				</button>
+			</div>
+		</div>		
+	</div>						
+</div>
+

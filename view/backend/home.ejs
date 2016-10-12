@@ -38,7 +38,7 @@
 				<div class="btn-group fl">
 					<button class="btn logout-btn" 
 							ng-click="logout()">
-						<i class="iconfont">&#xe669;</i>
+						<i class="icon iconfont">&#xe669;</i>
 					</button>
 				</div>
 			</div>
@@ -48,29 +48,33 @@
 			<nav>
 				<ul>
 					<li>
-						<a href="#!/index">
+						<a ng-class="{active: activePage =='index'}"
+						   href="#!/index">
 							<i class="icon iconfont">&#xe71b;</i>
 							<span class="text">Home</span>
 						</a>
 					</li>
 
 					<li>
-						<a href="#!/article">
+						<a ng-class="{active: activePage =='article'}"
+						   href="#!/article">
 							<i class="icon iconfont">&#xe601;</i>
 							<span class="text">article</span>
 						</a>
 					</li>
 					
 					<li>
-						<a href="#!/picture">
-							<i class="icon iconfont">&#xe6b9;</i>
+						<a ng-class="{active: activePage =='picture'}"
+						   href="#!/picture">
+							<i class="icon iconfont">&#xe6ad;</i>
 							<span class="text">Picture</span>
 						</a>
 					</li>
 
 					<li>
-						<a href="#!/profile">
-							<i class="icon iconfont">&#xe651;</i>
+						<a ng-class="{active: activePage =='profile'}"
+						   href="#!/profile">
+							<i class="icon iconfont">&#xe73a;</i>
 							<span class="text">Profile</span>
 						</a>
 					</li>
@@ -78,11 +82,10 @@
 			</nav>
 		</aside>
 
-		<div class="body">
-			<div ng-view></div>
-		</div>
+		<div class="body" ng-view></div>
 		
 		<script type="text/javascript" src="/backend/static/angular.min.js"></script>
+		<script type="text/javascript" src="/backend/static/angular-animate.min.js"></script>
 		<script type="text/javascript" src="/backend/static/angular-route.min.js"></script>
 		<script type="text/javascript" src="/backend/static/src/app.js"></script>
 		<script type="text/javascript" src="/backend/static/src/services/model/user.js"></script>
@@ -92,6 +95,6 @@
 		<script type="text/javascript" src="/backend/static/src/controllers/index/index.controller.js"></script>
 		<script type="text/javascript" src="/backend/static/src/controllers/picture/picture.controller.js"></script>
 		<script type="text/javascript" src="/backend/static/src/controllers/profile/profile.controller.js"></script>
-		<script type="text/javascript" src="/backend/static/src/directives/imageCropper/imageCropper.js"></script>
+		<script type="text/javascript" src="/backend/static/src/directives/dialog/uploadPhotoDialog/uploadPhotoDialog.js"></script>
 	</body>
 </html>

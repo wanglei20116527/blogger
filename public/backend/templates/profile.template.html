@@ -1,4 +1,96 @@
-<div>
-	<h1>profile template</h1>
-	<image-cropper image="image"></image-cropper>
+<div class="profile-page page">
+	<div ng-if="loading" class="loading">
+		<h1>loading</h1>
+	</div>
+
+	<div class="dialog-area">
+		<div ng-if="message.error.show" 
+		     class="message-dialog error">
+		    <div class="icon-wrapper">
+		    	<i class="icon iconfont">&#xe699;</i>
+		    </div>
+		    <p class="message" ng-bind="message.error.msg"></p>
+		</div>
+
+		<div ng-if="message.success.show" 
+		     class="message-dialog success">
+		    <div class="icon-wrapper">
+		    	<i class="icon iconfont">&#xe615;</i>
+		    </div>
+		    <p class="message" ng-bind="message.success.msg"></p>
+		</div>
+	</div>
+
+	<div class="model-dialog-area">
+		<upload-photo-dialog 
+			ng-if     ="imageCropper.show"
+			image     ="{{imageCropper.image}}"
+			on-close  ="imageCropper.cancel()"
+			on-cancel ="imageCropper.cancel()"
+			on-confirm="imageCropper.confirm(image)"
+			>
+		</upload-photo-dialog>
+	</div>
+
+	<div ng-if="!loading"
+	     class="profile-page-body">
+	     <div class="wrapper">
+	     	<ul class="profile-tab clearfix">
+		     	<li class="fl tab-item"><a>Personal Info</a></li>
+		     	<li class="fl tab-item active"><a>Setting Photo</a></li>
+		    	<li class="fl tab-item"><a>Change Password</a></li>
+		    </ul>
+
+		    <div class="setting-photo" 
+	     	  	 ng-show="true">
+
+		     	<div class="setting-photo-area">
+		     	 	<div class="photo">
+		     	  		<div class="wrapper">
+		     	  			<i class="icon iconfont">&#xe6ad;</i>
+		     	  			<span class="title">点击选择上传头像</span>
+		     	  			<input type="file" 
+		     	  				   title=" " 
+		     	  				   onchange="angular.element(this).scope().onImageSelect.call(this, event)"
+		     	  			/>
+		     	  		</div>
+		     	  	</div>
+		     	  	<p class="photo-desc">仅支持JPG,PNG格式，文件小于10M</p>
+		     	</div>
+
+		     	<div class="target-photo-area">
+		     	  	<h3 class="title">最佳尺寸100×100，可以上传高质量图片进行裁切</h3>
+
+		     	  	<ul class="clearfix">
+		     	  		<li class="fl">
+		     	  			<div class="target-photo large">
+		     	  				<div class="wrapper">
+		     	  					<img ng-src="{{user.photo}}"/>
+		     	  				</div>
+		     	  			</div>
+		     	  		</li>
+
+		     	  		<li class="fl">
+		     	  			<div class="target-photo medium">
+		     	  				<div class="wrapper">
+		     	  					<img ng-src="{{user.photo}}"/>
+		     	  				</div>
+		     	  			</div>
+		     	  		</li>
+
+		     	  		<li class="fl">
+		     	  			<div class="target-photo small">
+		     	  				<div class="wrapper">
+		     	  					<img ng-src="{{user.photo}}"/>
+		     	  				</div>
+		     	  			</div>
+		     	  		</li>
+		     	  	</ul>
+		     	</div>
+
+	     	</div>
+
+	     </div>
+	</div>
+	
 </div>

@@ -12,20 +12,32 @@
   -webkit-text-stroke-width: 0.2px;
   -moz-osx-font-smoothing: grayscale; }
 
-.icon-home:before {
-  content: "\e71b"; }
-
 .icon-logout:before {
   content: "\e669"; }
+
+.icon-profile:before {
+  content: "\e73a"; }
 
 .icon-article:before {
   content: "\e601"; }
 
-.icon-picture:before {
-  content: "\e6b9"; }
+.icon-error:before {
+  content: "\e699"; }
 
-.icon-profile:before {
-  content: "\e651"; }
+.icon-biaoqing:before {
+  content: "\e615"; }
+
+.icon-home:before {
+  content: "\e71b"; }
+
+.icon-picture:before {
+  content: "\e6ad"; }
+
+.icon-cry:before {
+  content: "\e652"; }
+
+.icon-24:before {
+  content: "\e61c"; }
 
 /*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */
 /**
@@ -441,6 +453,7 @@ html,
 body {
   width: 100%;
   height: 100%;
+  min-width: 1000px;
   overflow: hidden; }
 
 html {
@@ -448,6 +461,13 @@ html {
 
 body {
   font: 12px/1.5 helvetica, arial, sans-serif; }
+
+ul {
+  list-style: none; }
+
+a,
+a:focus {
+  outline: none; }
 
 .fl {
   float: left; }
@@ -471,83 +491,276 @@ body {
   border: none;
   outline: none;
   background: transparent; }
-  .btn.active {
+  .btn:active, .btn:focus {
     outline: none; }
 
-.image-cropper {
-  cursor: move;
+.image-cropper-dialog {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.4);
   -webkit-user-select: none;
   user-select: none; }
-  .image-cropper .ic-dragbar {
-    position: absolute;
-    z-index: 4;
-    background: url("/backend/static/image/ic-dragbar.gif"); }
-    .image-cropper .ic-dragbar.top {
-      top: 0;
-      width: 100%;
-      height: 1px;
-      cursor: s-resize; }
-    .image-cropper .ic-dragbar.right {
-      right: 0;
-      width: 1px;
-      height: 100%;
-      cursor: n-resize; }
-    .image-cropper .ic-dragbar.bottom {
-      bottom: 0;
-      width: 100%;
-      height: 1px;
-      cursor: n-resize; }
-    .image-cropper .ic-dragbar.left {
-      left: 0;
-      width: 1px;
-      height: 100%;
-      cursor: e-resize; }
-  .image-cropper .ic-handle {
-    position: absolute;
-    z-index: 2;
+  .image-cropper-dialog > .wrapper {
     display: inline-block;
-    box-sizing: border-box;
-    width: 8px;
-    height: 8px;
-    margin: auto;
-    background: #333;
-    border: 1px solid #eee; }
-    .image-cropper .ic-handle.top {
-      left: 0;
-      right: 0;
-      top: -4px;
-      cursor: s-resize; }
-    .image-cropper .ic-handle.top-right {
-      right: -4px;
-      top: -4px;
-      cursor: sw-resize; }
-    .image-cropper .ic-handle.right {
-      right: -4px;
+    width: 75rem;
+    margin-top: 10rem;
+    border-radius: 2px;
+    background-color: #fff;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4); }
+    .image-cropper-dialog > .wrapper .dialog-header {
+      padding: 1.4rem 2.4rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+      .image-cropper-dialog > .wrapper .dialog-header > .title {
+        font-weight: 400;
+        font-size: 1.6rem; }
+    .image-cropper-dialog > .wrapper .dialog-body {
+      position: relative;
+      padding: 2rem 4rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+      .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper {
+        position: relative;
+        z-index: 10;
+        padding-right: 5.5rem;
+        border-right: 1px solid rgba(0, 0, 0, 0.1); }
+        .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper {
+          cursor: move; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-dragbar {
+            position: absolute;
+            z-index: 4;
+            background: url("/backend/static/image/ic-dragbar.gif"); }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-dragbar.top {
+              top: 0;
+              width: 100%;
+              height: 1px;
+              cursor: s-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-dragbar.right {
+              right: 0;
+              width: 1px;
+              height: 100%;
+              cursor: n-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-dragbar.bottom {
+              bottom: 0;
+              width: 100%;
+              height: 1px;
+              cursor: n-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-dragbar.left {
+              left: 0;
+              width: 1px;
+              height: 100%;
+              cursor: e-resize; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle {
+            position: absolute;
+            z-index: 2;
+            display: inline-block;
+            box-sizing: border-box;
+            width: 8px;
+            height: 8px;
+            margin: auto;
+            background: #333;
+            border: 1px solid #eee; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.top {
+              left: 0;
+              right: 0;
+              top: -4px;
+              cursor: s-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.top-right {
+              right: -4px;
+              top: -4px;
+              cursor: sw-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.right {
+              right: -4px;
+              top: 0;
+              bottom: 0;
+              cursor: w-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.right-bottom {
+              right: -4px;
+              bottom: -4px;
+              cursor: nw-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.bottom {
+              left: 0;
+              right: 0;
+              bottom: -4px;
+              cursor: n-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.bottom-left {
+              left: -4px;
+              bottom: -4px;
+              cursor: ne-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.left {
+              left: -4px;
+              top: 0;
+              bottom: 0;
+              cursor: e-resize; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-cropper-wrapper .image-cropper .ic-handle.left-top {
+              left: -4px;
+              top: -4px;
+              cursor: se-resize; }
+      .image-cropper-dialog > .wrapper .dialog-body .image-preview {
+        margin-left: 5rem; }
+        .image-cropper-dialog > .wrapper .dialog-body .image-preview > .title {
+          margin-bottom: 4rem;
+          font-weight: 400;
+          font-size: 1.2rem;
+          text-align: left;
+          color: #666; }
+        .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image {
+          margin-left: 3rem; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image:first-child {
+            margin-left: 0; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image .preview-image-desc {
+            margin-top: 2rem;
+            color: #666; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image .image-wrapper {
+            position: relative;
+            height: 10rem; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image .image-wrapper .inner-wrapper {
+              position: absolute;
+              margin: auto;
+              left: 0;
+              right: 0;
+              top: 0;
+              bottom: 0;
+              overflow: hidden;
+              border-radius: 50%; }
+              .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image .image-wrapper .inner-wrapper canvas {
+                width: 100%;
+                height: 100%; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image.large .image-wrapper {
+            width: 10rem; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image.large .image-wrapper .inner-wrapper {
+              width: 10rem;
+              height: 10rem; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image.medium .image-wrapper {
+            width: 6.4rem; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image.medium .image-wrapper .inner-wrapper {
+              width: 6.4rem;
+              height: 6.4rem; }
+          .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image.small .image-wrapper {
+            width: 3.2rem; }
+            .image-cropper-dialog > .wrapper .dialog-body .image-preview .image-preview-body .preview-image.small .image-wrapper .inner-wrapper {
+              width: 3.2rem;
+              height: 3.2rem; }
+    .image-cropper-dialog > .wrapper .dialog-footer > .btn-group {
+      padding: 1.4rem 2.4rem; }
+      .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 2px;
+        font-size: 1.6rem;
+        color: #fff; }
+        .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-cancel {
+          margin-right: 1.5rem;
+          background-color: #666; }
+        .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-confirm {
+          background-color: #2196F3; }
+
+.profile-page-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 3rem 0 4rem 3rem; }
+  .profile-page-body .profile-tab {
+    border-bottom: 1px solid #2196F3;
+    background-color: #2196F3;
+    box-shadow: 0 0 0.4rem 0 rgba(0, 0, 0, 0.4); }
+    .profile-page-body .profile-tab .tab-item {
+      margin-left: 2rem;
+      padding: 1rem 0 0.8rem;
+      cursor: pointer; }
+      .profile-page-body .profile-tab .tab-item:first-child {
+        margin-left: 0;
+        padding-left: 1.8rem; }
+      .profile-page-body .profile-tab .tab-item.active, .profile-page-body .profile-tab .tab-item:hover {
+        border-bottom: 2px solid #fff; }
+      .profile-page-body .profile-tab .tab-item a {
+        font-size: 1.6rem;
+        color: #fff; }
+  .profile-page-body .setting-photo {
+    position: relative;
+    margin-top: 3rem;
+    padding: 5rem 0 5rem 4rem;
+    box-shadow: 0 0 0.4rem 0 rgba(0, 0, 0, 0.4);
+    overflow: hidden; }
+    .profile-page-body .setting-photo .setting-photo-area {
+      position: relative;
+      display: inline-block;
+      z-index: 10; }
+      .profile-page-body .setting-photo .setting-photo-area .photo {
+        padding-right: 5rem;
+        border-right: 1px solid #f4f4f4; }
+        .profile-page-body .setting-photo .setting-photo-area .photo > .wrapper {
+          position: relative;
+          width: 22rem;
+          height: 22rem;
+          line-height: 22rem;
+          cursor: pointer;
+          text-align: center;
+          background: #f4f4f4; }
+          .profile-page-body .setting-photo .setting-photo-area .photo > .wrapper .icon {
+            margin-right: 1rem;
+            font-size: 3rem;
+            color: #666; }
+          .profile-page-body .setting-photo .setting-photo-area .photo > .wrapper .title {
+            font-size: 1.4rem;
+            color: #666; }
+          .profile-page-body .setting-photo .setting-photo-area .photo > .wrapper input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            outline: none;
+            opacity: 0;
+            cursor: pointer; }
+      .profile-page-body .setting-photo .setting-photo-area .photo-desc {
+        margin-top: 1rem;
+        color: #666; }
+    .profile-page-body .setting-photo .target-photo-area {
+      position: absolute;
+      z-index: 5;
       top: 0;
-      bottom: 0;
-      cursor: w-resize; }
-    .image-cropper .ic-handle.right-bottom {
-      right: -4px;
-      bottom: -4px;
-      cursor: nw-resize; }
-    .image-cropper .ic-handle.bottom {
       left: 0;
-      right: 0;
-      bottom: -4px;
-      cursor: n-resize; }
-    .image-cropper .ic-handle.bottom-left {
-      left: -4px;
-      bottom: -4px;
-      cursor: ne-resize; }
-    .image-cropper .ic-handle.left {
-      left: -4px;
-      top: 0;
-      bottom: 0;
-      cursor: e-resize; }
-    .image-cropper .ic-handle.left-top {
-      left: -4px;
-      top: -4px;
-      cursor: se-resize; }
+      height: 100%;
+      width: 100%;
+      padding: 5rem 0 5rem 36rem; }
+      .profile-page-body .setting-photo .target-photo-area > .title {
+        font-weight: 400;
+        color: #666;
+        margin-bottom: 4rem; }
+      .profile-page-body .setting-photo .target-photo-area .target-photo {
+        position: relative;
+        margin-right: 4rem;
+        height: 10rem; }
+        .profile-page-body .setting-photo .target-photo-area .target-photo .wrapper {
+          position: absolute;
+          margin: auto;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          border-radius: 50%;
+          overflow: hidden; }
+          .profile-page-body .setting-photo .target-photo-area .target-photo .wrapper img {
+            width: 100%;
+            height: 100%; }
+        .profile-page-body .setting-photo .target-photo-area .target-photo.large {
+          width: 10rem; }
+          .profile-page-body .setting-photo .target-photo-area .target-photo.large .wrapper {
+            width: 10rem;
+            height: 10rem; }
+        .profile-page-body .setting-photo .target-photo-area .target-photo.medium {
+          width: 6.4rem; }
+          .profile-page-body .setting-photo .target-photo-area .target-photo.medium .wrapper {
+            width: 6.4rem;
+            height: 6.4rem; }
+        .profile-page-body .setting-photo .target-photo-area .target-photo.small {
+          width: 3.2rem; }
+          .profile-page-body .setting-photo .target-photo-area .target-photo.small .wrapper {
+            width: 3.2rem;
+            height: 3.2rem; }
 
 .header {
   position: fixed;
@@ -566,13 +779,13 @@ body {
 .header-nav > .title {
   font-weight: 500;
   font-size: 2.5rem;
-  color: #0aa89e; }
+  color: #2196F3; }
 .header-nav .menu-bar-toggle {
   position: relative;
   display: block;
   width: 1.8rem;
   height: 100%;
-  margin-left: 1.5rem;
+  margin-left: 2rem;
   cursor: pointer; }
   .header-nav .menu-bar-toggle span {
     position: absolute;
@@ -597,24 +810,31 @@ body {
   .header-profile .intro .photo-wrapper {
     width: 6.4rem;
     height: 6.4rem;
-    padding: 1.2rem;
+    padding: 1rem;
     overflow: hidden; }
     .header-profile .intro .photo-wrapper .photo {
       height: 100%;
       -webkit-border-radius: 50%;
       border-radius: 50%; }
   .header-profile .intro .name {
-    width: 6rem;
-    text-align: center;
-    font-size: 1.6rem;
-    color: #666;
     white-space: nowrap;
     overflow: hidden;
     -webkit-text-overflow: ellipsis;
     -moz-text-overflow: ellipsis;
     -ms-text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
-    text-overflow: ellipsis; }
+    text-overflow: ellipsis;
+    width: 8rem;
+    text-align: center;
+    font-size: 1.8rem;
+    color: #666; }
+    .header-profile .intro .name:hover {
+      color: #000; }
+.header-profile .logout-btn .icon {
+  font-size: 1.8rem;
+  color: #666; }
+  .header-profile .logout-btn .icon:hover {
+    color: #000; }
 
 .menu-bar,
 .body {
@@ -623,7 +843,7 @@ body {
 
 .menu-bar {
   position: absolute;
-  width: 22rem;
+  width: 22.5rem;
   z-index: 5;
   overflow: hidden;
   background: #fff;
@@ -634,29 +854,44 @@ body {
   -o-transition: width 0.3s ease-in-out;
   transition: width 0.3s ease-in-out; }
   .menu-bar.collapse {
-    width: 6rem; }
+    width: 8rem; }
     .menu-bar.collapse + .body {
-      padding-left: 6rem; }
+      padding-left: 8rem; }
+    .menu-bar.collapse .text {
+      display: none; }
   .menu-bar nav {
     width: 100%;
-    padding-top: 10px; }
+    padding-top: 2rem; }
     .menu-bar nav li {
+      width: 22.5rem;
       list-style: none; }
       .menu-bar nav li a {
+        position: relative;
         display: block;
-        padding: 10px 3rem;
+        padding: 0 3rem;
+        margin: 2rem 0;
         font-size: 1.6rem;
-        text-decoration: none;
-        color: #666; }
-        .menu-bar nav li a.active:before {
+        color: #666;
+        text-decoration: none; }
+        .menu-bar nav li a:hover {
+          color: #000; }
+        .menu-bar nav li a.active {
+          color: #2196F3; }
+        .menu-bar nav li a:hover:after, .menu-bar nav li a.active:after {
           content: "";
-          width: 10px;
-          height: 100%;
-          background: #0aa89e; }
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 3px;
+          height: 100%; }
+        .menu-bar nav li a:hover:after {
+          background: #000; }
+        .menu-bar nav li a.active:after {
+          background: #2196F3; }
         .menu-bar nav li a .icon {
-          font-size: 18px;
-          color: #0aa89e;
-          margin-right: 4px; }
+          font-size: 2rem;
+          color: #2196F3;
+          margin-right: 1rem; }
 
 .body {
   position: relative;
@@ -667,5 +902,62 @@ body {
   -ms-transition: padding 0.3s ease-in-out;
   -o-transition: padding 0.3s ease-in-out;
   transition: padding 0.3s ease-in-out; }
+  .body .page {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-right: 3rem; }
+    .body .page .dialog-area,
+    .body .page .model-dialog-area {
+      z-index: 100;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      padding-right: 3rem; }
+    .body .page .dialog-area {
+      position: relative; }
+      .body .page .dialog-area .message-dialog {
+        position: absolute;
+        top: 1rem;
+        right: 0;
+        display: block;
+        width: 30rem;
+        min-height: 6rem;
+        padding: 1rem 2rem;
+        border-radius: 0.4rem; }
+        .body .page .dialog-area .message-dialog.ng-enter {
+          top: 0;
+          -webkit-transition: top 0.2s ease-in-out;
+          -moz-transition: top 0.2s ease-in-out;
+          -ms-transition: top 0.2s ease-in-out;
+          -o-transition: top 0.2s ease-in-out;
+          transition: top 0.2s ease-in-out; }
+        .body .page .dialog-area .message-dialog.ng-enter.ng-enter-active {
+          top: 1rem; }
+        .body .page .dialog-area .message-dialog.ng-leave {
+          -webkit-transition: right 0.3s ease-in-out;
+          -moz-transition: right 0.3s ease-in-out;
+          -ms-transition: right 0.3s ease-in-out;
+          -o-transition: right 0.3s ease-in-out;
+          transition: right 0.3s ease-in-out; }
+        .body .page .dialog-area .message-dialog.ng-leave.ng-leave-active {
+          right: -40rem; }
+        .body .page .dialog-area .message-dialog.error {
+          color: #A95252;
+          background: #F1D7D7;
+          box-shadow: 0 0 0.4rem 0 #F1D7D7; }
+        .body .page .dialog-area .message-dialog.success {
+          color: #52A954;
+          background: #DEFCD5;
+          box-shadow: 0 0 0.4rem 0 #DEFCD5; }
+        .body .page .dialog-area .message-dialog .icon-wrapper {
+          position: absolute; }
+          .body .page .dialog-area .message-dialog .icon-wrapper .icon {
+            font-size: 2.4rem; }
+        .body .page .dialog-area .message-dialog .message {
+          padding-top: 0.8rem;
+          padding-left: 3.5rem;
+          font-size: 1.6rem; }
 
 /*# sourceMappingURL=main.css.map */

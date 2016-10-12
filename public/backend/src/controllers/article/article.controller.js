@@ -1,5 +1,8 @@
 angular.module("Backend").controller("articleCtrl", [
-	function () {
-		this.info = "article controller";
+	"$rootScope",
+	function ($rootScope) {
+		$rootScope.$emit("pageChanged", {
+			page: "article",
+		});
 	}
 ]);

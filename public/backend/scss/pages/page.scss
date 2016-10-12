@@ -29,7 +29,7 @@
 		display: block;
 		width: 1.8rem;
 		height: 100%;
-		margin-left: 1.5rem;
+		margin-left: 2rem;
 		cursor: pointer;
 
 		span {
@@ -64,7 +64,7 @@
 		.photo-wrapper {
 			width: 6.4rem;
 			height: 6.4rem;
-			padding: 1.2rem;
+			padding: 1rem;
 			overflow: hidden;
 
 			.photo {
@@ -75,17 +75,28 @@
 		}
 
 		.name {
-			width: 6rem;
+			@include textOverflowEllipsis;
+
+			width: 8rem;
 			text-align: center;
-			font-size: 1.6rem;
+			font-size: 1.8rem;
 			color: $grey;
 
-			@include textOverflowEllipsis;
+			&:hover {
+				color: $black;
+			}
 		}
 	}
 
-	.more {
+	.logout-btn {
+		.icon {
+			font-size: 1.8rem;
+			color: $grey;
 
+			&:hover {
+				color: $black;
+			}
+		}
 	}
 }
 
@@ -97,7 +108,7 @@
 
 .menu-bar {
 	position: absolute;
-	width: 22rem;
+	width: 22.5rem;
 	z-index: 5;
 	overflow: hidden;
 	background: $white;
@@ -110,38 +121,65 @@
 	        transition: width 0.3s ease-in-out;
 
 	&.collapse {
-		width: 6rem;
+		width: 8rem;
 
 		& + .body {
-			padding-left: 6rem;
+			padding-left: 8rem;
+		}
+
+		.text {
+			display: none;
 		}
 	}
 
 	nav {
 		width: 100%;
-		padding-top: 10px;
+		padding-top: 2rem;
 
 		li {
+			width: 22.5rem;
 			list-style: none;
 
 			a {
+				position: relative;
 				display: block;
-			    padding: 10px 3rem;
+			    padding: 0 3rem;
+			    margin: 2rem 0;
 			    font-size: 1.6rem;
-			    text-decoration: none;
 			    color: $grey;
+			    text-decoration: none;
 
-			    &.active:before {
+			    &:hover  {
+			    	color: $black;
+			    }
+
+			    &.active {
+			    	color: $blue;
+			    }
+
+			    &:hover:after,
+			    &.active:after {
 			    	content: "";
-			    	width: 10px;
+			    	position: absolute;
+			    	top: 0;
+			    	left: 0;
+			    	width: 3px;
 			    	height: 100%;
+			    }
+
+
+			    &:hover:after {
+			    	background: $black;
+			    }
+
+			    &.active:after {
 			    	background: $blue;
 			    }
 
 			    .icon {
-			    	font-size: 18px;
+			    	font-size: 2rem;
 			    	color: $blue;
-			    	margin-right: 4px;
+			    	margin-right: 1rem;
 			    }
 			}
 		}
@@ -158,4 +196,88 @@
 	    -ms-transition: padding 0.3s ease-in-out;
 	     -o-transition: padding 0.3s ease-in-out;
 	        transition: padding 0.3s ease-in-out;
+
+	.page {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		padding-right: 3rem;
+
+		.dialog-area,
+		.model-dialog-area {
+			z-index: 100;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 0;
+			padding-right: 3rem;
+		}
+
+
+		.dialog-area {
+			position: relative;
+
+			.message-dialog {
+				position: absolute;
+				top: 1rem;
+				right: 0;
+				display: block;
+				width: 30rem;
+				min-height: 6rem;
+				padding: 1rem 2rem;
+				border-radius: 0.4rem;
+
+				&.ng-enter {
+					top: 0;
+					-webkit-transition: top 0.2s ease-in-out;
+					-moz-transition: top 0.2s ease-in-out;
+					-ms-transition: top 0.2s ease-in-out;
+					-o-transition: top 0.2s ease-in-out;
+					transition: top 0.2s ease-in-out;
+				}
+
+				&.ng-enter.ng-enter-active {
+					top: 1rem;
+				}
+
+				&.ng-leave {
+					-webkit-transition: right 0.3s ease-in-out;
+					-moz-transition: right 0.3s ease-in-out;
+					-ms-transition: right 0.3s ease-in-out;
+					-o-transition: right 0.3s ease-in-out;
+					transition: right 0.3s ease-in-out;
+				}
+
+				&.ng-leave.ng-leave-active {
+					right: -40rem;
+				}
+
+				&.error {
+					color: $cerise;
+					background: $pink;
+					box-shadow: 0 0 0.4rem 0 $pink;
+				}
+
+				&.success {
+					color: $green;
+					background: $lightGreen;
+					box-shadow: 0 0 0.4rem 0 $lightGreen;
+				}
+
+				.icon-wrapper {
+					position: absolute;
+
+					.icon {
+						font-size: 2.4rem;
+					}
+				}
+
+				.message {
+					padding-top: 0.8rem;
+					padding-left: 3.5rem;
+					font-size: 1.6rem;
+				}
+			}
+		}
+	}
 }

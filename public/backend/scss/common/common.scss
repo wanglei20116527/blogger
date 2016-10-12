@@ -26,7 +26,8 @@
 	outline: none;
 	background: transparent;
 
-	&.active {
+	&:active,
+	&:focus {
 		outline: none;
-	}
+	} 
 }

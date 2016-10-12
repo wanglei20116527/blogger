@@ -1,5 +1,8 @@
 angular.module("Backend").controller("pictureCtrl", [
-	function () {
-		this.info = "picture controller";
+	"$rootScope",
+	function ($rootScope) {
+		$rootScope.$emit("pageChanged", {
+			page: "picture",
+		});
 	}
 ]);
