@@ -1,6 +1,5 @@
 <div class="dialog image-cropper-dialog">
 	<div class="wrapper">
-
 		<div class="dialog-header clearfix">
 			<h4 class="title fl">Upload Photo</h4>	
 			<button class="btn btn-close icon iconfont fr"
@@ -91,8 +90,14 @@
 				</button>
 
 				<button class="btn btn-confirm"
-						ng-click="confirm()">
-						upload
+						ng-click="confirm()"
+						ng-show="!uploading">
+						confirm
+				</button>
+
+				<button class="btn btn-uploading" 
+						ng-show="uploading">
+						<i class="icon iconfont animation-rotate">&#xe626;</i>
 				</button>
 			</div>
 		</div>		

@@ -242,9 +242,20 @@
 				    	background-color: $grey;
 				    }
 
-				    &.btn-confirm {
+				    &.btn-confirm,
+				    &.btn-uploading {
 				    	background-color: $blue;
 				    }
+
+				    &.btn-uploading {
+				    	padding: 0.8rem 3rem;
+				    	
+				    	.icon {
+				    		display: inline-block;
+				    	}
+				    }
+
+
 				}
 			}
 			

@@ -124,7 +124,10 @@
 		width: 8rem;
 
 		& + .body {
-			padding-left: 8rem;
+			
+			.view {
+				padding-left: 8rem;	
+			}
 		}
 
 		.text {
@@ -186,97 +189,108 @@
 	}
 }
 
+.message-area {
+	position: fixed;
+	z-index: 20;
+	top: 0;
+	left: 0;
+	width: 100%;
+
+	.message-list {
+		position: relative;
+		height: 0;
+		margin-right: 3rem;
+
+		.message-dialog {
+			position: relative;
+			top: 7rem;
+			right: 0;
+			width: 30rem;
+			min-height: 6rem;
+			padding: 1rem 2rem;
+			margin-top: 1rem;
+			border-radius: 0.4rem;
+
+			&.ng-leave {
+				-webkit-transition: all 0.3s linear;
+				-moz-transition: all 0.3s linear;
+				-ms-transition: all 0.3s linear;
+				-o-transition: all 0.3s linear;
+				transition: all 0.3s linear;
+			}
+
+			&.ng-leave.ng-leave-active {
+				right: -40rem;
+			}
+
+			&.error {
+				color: $cerise;
+				background: $pink;
+				box-shadow: 0 0 0.4rem 0 $pink;
+			}
+
+			&.success {
+				color: $green;
+				background: $lightGreen;
+				box-shadow: 0 0 0.4rem 0 $lightGreen;
+			}
+
+			.icon-wrapper {
+				position: absolute;
+
+				.icon {
+					font-size: 2.4rem;
+				}
+			}
+
+			.message {
+				padding-top: 0.8rem;
+				padding-left: 3.5rem;
+				font-size: 1.6rem;
+			}
+		}
+	}
+}
+
 .body {
 	position: relative;
-	padding-left: 22.5rem;
 	z-index: 1;
+	width: 100%;
+	height: 100%;
 
-	-webkit-transition: padding 0.3s ease-in-out;
-	   -moz-transition: padding 0.3s ease-in-out;
-	    -ms-transition: padding 0.3s ease-in-out;
-	     -o-transition: padding 0.3s ease-in-out;
-	        transition: padding 0.3s ease-in-out;
-
-	.page {
+	.view {
 		position: relative;
 		width: 100%;
 		height: 100%;
-		padding-right: 3rem;
+		padding-left: 22.5rem;
 
-		.dialog-area,
-		.model-dialog-area {
-			z-index: 100;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 0;
-			padding-right: 3rem;
-		}
-
-
-		.dialog-area {
+		-webkit-transition: padding 0.3s ease-in-out;
+		   -moz-transition: padding 0.3s ease-in-out;
+		    -ms-transition: padding 0.3s ease-in-out;
+		     -o-transition: padding 0.3s ease-in-out;
+		        transition: padding 0.3s ease-in-out;
+		
+		.page {
 			position: relative;
+			width: 100%;
+			height: 100%;
+			padding-right: 3rem;
 
-			.message-dialog {
-				position: absolute;
-				top: 1rem;
-				right: 0;
-				display: block;
-				width: 30rem;
-				min-height: 6rem;
-				padding: 1rem 2rem;
-				border-radius: 0.4rem;
+			.dialog-area,
+			.model-dialog-area {
+				z-index: 100;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 0;
+				padding-right: 3rem;
+			}
 
-				&.ng-enter {
-					top: 0;
-					-webkit-transition: top 0.2s ease-in-out;
-					-moz-transition: top 0.2s ease-in-out;
-					-ms-transition: top 0.2s ease-in-out;
-					-o-transition: top 0.2s ease-in-out;
-					transition: top 0.2s ease-in-out;
-				}
 
-				&.ng-enter.ng-enter-active {
-					top: 1rem;
-				}
+			.dialog-area {
+				position: relative;
 
-				&.ng-leave {
-					-webkit-transition: right 0.3s ease-in-out;
-					-moz-transition: right 0.3s ease-in-out;
-					-ms-transition: right 0.3s ease-in-out;
-					-o-transition: right 0.3s ease-in-out;
-					transition: right 0.3s ease-in-out;
-				}
-
-				&.ng-leave.ng-leave-active {
-					right: -40rem;
-				}
-
-				&.error {
-					color: $cerise;
-					background: $pink;
-					box-shadow: 0 0 0.4rem 0 $pink;
-				}
-
-				&.success {
-					color: $green;
-					background: $lightGreen;
-					box-shadow: 0 0 0.4rem 0 $lightGreen;
-				}
-
-				.icon-wrapper {
-					position: absolute;
-
-					.icon {
-						font-size: 2.4rem;
-					}
-				}
-
-				.message {
-					padding-top: 0.8rem;
-					padding-left: 3.5rem;
-					font-size: 1.6rem;
-				}
+				
 			}
 		}
 	}

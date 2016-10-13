@@ -1,5 +1,6 @@
-const validation  = require("../../../utils/validation");
-const userService = require("../../../service/userService");
+const validation   = require("../../../utils/validation");
+const imageService = require("../../../service/imageService");
+const userService  = require("../../../service/userService");
 
 module.exports = {
 	getUser: function (req, res) {
@@ -40,5 +41,41 @@ module.exports = {
 			photo,
 			about
 		} = req.body;
+	},
+
+	updatePhoto: function (req, res) {
+		let {
+			user
+		} = req.session.user;
+
+		user = Object.assign({}, user);
+
+		let {
+			image
+		} = req.body;
+		
+		image = imageService.base64ToBuffer(image);
+
+		userService.updatePhoto(user, image).then(photo=>{
+			req.session.user.photo = photo;
+			
+			res.json({
+				success: true,
+				data: {
+					image: photo
+				}
+			});
+
+		}).catch(err=>{
+			res.json({
+				success: false,
+				error: {
+					code: 190000,
+					message: err.stack
+				}
+			});
+		});
+
+		
 	},
 };

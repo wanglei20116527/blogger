@@ -30,7 +30,9 @@ function initApp () {
 	
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({ extended: true }));
-	
+
+	app.use("/static/photo", express.static(path.join(__dirname, "public/photo")));
+
 	// app.use("/static/common/js"	  , express.static(path.join(__dirname, "public/common/js")));
 	// app.use("/static/common/css"  , express.static(path.join(__dirname, "public/common/css")));
 
@@ -38,8 +40,10 @@ function initApp () {
 	// app.use("/blog/static/js"     , express.static(path.join(__dirname, "public/blog/js")));
 	// app.use("/blog/static/css"    , express.static(path.join(__dirname, "public/blog/css")));
 
-	app.use("/backend/static" , express.static(path.join(__dirname, "public/backend")));
-	app.use("/backend/static" , express.static(path.join(__dirname, "public/lib")));
+
+	app.use("/backend/static", express.static(path.join(__dirname, "public/backend")));
+	app.use("/backend/static", express.static(path.join(__dirname, "public/lib")));
+
 	// app.use("/backend/static" , express.static(path.join(__dirname, "public/backend/css")));
 
 

@@ -15,6 +15,9 @@
 .icon-logout:before {
   content: "\e669"; }
 
+.icon-loading:before {
+  content: "\e626"; }
+
 .icon-profile:before {
   content: "\e73a"; }
 
@@ -494,6 +497,77 @@ a:focus {
   .btn:active, .btn:focus {
     outline: none; }
 
+.animation-rotate {
+  -webkit-animation: animateRotate 1s linear infinite;
+  -mozanimation: animateRotate 1s linear infinite;
+  -ms-animation: animateRotate 1s linear infinite;
+  -o-animation: animateRotate 1s linear infinite;
+  animation: animateRotate 1s linear infinite; }
+@-webkit-keyframes animateRotate {
+  from {
+    -webkit-transform: rotate(0);
+    -moztransform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0); }
+  to {
+    -webkit-transform: rotate(360deg);
+    -moztransform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+@-moz-keyframes animateRotate {
+  from {
+    -webkit-transform: rotate(0);
+    -moztransform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0); }
+  to {
+    -webkit-transform: rotate(360deg);
+    -moztransform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+@-ms-keyframes animateRotate {
+  from {
+    -webkit-transform: rotate(0);
+    -moztransform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0); }
+  to {
+    -webkit-transform: rotate(360deg);
+    -moztransform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+@-o-keyframes animateRotate {
+  from {
+    -webkit-transform: rotate(0);
+    -moztransform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0); }
+  to {
+    -webkit-transform: rotate(360deg);
+    -moztransform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+@keyframes animateRotate {
+  from {
+    -webkit-transform: rotate(0);
+    -moztransform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0); }
+  to {
+    -webkit-transform: rotate(360deg);
+    -moztransform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
 .image-cropper-dialog {
   position: absolute;
   z-index: 100;
@@ -654,8 +728,12 @@ a:focus {
         .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-cancel {
           margin-right: 1.5rem;
           background-color: #666; }
-        .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-confirm {
+        .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-confirm, .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-uploading {
           background-color: #2196F3; }
+        .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-uploading {
+          padding: 0.8rem 3rem; }
+          .image-cropper-dialog > .wrapper .dialog-footer > .btn-group .btn.btn-uploading .icon {
+            display: inline-block; }
 
 .profile-page-body {
   position: relative;
@@ -855,7 +933,7 @@ a:focus {
   transition: width 0.3s ease-in-out; }
   .menu-bar.collapse {
     width: 8rem; }
-    .menu-bar.collapse + .body {
+    .menu-bar.collapse + .body .view {
       padding-left: 8rem; }
     .menu-bar.collapse .text {
       display: none; }
@@ -893,71 +971,79 @@ a:focus {
           color: #2196F3;
           margin-right: 1rem; }
 
+.message-area {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  width: 100%; }
+  .message-area .message-list {
+    position: relative;
+    height: 0;
+    margin-right: 3rem; }
+    .message-area .message-list .message-dialog {
+      position: relative;
+      top: 7rem;
+      right: 0;
+      width: 30rem;
+      min-height: 6rem;
+      padding: 1rem 2rem;
+      margin-top: 1rem;
+      border-radius: 0.4rem; }
+      .message-area .message-list .message-dialog.ng-leave {
+        -webkit-transition: all 0.3s linear;
+        -moz-transition: all 0.3s linear;
+        -ms-transition: all 0.3s linear;
+        -o-transition: all 0.3s linear;
+        transition: all 0.3s linear; }
+      .message-area .message-list .message-dialog.ng-leave.ng-leave-active {
+        right: -40rem; }
+      .message-area .message-list .message-dialog.error {
+        color: #A95252;
+        background: #F1D7D7;
+        box-shadow: 0 0 0.4rem 0 #F1D7D7; }
+      .message-area .message-list .message-dialog.success {
+        color: #52A954;
+        background: #DEFCD5;
+        box-shadow: 0 0 0.4rem 0 #DEFCD5; }
+      .message-area .message-list .message-dialog .icon-wrapper {
+        position: absolute; }
+        .message-area .message-list .message-dialog .icon-wrapper .icon {
+          font-size: 2.4rem; }
+      .message-area .message-list .message-dialog .message {
+        padding-top: 0.8rem;
+        padding-left: 3.5rem;
+        font-size: 1.6rem; }
+
 .body {
   position: relative;
-  padding-left: 22.5rem;
   z-index: 1;
-  -webkit-transition: padding 0.3s ease-in-out;
-  -moz-transition: padding 0.3s ease-in-out;
-  -ms-transition: padding 0.3s ease-in-out;
-  -o-transition: padding 0.3s ease-in-out;
-  transition: padding 0.3s ease-in-out; }
-  .body .page {
+  width: 100%;
+  height: 100%; }
+  .body .view {
     position: relative;
     width: 100%;
     height: 100%;
-    padding-right: 3rem; }
-    .body .page .dialog-area,
-    .body .page .model-dialog-area {
-      z-index: 100;
-      top: 0;
-      left: 0;
+    padding-left: 22.5rem;
+    -webkit-transition: padding 0.3s ease-in-out;
+    -moz-transition: padding 0.3s ease-in-out;
+    -ms-transition: padding 0.3s ease-in-out;
+    -o-transition: padding 0.3s ease-in-out;
+    transition: padding 0.3s ease-in-out; }
+    .body .view .page {
+      position: relative;
       width: 100%;
-      height: 0;
+      height: 100%;
       padding-right: 3rem; }
-    .body .page .dialog-area {
-      position: relative; }
-      .body .page .dialog-area .message-dialog {
-        position: absolute;
-        top: 1rem;
-        right: 0;
-        display: block;
-        width: 30rem;
-        min-height: 6rem;
-        padding: 1rem 2rem;
-        border-radius: 0.4rem; }
-        .body .page .dialog-area .message-dialog.ng-enter {
-          top: 0;
-          -webkit-transition: top 0.2s ease-in-out;
-          -moz-transition: top 0.2s ease-in-out;
-          -ms-transition: top 0.2s ease-in-out;
-          -o-transition: top 0.2s ease-in-out;
-          transition: top 0.2s ease-in-out; }
-        .body .page .dialog-area .message-dialog.ng-enter.ng-enter-active {
-          top: 1rem; }
-        .body .page .dialog-area .message-dialog.ng-leave {
-          -webkit-transition: right 0.3s ease-in-out;
-          -moz-transition: right 0.3s ease-in-out;
-          -ms-transition: right 0.3s ease-in-out;
-          -o-transition: right 0.3s ease-in-out;
-          transition: right 0.3s ease-in-out; }
-        .body .page .dialog-area .message-dialog.ng-leave.ng-leave-active {
-          right: -40rem; }
-        .body .page .dialog-area .message-dialog.error {
-          color: #A95252;
-          background: #F1D7D7;
-          box-shadow: 0 0 0.4rem 0 #F1D7D7; }
-        .body .page .dialog-area .message-dialog.success {
-          color: #52A954;
-          background: #DEFCD5;
-          box-shadow: 0 0 0.4rem 0 #DEFCD5; }
-        .body .page .dialog-area .message-dialog .icon-wrapper {
-          position: absolute; }
-          .body .page .dialog-area .message-dialog .icon-wrapper .icon {
-            font-size: 2.4rem; }
-        .body .page .dialog-area .message-dialog .message {
-          padding-top: 0.8rem;
-          padding-left: 3.5rem;
-          font-size: 1.6rem; }
+      .body .view .page .dialog-area,
+      .body .view .page .model-dialog-area {
+        z-index: 100;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 0;
+        padding-right: 3rem; }
+      .body .view .page .dialog-area {
+        position: relative; }
 
 /*# sourceMappingURL=main.css.map */

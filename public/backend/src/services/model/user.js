@@ -1,14 +1,10 @@
 angular.module("Backend").service("User", [
 	"$http",
 	"$q",
-	function ($http, $q) {
+	"$timeout",
+
+	function ($http, $q, $timeout) {
 		var BASE_URL = "/backend/user";
-
-		this.update = function (user) {
-		};
-
-		this.updatePassword = function (oP, nP, cP) {
-		};
 
 		this.get = function () {
 			return new $q(function (resolve, reject){
@@ -37,9 +33,43 @@ angular.module("Backend").service("User", [
 							user[key] = defaultData[key];
 						}
 					}
+
+					!!user.photo && (user.photo += "?a=" + Date.now());
+
 					resolve(user);
+
 				}).catch(reject);	
 			});	
+		};
+
+		this.update = function (user) {
+		};
+
+		this.updatePhoto = function (imageBase64) {
+			return new $q(function (resolve, reject) {
+				var url = BASE_URL + "/photo";
+				$http.post(url, {
+					image: imageBase64
+				}).then(function (ret) {
+					ret = ret.data;
+
+					if (!ret.success) {
+						var errMsg = ret.error.message;
+						reject(new Error(errMsg)); 
+						return;
+					}
+
+					var image = ret.data.image;
+
+					image && (image += "?a=" + Date.now());
+
+					resolve(image);
+
+				}).catch(reject)
+			});
+		};
+
+		this.updatePassword = function (oP, nP, cP) {
 		};
 
 		this.logout = function () {

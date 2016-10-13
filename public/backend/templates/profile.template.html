@@ -4,30 +4,16 @@
 	</div>
 
 	<div class="dialog-area">
-		<div ng-if="message.error.show" 
-		     class="message-dialog error">
-		    <div class="icon-wrapper">
-		    	<i class="icon iconfont">&#xe699;</i>
-		    </div>
-		    <p class="message" ng-bind="message.error.msg"></p>
-		</div>
-
-		<div ng-if="message.success.show" 
-		     class="message-dialog success">
-		    <div class="icon-wrapper">
-		    	<i class="icon iconfont">&#xe615;</i>
-		    </div>
-		    <p class="message" ng-bind="message.success.msg"></p>
-		</div>
+		
 	</div>
 
 	<div class="model-dialog-area">
 		<upload-photo-dialog 
-			ng-if     ="imageCropper.show"
-			image     ="{{imageCropper.image}}"
-			on-close  ="imageCropper.cancel()"
-			on-cancel ="imageCropper.cancel()"
-			on-confirm="imageCropper.confirm(image)"
+			ng-if     ="uploadPhotoDialog.show"
+			image     ="{{uploadPhotoDialog.image}}"
+			on-close  ="uploadPhotoDialog.cancel()"
+			on-cancel ="uploadPhotoDialog.cancel()"
+			on-confirm="uploadPhotoDialog.confirm(image)"
 			>
 		</upload-photo-dialog>
 	</div>

@@ -1,0 +1,21 @@
+.animation-rotate {
+	$prefixList: "-webkit-", "-moz", "-ms-", "-o-", "";
+	
+	@include keyframes ("animateRotate") {
+		from {
+			@each $prefix in $prefixList {
+				#{$prefix}transform: rotate(0);
+			}
+		}
+
+		to {
+			@each $prefix in $prefixList {
+				#{$prefix}transform: rotate(360deg);
+			}
+		}
+	}
+
+	@each $prefix in $prefixList {
+		#{$prefix}animation: animateRotate 1s linear infinite;
+	}
+}

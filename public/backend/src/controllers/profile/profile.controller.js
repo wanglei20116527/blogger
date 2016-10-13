@@ -4,26 +4,16 @@ angular.module("Backend").controller("profileCtrl", [
 	"$q",
 	"$timeout",
 	"$window",
+	"Config",
 	"User",
-	function ($rootScope, $scope, $q, $timeout, $window, User) {
+	function ($rootScope, $scope, $q, $timeout, $window, Config, User) {
 		$rootScope.$emit("pageChanged", {
 			page: "profile",
 		});
 
 		$scope.loading = true;
-		$scope.message = {
-			error: {
-				show: false,
-				msg: "",
-			},
 
-			success: {
-				show: false,
-				msg: "",
-			},
-		};
-
-		$scope.imageCropper = {
+		$scope.uploadPhotoDialog = {
 			show : false,
 			image: null,
 			cancel: function () {
@@ -34,8 +24,10 @@ angular.module("Backend").controller("profileCtrl", [
 			confirm: function (image) {
 				this.show  = !this.show;
 				this.image = null;
-
+				
 				$scope.user.photo = image;
+
+				$rootScope.$emit("userUpdate");
 			},
 		};
 
@@ -49,12 +41,18 @@ angular.module("Backend").controller("profileCtrl", [
 				self.value = null;
 
 				if ($window.FileReader == null) {
-					showErrorMsg("browser not support FileReader");
+					dispatchMsg({
+						type: Config.MESSAGE.ERROR,
+						msg : "browser version is too low"
+					});
 					return;
 				}
 
 				if (!/^image\//.test(file.type)) {
-					showErrorMsg("file type invalid");	
+					dispatchMsg({
+						type: Config.MESSAGE.ERROR,
+						msg : "file type invalid"
+					});
 					return;
 				}
 
@@ -62,8 +60,8 @@ angular.module("Backend").controller("profileCtrl", [
 
 				fileReader.onload = function (args) {
 					$scope.$apply(function(){
-						$scope.imageCropper.show  = true;
-						$scope.imageCropper.image = args.target.result;
+						$scope.uploadPhotoDialog.show  = true;
+						$scope.uploadPhotoDialog.image = args.target.result;
 					});
 				};
 
@@ -101,29 +99,8 @@ angular.module("Backend").controller("profileCtrl", [
 			});
 		}
 
-		function showErrorMsg (msg) {
-			$timeout(function () {
-				$scope.message.error.show = true;
-				$scope.message.error.msg  = msg;
-
-				$timeout(function () {
-					$scope.message.error.show = false;
-					$scope.message.error.msg  = "";
-				}, 1500);
-			}, 600);
+		function dispatchMsg (msg) {
+			$rootScope.$emit("message", msg);
 		}
-
-		function showSuccessMsg (msg) {
-			$timeout(function () {
-				$scope.message.success.show = true;
-				$scope.message.success.msg  = msg;
-
-				$timeout(function () {
-					$scope.message.success.show = false;
-					$scope.message.success.msg  = "";
-				}, 1500);
-			}, 600);
-		}
-
 	}
 ]);

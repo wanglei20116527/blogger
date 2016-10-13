@@ -16,5 +16,7 @@ router.post("/login" ,  loginCtrl.checkCaptcha,
 router.post("/logout", 	checkLoginFilter, 
 						logoutCtrl.logout);
 
+router.post("/photo", 	checkLoginFilter, 
+						userCtrl.updatePhoto);
 
 module.exports = router;

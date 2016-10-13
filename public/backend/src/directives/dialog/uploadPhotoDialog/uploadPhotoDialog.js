@@ -1,8 +1,11 @@
 angular.module("Backend").directive("uploadPhotoDialog", [
+	"$rootScope",
 	"$timeout",
 	"$window", 
+	"Config",
+	"User",
 
-	function ($timeout, $window) {
+	function ($rootScope, $timeout, $window, Config, User) {
 		return {
 			restrict: 'E',
 			scope: {
@@ -15,6 +18,8 @@ angular.module("Backend").directive("uploadPhotoDialog", [
 			templateUrl: "/backend/static/src/directives/dialog/uploadPhotoDialog/uploadPhotoDialog.html",
 			
 			link: function (scope, element, attrs) {
+				var isInit = false;
+
 				var cropperConfig = angular.merge({}, scope.cropperConfig || {}, {
 					width     : 250,
 					height    : 250,
@@ -23,8 +28,8 @@ angular.module("Backend").directive("uploadPhotoDialog", [
 
 				var imageData = {
 					source: scope.image,
-					width : 0,
-					height: 0
+					width : 1,
+					height: 1
 				};
 
 				var imageCropper = element[0].querySelector(".image-cropper");
@@ -70,11 +75,14 @@ angular.module("Backend").directive("uploadPhotoDialog", [
 				var previewCanvasM = element[0].querySelector(".preview-canvas-m");
 				var previewCanvasS = element[0].querySelector(".preview-canvas-s");
 
+				scope.uploading = false;
+
 				scope.$watch("image", function (newUrl, oldUrl) {
 					if (newUrl === oldUrl || newUrl == null) {
 						return;
 					}
-					update();
+
+					isInit ? update() : init();
 				});
 
 				scope.close = function () {
@@ -103,6 +111,8 @@ angular.module("Backend").directive("uploadPhotoDialog", [
 						};
 
 						initCropper();
+
+						isInit = true;
 					};
 
 					image.src = scope.image;
@@ -113,6 +123,7 @@ angular.module("Backend").directive("uploadPhotoDialog", [
 					
 					image.onload = function () {
 						imageData = {
+							image : image, 
 							source: scope.image,
 							width : image.width,
 							height: image.height
@@ -133,15 +144,30 @@ angular.module("Backend").directive("uploadPhotoDialog", [
 				}
 
 				function confirm () {
-					if (!scope.onConfirm) {
-						return;
-					}
+					scope.uploading = true;
 
-					var imageUrl = previewCanvasL.toDataURL("image/png");
+					var croppedImage = previewCanvasL.toDataURL("image/png");
+					User.updatePhoto(croppedImage.split(",")[1]).then(function (image){
+						dispatchMsg({
+							type: Config.MESSAGE.SUCCESS,
+							msg: "upload photo success"
+						});
 
-					scope.onConfirm({
-						image: imageUrl
-					});
+						$timeout(function(){
+							scope.onConfirm && scope.onConfirm({
+								image: image
+							});
+							scope.uploading = false;
+						}, 200);
+						
+					}).catch(function (err) {
+						console.error(err);
+						dispatchMsg({
+							type: Config.MESSAGE.ERROR,
+							msg: "fail to upload photo"
+						});
+						scope.uploading = false;
+					});					
 				}
 
 				function initCropper () {
@@ -633,6 +659,10 @@ angular.module("Backend").directive("uploadPhotoDialog", [
 						windowEl.off("mousemove", resize);
 						windowEl.off("mouseup"  , stopResizable);
 					}
+				}
+
+				function dispatchMsg (msg) {
+					$rootScope.$emit("message", msg);
 				}
 			}
 		};
