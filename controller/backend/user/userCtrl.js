@@ -31,18 +31,6 @@ module.exports = {
 		}
 	},
 
-	updateUser: function (req, res) {
-		let {
-			username,
-			newPassword,
-			oldPassword,
-			email,
-			phone,
-			photo,
-			about
-		} = req.body;
-	},
-
 	updatePhoto: function (req, res) {
 		let {
 			user
@@ -75,7 +63,134 @@ module.exports = {
 				}
 			});
 		});
+	},
 
+	updatePassword: function (req, res) {
+		let user = {
+			user
+		} = req.session.user;
+
+		let tUser = Object.assign({}, user || {});
+
+		let {
+			oPassword,
+			nPassword,
+			cPassword 
+		} = req.body;
+
+		if (oPassword !== user.password) {
+			res.json({
+				success: false,
+				error: {
+					code: 120100,
+					message: "password not correct",
+				}
+			});
+			return;
+		}
+
+		if (nPassword !== cPassword) {
+			res.json({
+				success: false,
+				error: {
+					code: 120101,
+					message: "password not same",
+				}
+			});
+			return;
+		}
+
+		if (!validation.checkPassword(nPassword)) {
+			res.json({
+				success: false,
+				error: {
+					code: 120102,
+					message: "password not valid",
+				}
+			});
+			return;
+		}
+
+		tUser.password = nPassword;
+
+		userService.updateUser(tUser).then(()=>{
+			req.session.user.password = nPassword;
+
+			res.json({
+				success: true,
+				data: {
+					image: photo
+				}
+			});
+
+		}).catch(err=>{
+			res.json({
+				success: false,
+				error: {
+					code: 190000,
+					message: err.stack
+				}
+			});
+		});
+	},
+
+	updateUser: function (req, res) {
+		let {
+			email = "",
+			phone = "",
+			about = ""
+		} = req.body;
+
+		email = email.trim();
+		photo = photo.trim();
+		about = about.trim();
+
+		if (email !== "" && !validation.checkEmail(email)) {
+			res.json({
+				success: false,
+				error: {
+					code: 120103,
+					message: "email not vaild",
+				}
+			});
+			return;
+		}
+
+		if (phone !== "" && !validation.checkPhone(phone)) {
+			res.json({
+				success: false,
+				error: {
+					code: 120104,
+					message: "phone not vaild",
+				}
+			});
+			return;
+		}
+
+		let {
+			user
+		} = req.session.user;
+
+		let tUser = Object.assign({}, user || {});
 		
+		tUser.email = email;
+		tUser.phone = phone;
+		tUser.about = about;
+
+		userService.updateUser(tUser).then(()=>{
+			req.session.user = tUser;
+
+			res.json({
+				success: true
+			});
+		}).catch(err=>{
+			res.json({
+				success: false,
+				error: {
+					code: 190000,
+					message: err.stack
+				}
+			});
+		});
 	},
 };

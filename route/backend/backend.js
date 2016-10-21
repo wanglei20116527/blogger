@@ -1,7 +1,9 @@
-const express     = require("express");
-const renderCtrl  = require("../../controller/templateRenderCtrl").backend;
-const captchaCtrl = require("../../controller/common/captchaCtrl");
-const userRouter  = require("./user");
+const express        = require("express");
+const renderCtrl     = require("../../controller/templateRenderCtrl").backend;
+const captchaCtrl    = require("../../controller/common/captchaCtrl");
+const userRouter     = require("./user");
+const categoryRouter = require("./category");
+const articleRouter  = require("./article");
 
 let router = express.Router();
 
@@ -14,7 +16,8 @@ router.get("/home"  , renderCtrl.renderHomePage);
 router.get("/captcha", 	captchaCtrl.updateCaptcha);
 
 // user route
-router.use("/user", userRouter);
-
+router.use("/user"    , userRouter);
+router.use("/category", categoryRouter);
+router.use("/article" , articleRouter);
 
 module.exports = router; 

@@ -1,3 +1,4 @@
+const assert    = require("assert"); 
 const database  = require("./database");
 
 const TABLENAME = "category";
@@ -15,12 +16,18 @@ class Category {
 	}
 
 	static add (connection, category) {
-		return database.insert(
+		return new Promise((resolve, reject)=>{
+			database.insert(
 						connection, 
 						TABLENAME, 
 						FIELDS, 
 						[new Category(category)]
-						);
+					)
+					.then(categories=>{
+						resolve(categories[0]);
+					})
+					.catch(reject);
+		});
 	}
 
 	static update (connection, category) {
@@ -35,8 +42,10 @@ class Category {
 						TABLENAME, 
 						FIELDS, 
 						[new Category(category)]
-					);
-					.then(resolve)
+					)
+					.then(categories=>{
+						resolve(categories[0]);
+					})
 					.catch(reject);
 		});
 	}
@@ -48,12 +57,41 @@ class Category {
 				return;
 			}
 
-			database.update(
+			database.delete(
 						connection, 
-						TABLENAME, 
+						TABLENAME,
+						FIELDS, 
 						[new Category(category)]
 					)
 					.then(resolve)
+					.catch(reject);
+		});
+	}
+
+	static isCategoryExistByUserAndCategory (connection, user, category) {
+		assert(user.id , null, `user can not be ${user.id}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							count(*) as number
+						from 
+							${TABLENAME} 
+						where 
+							user=?
+							and id=?
+							and name=? 
+							and deleteTime is null`;
+			
+			let params = [user.id, category.id, category.name];
+
+			database.executeSql(
+						connection, 
+						sql, 
+						params
+					)
+					.then(ret=>{
+						resolve(ret[0].number > 0);
+					})
 					.catch(reject);
 		});
 	}
@@ -81,6 +119,29 @@ class Category {
 							ret.push(category);
 						}
 						resolve(ret);
+					})
+					.catch(reject);
+		});
+	}
+
+	static isCategoryExistByUserAndName (connection, user, name) {
+		return new Promise((resolve, reject)=>{
+			if (user.id == null) {
+				reject(new Error(`user id can not be ${user.id}`));
+				return;
+			}
+
+			let sql = `select * from ${TABLENAME} 
+								where user=? and name=? and deleteTime is null`;
+			let params = [user.id, name];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(categories=>{
+						resolve(categories.length > 0);
 					})
 					.catch(reject);
 		});

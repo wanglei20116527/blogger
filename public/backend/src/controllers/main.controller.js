@@ -44,6 +44,10 @@ angular.module("Backend").controller("mainCtrol", [
 			updateUser();
 		});
 
+		$rootScope.$on("pageChanged", function (event, args) {
+			$scope.activePage = args.page;
+		});
+
 		$scope.logout = function () {
 			User.logout().then(function(){
 				// todo redirct to login page 

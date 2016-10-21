@@ -16,4 +16,8 @@ module.exports = {
 	checkPhone: function (phone) {
 		return /^\d{11}$/.test(phone);
 	},
+
+	checkCategoryName: function (name) {
+		return name !== "";
+	}
 };

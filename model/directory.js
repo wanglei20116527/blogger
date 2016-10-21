@@ -53,6 +53,7 @@ class Directory {
 			database.delete(
 						connection, 
 						TABLENAME, 
+						FIELDS,
 						[new Directory(directory)]
 					)
 					.then(resolve)

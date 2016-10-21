@@ -1,5 +1,62 @@
-<div>
-	<h1>article template</h1>
+<div class="article-page page">
+	<div ng-include="'/backend/static/templates/loading.template.html'"
+		 ng-if="loading">
+	</div>
 
-	<h2 ng-bind="articleCtrl.info"></h2>
+	<div class="model-dialog-area">
+		<add-category-dialog
+			ng-if="dialog.addCategoryDialog.show"
+			on-close="dialog.addCategoryDialog.close()"
+			on-cancel="dialog.addCategoryDialog.cancel()"
+			on-confirm="dialog.addCategoryDialog.confirm(category)">
+		</add-category-dialog>
+
+		<update-category-dialog
+			ng-if="dialog.updateCategoryDialog.show"
+			category="{{dialog.updateCategoryDialog.category}}"
+			on-close="dialog.updateCategoryDialog.close()"
+			on-cancel="dialog.updateCategoryDialog.cancel()"
+			on-confirm="dialog.updateCategoryDialog.confirm(category)">
+		</update-category-dialog>
+
+		<confirm-dialog
+			ng-if="dialog.deleteCategoryDialog.show"
+			title="{{dialog.deleteCategoryDialog.title}}"
+			message="{{dialog.deleteCategoryDialog.message}}"
+			on-close="dialog.deleteCategoryDialog.close()"
+			on-cancel="dialog.deleteCategoryDialog.cancel()"
+			on-confirm="dialog.deleteCategoryDialog.confirm()">
+		</confirm-dialog>
+	</div>
+
+	<div ng-if="!loading">
+		<header>
+			<ul>
+				<li ng-class="{active: item.activeItem === item.items.article}"
+					ng-click="itemChange(item.items.article)">
+					<a ng-bind="item.items.article"></a>
+				</li>
+
+				<li ng-class="{active: item.activeItem === item.items.category}"
+					ng-click="itemChange(item.items.category)">
+					<a ng-bind="item.items.category"></a>
+				</li>
+			</ul>
+		</header>
+
+		<div ng-show="item.activeItem === item.items.article">
+			<h1>article</h1>
+		</div>
+
+		<div ng-show="item.activeItem === item.items.category">
+			<header>
+				<button class="btn add-category-btn">add</button>
+			</header>
+
+			<div>
+				{{category.categories}}
+			</div>
+		</div>
+	</div>
 </div>
+

@@ -150,6 +150,7 @@ let database = {
 
 	insert: function (connection, tableName, fields, values) {
 		values = values || [];
+		fields = Object.assign([], fields || []);
 
 		return new Promise((resolve, reject)=>{
 			try {
@@ -176,7 +177,12 @@ let database = {
 				}
 
 				Promise.all(promises).then(ret=>{
-					resolve(ret);
+					for (var i = 0, len = values.length; i < len; ++i) {
+						var valueObj = values[i];
+						valueObj.id = ret[i].insertId;
+					}
+
+					resolve(values);
 				}).catch(reject);
 			} catch (err) {
 				reject(err);
@@ -186,6 +192,7 @@ let database = {
 
 	update: function (connection, tableName, fields, values) {
 		values = values || [];
+		fields = Object.assign([], fields || []);
 		
 		return new Promise((resolve, reject)=>{
 			try {
@@ -218,8 +225,9 @@ let database = {
 		});
 	},
 
-	delete: function (connection, tableName, values) {
+	delete: function (connection, tableName, fields, values) {
 		values = values || [];
+		fields = Object.assign([], fields || []);
 
 		return new Promise((resolve, reject)=>{
 			try {
@@ -229,7 +237,6 @@ let database = {
 				}
 
 				let deleteTime = Date.now();
-				let fields     = ["deleteTime"];
 				let promises   = [];
 
 				fields.push("deleteTime");
@@ -276,6 +283,8 @@ function generateInsertData (tableName, fields, valueObj) {
 	}
 
 	sql += "( " + fieldStr + " )" + " values( " + valueStr + " )";
+
+	return [sql, params];
 }
 
 function generateUpdateData (tableName, id, fields, valueObj) {

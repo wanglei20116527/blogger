@@ -1,0 +1,19 @@
+.add-category-dialog {
+	& > .wrapper {
+		width: 50rem;
+	}
+
+	.dialog-body {
+		.input-wrapper {
+			.category-name-input {
+				display: block;
+				width: 100%;
+				outline: none;
+				padding: 0.6rem 1rem;
+				border-radius: 0.2rem;
+				border: 1px solid $lightGrey;
+				font-size: 1.6rem;
+			}
+		}
+	}
+}

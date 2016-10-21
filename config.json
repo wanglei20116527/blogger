@@ -20,5 +20,15 @@
 				"maxAge": 864000000
 			}
 		}
+	},
+
+	"log": {
+		"appenders": [
+			{
+				"type": "console"
+			}
+		],
+
+		"replaceConsole": true
 	}
 }

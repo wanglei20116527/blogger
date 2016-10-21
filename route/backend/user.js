@@ -9,6 +9,8 @@ let router  = express.Router();
 router.get("/", checkLoginFilter,
 				userCtrl.getUser);
 
+router.post("/password")
+
 router.post("/login" ,  loginCtrl.checkCaptcha, 
 						loginCtrl.checkNameAndPassword,
 						loginCtrl.loginSuccess);

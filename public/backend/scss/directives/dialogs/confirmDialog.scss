@@ -1,0 +1,11 @@
+.confirm-dialog {
+	& > .wrapper {
+		width: 50rem;
+	}
+
+	.dialog-body {
+		.message {
+			font-size: 1.6rem;
+		}
+	}
+}

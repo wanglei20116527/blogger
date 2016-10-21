@@ -38,7 +38,13 @@ let userService = {
 				resolve(photoUrl);
 			}).catch(reject);
 		});
-	}	
+	},
+
+	updateUser: function (user) {
+		return database.executeTemplate(conn=>{
+			return userModel.update(user);
+		});
+	},	
 };
 
 module.exports = userService;

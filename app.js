@@ -7,6 +7,8 @@ const session      = require("express-session");
 const router       = require("./route/router");
 const database     = require("./model/database");
 
+const articleModel = require("./model/article");
+
 database.init().then(initApp).catch(err=>{
 	console.error(err);
 });
