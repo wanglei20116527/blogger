@@ -1,3 +1,4 @@
+const assert    = require("assert");
 const database  = require("./database");
 
 const TABLENAME = "directory";
@@ -5,71 +6,192 @@ const FIELDS = [
 	"id",
 	"name", 
 	"parentDirectory",
-	"user"
+	"user",
+	"path"
 ];
 
 class Directory {
-	
 	constructor (directory) {
 		for (let field of FIELDS) {
 			this[field] = field in directory ? directory[field] : null;
 		}
 	}
 
+	static isExistByUserAndId (connection, user, id) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(id, null, `id can't be ${id}`);
+
+		return new Promise((resolve, reject)=>{
+			this.getDirByUserAndId(connection, user, id).then(dir=>{
+				resolve(dir != null);
+			}).catch(reject);
+		});
+	}
+
+	static isRootDirExistByUserAndName (connection, user, name) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(name, null, `directory name can't be ${name}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select
+							*
+						from
+							${TABLENAME}
+						where
+							user=?
+							and name=?
+							and parentDirectory is null
+							and deleteTime is null`;
+
+			let params = [user.id, name];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(dirs=>{
+						resolve(dirs.length > 0);
+					})
+					.catch(reject);
+		});
+	}
+
+	static isSubDirExistByUserAndName (connection, user, name, pDir) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(name, null, `directory name can't be ${name}`);
+		assert.notEqual(pDir.id, null, `parent directory id can't be ${pDir.id}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select
+							*
+						from
+							${TABLENAME}
+						where
+							user=?
+							and name=?
+							and parentDirectory=?
+							and deleteTime is null`;
+
+			let params = [user.id, name, pDir.id];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(dirs=>{
+						resolve(dirs.length > 0);
+					})
+					.catch(reject);
+		});
+	}
+
+	static getDirByUserAndId (connection, user, id) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(id, null, `id can't be ${id}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select
+							*
+						from
+							${TABLENAME}
+						where
+							id=?
+							and user=?
+							and deleteTime is null`;
+
+			let params = [id, user.id];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(dirs=>{
+						let dir = dirs.length > 0 ? dirs[0] : null;
+
+						if (dir != null) {
+							dir = new Directory(dir);
+						}
+
+						resolve(dir);
+					})
+					.catch(reject);
+		});
+	}
+
 	static add (connection, directory) {
-		return database.insert(
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(directory, null, `directory can't be ${directory}`);
+
+		return new Promise((resolve, reject)=>{
+			let fields = FIELDS.slice(1);
+
+			database.insert(
 						connection, 
 						TABLENAME, 
-						FIELDS, 
+						fields, 
 						[new Directory(directory)]
-					);
+					)
+					.then(ret=>{
+						resolve(new Directory(ret[0]));
+					}).catch(reject);
+		});
 	}
 
 	static update (connection, directory) {
-		return new Promise((resolve, reject)=>{
-			if (directory.id == null) {
-				reject(new Error(`directory id can not be ${directory.id}`));
-				return;
-			}
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
 
+		return new Promise((resolve, reject)=>{
 			database.update(
-						connection, 
-						TABLENAME, 
-						FIELDS, 
-						[new Directory(directory)]
-					)
-					.then(resolve)
-					.catch(reject);
+					connection, 
+					TABLENAME, 
+					FIELDS, 
+					[new Directory(directory)]
+				)
+				.then(ret=>{
+					resolve([new Directory(directory)]);
+				}).catch(reject);;
 		});
 	}
 
 	static delete (connection, directory) {
-		return new Promise((resolve, reject)=>{
-			if (directory.id == null) {
-				reject(new Error(`directory id can not be ${directory.id}`));
-				return;
-			}
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
 
-			database.delete(
-						connection, 
-						TABLENAME, 
-						FIELDS,
-						[new Directory(directory)]
-					)
-					.then(resolve)
-					.catch(reject);
-		});
+		let where = "id=?";
+		let whereValues = [
+			[directory.id]
+		];
+
+		database.delete(
+					connection, 
+					TABLENAME, 
+					where,
+					whereValues
+				);
 	}
 
-	static getUserRootDirectory (connection, user) {
-		return new Promise((resolve, reject)=>{
-			if (user.id == null) {
-				reject(new Error(`user id can not be ${user.id}`));
-				return;
-			}
+	static getUserRootDirs (connection, user) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
 
-			let sql = `select * from ${TABLENAME}
-								where user=? and parentDirectory is null and deleteTime is null`;
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							* 
+						from 
+							${TABLENAME}
+						where 
+							user=? 
+							and parentDirectory is null 
+							and deleteTime is null`;
+
 			let params = [user.id];
 
 			database.executeSql(
@@ -77,46 +199,47 @@ class Directory {
 							sql, 
 							params
 							)
-					.then(directories=>{
-						let ret = [];
-						for (let directory of directories) {
-							directory = new Directory(directory);
-							ret.push(directory);
+					.then(dirs=>{
+						let tDirs = [];
+						for (let dir of dirs) {
+							dir = new Directory(dir);
+							tDirs.push(dir);
 						}
-						resolve(ret);
+						resolve(tDirs);
 					})
 					.catch(reject);
 		});
 	}
 
-	static getUserSubDirectory (connection, user, directory) {
+	static getUserSubDirs (connection, user, directory) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
+
 		return new Promise((resolve, reject)=>{
-			if (user.id == null) {
-				reject(new Error(`user id can not be ${user.id}`));
-				return;
-			}
+			let sql = 	`select 
+							* 
+						from 
+							${TABLENAME}
+						where 
+							user=? 
+							and parentDirectory=? 
+							and deleteTime is null`;
 
-			if (directory.id == null) {
-				reject(new Error(`directory id can not be ${directory.id}`));
-				return;
-			}
-
-			let sql = `select * from ${TABLENAME}
-								where user=? and parentDirectory=? and deleteTime is null`;
 			let params = [user.id, directory.id];
 
 			database.executeSql(
 							connection, 
 							sql, 
 							params
-							)
+						)
 					.then(directories=>{
-						let ret = [];
-						for (let directory of directories) {
-							directory = new Directory(directory);
-							ret.push(directory);
+						let tDirs = [];
+						for (let dir of dirs) {
+							dir = new Directory(dir);
+							tDirs.push(dir);
 						}
-						resolve(ret);
+						resolve(tDirs);
 					})
 					.catch(reject);
 		});

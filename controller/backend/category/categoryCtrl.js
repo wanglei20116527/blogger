@@ -1,3 +1,4 @@
+const underscore      = require("underscore");
 const validation      = require("../../../utils/validation");
 const categoryService = require("../../../service/categoryService");
 
@@ -17,13 +18,8 @@ module.exports = {
 				}
 			});
 		}).catch(err=>{
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
+			console.error(err);
+			res.sendStatus(500);
 		});
 	},
 
@@ -36,12 +32,12 @@ module.exports = {
 			name = ''
 		} = req.body;
 
-		if (!validation.checkCategoryName(name)) {
+		if (!underscore.isString(name) || !validation.checkCategoryName(name)) {
 			res.json({
 				success: false,
 				error: {
 					code: 190300,
-					message: "category name invalid"
+					message: `category name ${name} invalid`
 				}
 			});
 			return;
@@ -76,13 +72,8 @@ module.exports = {
 			});
 
 		}).catch(err=>{
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
+			console.error(err);
+			res.sendStatus(500);
 		});
 	},
 
@@ -93,7 +84,6 @@ module.exports = {
 
 		let {
 			category
-
 		} = req.body;
 
 		if (!Number.isInteger(category.id)) {
@@ -101,18 +91,19 @@ module.exports = {
 				success: false,
 				error: {
 					code: 190302,
-					message: "category id invalid"
+					message: `category id ${category.id} invalid`
 				}
 			});
 			return;
 		}
 
-		if (!validation.checkCategoryName(category.name)) {
+		let name = category.name;
+		if (!underscore.isString(name) || !validation.checkCategoryName(name)) {
 			res.json({
 				success: false,
 				error: {
 					code: 190300,
-					message: "category name invalid"
+					message: `category name ${name} invalid`
 				}
 			});
 			return;
@@ -120,22 +111,35 @@ module.exports = {
 
 		category.user = user.id;
 
-		categoryService.updateCategory(category).then((category)=>{
-			res.json({
-				success: true,
-				data: {
-					category: category
+		categoryService.isCategoryExistByUserAndCategory(user, category)
+			.then(isExist=>{
+				if (!isExist) {
+					res.json({
+						success: false,
+						error: {
+							code: 190300,
+							message: `category invalid`
+						}
+					});
+					return;
 				}
+
+				categoryService.updateCategory(category).then((category)=>{
+					res.json({
+						success: true,
+						data: {
+							category: category
+						}
+					});
+				}).catch(err=>{
+					console.error(err);
+					res.sendStatus(500);
+				});
+			})
+			.catch(err=>{
+				console.error(err);
+				res.sendStatus(500);
 			});
-		}).catch(err=>{
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
-		});
 	},
 
 	deleteCategory: function (req, res) {
@@ -144,51 +148,54 @@ module.exports = {
 		} = req.session.user;
 
 		let {
-			category
+			category: categoryId
 		} = req.query;
 
-		try {
-			category = JSON.parse(category);
+		categoryId = parseInt(categoryId);
 
-		} catch (err) {
-			res.json({
-				success: false,
-				error: {
-					code: 190303,
-					message: "category invalid"
-				}
-			});
-			return;
-		}
-
-		if (!Number.isInteger(category.id)) {
+		if (!Number.isInteger(categoryId)) {
 			res.json({
 				success: false,
 				error: {
 					code: 190302,
-					message: "category id invalid"
+					message: `category id ${categoryId} invalid`
 				}
 			});
 			return;
 		}
 
-		category.user = user.id;
+		let category = {
+			id: categoryId,
+			user: user.id
+		};
+
+		categoryService.isCategoryExistByUserAndCategory(user, category)
+			.then(isExist=>{
+				if (!isExist) {
+					res.json({
+						success: false,
+						error: {
+							code: 190300,
+							message: `category not exist`
+						}
+					});
+					return;
+				}
+
+				categoryService.deleteCategory(category).then(()=>{
+					res.json({
+						success: true,
+					});
+				}).catch(err=>{
+					console.error(err);
+					res.sendStatus(500);
+				});
+			})
+			.catch(err=>{
+				console.error(err);
+				res.sendStatus(500);
+			});
+
 		
-		categoryService.deleteCategory(category).then(()=>{
-			res.json({
-				success: true,
-				data: {
-					category: category
-				}
-			});
-		}).catch(err=>{
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
-		});
 	},
 };

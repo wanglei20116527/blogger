@@ -1,3 +1,4 @@
+const underscore   = require("underscore");
 const validation   = require("../../../utils/validation");
 const imageService = require("../../../service/imageService");
 const userService  = require("../../../service/userService");
@@ -21,13 +22,8 @@ module.exports = {
 				}
 			});
 		} catch (err) {
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
+			console.error(err);
+			res.sendStatus(500);
 		}
 	},
 
@@ -55,13 +51,8 @@ module.exports = {
 			});
 
 		}).catch(err=>{
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
+			console.error(err);
+			res.sendStatus(500);
 		});
 	},
 
@@ -78,11 +69,24 @@ module.exports = {
 			cPassword 
 		} = req.body;
 
-		if (oPassword !== user.password) {
+		if (!underscore.isString(oPassword)
+			|| !underscore.isString(nPassword)
+			|| !underscore.isString(cPassword)) {
 			res.json({
 				success: false,
 				error: {
 					code: 120100,
+					message: "input parameter invalid",
+				}
+			});
+			return;
+		}
+
+		if (oPassword !== user.password) {
+			res.json({
+				success: false,
+				error: {
+					code: 120101,
 					message: "password not correct",
 				}
 			});
@@ -93,8 +97,8 @@ module.exports = {
 			res.json({
 				success: false,
 				error: {
-					code: 120101,
-					message: "password not same",
+					code: 120102,
+					message: "new password not same",
 				}
 			});
 			return;
@@ -104,7 +108,7 @@ module.exports = {
 			res.json({
 				success: false,
 				error: {
-					code: 120102,
+					code: 120103,
 					message: "password not valid",
 				}
 			});
@@ -124,13 +128,8 @@ module.exports = {
 			});
 
 		}).catch(err=>{
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
+			console.error(err);
+			res.sendStatus(500);
 		});
 	},
 
@@ -141,6 +140,18 @@ module.exports = {
 			about = ""
 		} = req.body;
 
+		if (!underscore.isString(email)
+			|| !underscore.isString(photo)
+			|| !underscore.isString(about)) {
+			res.json({
+				success: false,
+				error: {
+					code: 120104,
+					message: "input parameter invalid",
+				}
+			});
+		}
+
 		email = email.trim();
 		photo = photo.trim();
 		about = about.trim();
@@ -149,7 +160,7 @@ module.exports = {
 			res.json({
 				success: false,
 				error: {
-					code: 120103,
+					code: 120105,
 					message: "email not vaild",
 				}
 			});
@@ -160,7 +171,7 @@ module.exports = {
 			res.json({
 				success: false,
 				error: {
-					code: 120104,
+					code: 120106,
 					message: "phone not vaild",
 				}
 			});
@@ -184,13 +195,8 @@ module.exports = {
 				success: true
 			});
 		}).catch(err=>{
-			res.json({
-				success: false,
-				error: {
-					code: 190000,
-					message: err.stack
-				}
-			});
+			console.error(err);
+			res.sendStatus(500);
 		});
 	},
 };

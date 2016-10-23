@@ -16,11 +16,12 @@ class Category {
 	}
 
 	static add (connection, category) {
+		let fields = FIELDS.slice(1);
 		return new Promise((resolve, reject)=>{
 			database.insert(
 						connection, 
 						TABLENAME, 
-						FIELDS, 
+						fields, 
 						[new Category(category)]
 					)
 					.then(categories=>{
@@ -57,11 +58,16 @@ class Category {
 				return;
 			}
 
+			let where       = "id=?";
+			let whereValues = [
+				[category.id]
+			];
+
 			database.delete(
 						connection, 
 						TABLENAME,
-						FIELDS, 
-						[new Category(category)]
+						where,
+						whereValues
 					)
 					.then(resolve)
 					.catch(reject);
@@ -69,7 +75,7 @@ class Category {
 	}
 
 	static isCategoryExistByUserAndCategory (connection, user, category) {
-		assert(user.id , null, `user can not be ${user.id}`);
+		assert.notEqual(user.id , null, `user can not be ${user.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -79,10 +85,9 @@ class Category {
 						where 
 							user=?
 							and id=?
-							and name=? 
 							and deleteTime is null`;
 			
-			let params = [user.id, category.id, category.name];
+			let params = [user.id, category.id];
 
 			database.executeSql(
 						connection, 

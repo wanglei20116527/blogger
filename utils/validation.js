@@ -19,5 +19,9 @@ module.exports = {
 
 	checkCategoryName: function (name) {
 		return name !== "";
+	},
+
+	checkDirName: function (name) {
+		return name !== "" && name.length <= 100;
 	}
 };

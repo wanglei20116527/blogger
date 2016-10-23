@@ -28,5 +28,22 @@ module.exports = {
 				reject(err);
 			}
 		});
+	},
+
+	mkdir: function (path, mode) {
+		return new Promise((resolve, reject)=>{
+			try {
+				fs.mkdir(path, mode, err=>{
+					if (err) {
+						reject(err);
+						return;
+					}
+
+					resolve();
+				});
+			} catch (err) {
+				reject(err);
+			}
+		});
 	}
 };

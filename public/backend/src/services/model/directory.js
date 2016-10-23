@@ -1,40 +1,17 @@
-angular.module("Backend").service("Category", [
+angular.module("Backend").service("Directory", [
 	"$http",
 	"$q",
 
 	function ($http, $q) {
-		var BASE_URL = "/backend/category";
+		var BASE_URL = "/backend/directory";
 
-		this.getCategories = function () {
+		this.addDirectory = function (dir, pDir) {
 			return new $q(function (resolve, reject) {
-				var url = BASE_URL + "/all";
-
-				$http.get(url).then(function (ret) {
-					ret = ret.data;
-					
-					if (!ret.success) {
-						var errMsg = ret.error.message;
-						console.error(errMsg);
-						reject(new Error(errMsg)); 
-						return;
-					}
-
-					resolve(ret.data.categories);
-
-				}).catch(function(err){
-					console.error(err);
-					reject(new Error("server error"));
-				});
-			});
-		};
-
-		this.addCategory = function (name) {
-			return new $q(function (resolve, reject) {
-				var url = BASE_URL;
+				var url = BASE_URL
 
 				$http.put(url, {
-					name: name
-
+					directory: dir,
+					parentDirectory: pDir
 				}).then(function (ret) {
 					ret = ret.data;
 					
@@ -45,7 +22,7 @@ angular.module("Backend").service("Category", [
 						return;
 					}
 
-					resolve(ret.data.category);
+					resolve(ret.data.directory);
 
 				}).catch(function(err){
 					console.error(err);
@@ -54,10 +31,34 @@ angular.module("Backend").service("Category", [
 			});
 		};
 
-		this.deleteCategory = function (category) {
+		this.updateDirectory = function (dir) {
 			return new $q(function (resolve, reject) {
-				var url = BASE_URL + "?category=" + category.id;
-				console.log(url);
+				var url = BASE_URL
+
+				$http.post(url, {
+					directory: dir
+				}).then(function (ret) {
+					ret = ret.data;
+					
+					if (!ret.success) {
+						var errMsg = ret.error.message;
+						console.error(errMsg);
+						reject(new Error(errMsg)); 
+						return;
+					}
+
+					resolve(ret.data.directory);
+
+				}).catch(function(err){
+					console.error(err);
+					reject(new Error("server error"));
+				});
+			});	
+		};
+
+		this.deleteDirectory = function (dir) {
+			return new $q(function (resolve, reject) {
+				var url = BASE_URL + "?directory=" + dir.id;
 
 				$http.delete(url).then(function (ret) {
 					ret = ret.data;
@@ -70,36 +71,12 @@ angular.module("Backend").service("Category", [
 					}
 
 					resolve();
-				}).catch(function(err){
-					console.error(err);
-					reject(new Error("server error"));
-				});
-			});
-		};
-
-		this.updateCategory = function (category) {
-			return new $q(function (resolve, reject) {
-				var url = BASE_URL;
-
-				$http.post(url, {
-					category: category
-
-				}).then(function (ret) {
-					ret = ret.data;
-					
-					if (!ret.success) {
-						var errMsg = ret.error.message;
-						reject(new Error(errMsg)); 
-						return;
-					}
-
-					resolve(ret.data.category);
 
 				}).catch(function(err){
 					console.error(err);
 					reject(new Error("server error"));
 				});
-			});
+			});		
 		};
 	}
 ]);

@@ -1,3 +1,4 @@
+const underscore  = require("underscore");
 const config      = require("../../../config").backend;
 const userService = require("../../../service/userService");
 const hashService = require("../../../service/hashService");
@@ -77,9 +78,16 @@ module.exports = {
 
 	loginSuccess: function (req, res) {
 		try {
-			let remember = req.body.remember;
+			let {
+				remember = false,
+				user = {}
+			} = req.body;
+
+			if (!underscore.isBoolean(remember)) {
+				remember = false;
+			}
+
 			let session  = req.session;
-			let user     = req.body.user|| {};
 			let token    = hashService.hash(`${user.name}-${user.password}-${Date.now()}`);
 
 			session.user = {

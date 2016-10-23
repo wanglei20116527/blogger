@@ -1,5 +1,5 @@
-const assert   = require('assert');
-const database = require("./database");
+const assert     = require("assert");
+const database   = require("./database");
 
 const TABLENAME = "article";
 const FIELDS = [
@@ -21,17 +21,18 @@ class Article {
 	}
 
 	static add (connection, article) {
+		let fields = FIELDS.slice(1);
 		return database.insert(
 						connection, 
 						TABLENAME, 
-						FIELDS, 
+						fields, 
 						[new Article(article)]
 					);
 	}
 
 	static update (connection, article) {
-		assert(article.id, null, `article id can not be ${article.id}`);
-		assert(article.author, null, `article author can not be ${article.author}`);
+		assert.notEqual(article.id, null, `article id can not be ${article.id}`);
+		assert.notEqual(article.author, null, `article author can not be ${article.author}`);
 
 		return new Promise((resolve, reject)=>{
 			let where       = "id=? and author=?";
@@ -55,23 +56,17 @@ class Article {
 	}
 
 	static delete (connection, article) {
-		assert(article.id, null, `article id can not be ${article.id}`);
-		assert(article.author, null, `article author can not be ${article.author}`);
+		assert.notEqual(article.id, null, `article id can not be ${article.id}`);
 
 		return new Promise((resolve, reject)=>{
-			let where       = "id=? and author=?";
+			let where       = "id=?";
 			let whereValues = [
-				{
-					id    : article.id,
-					author: article.author
-				}
+				[article.id]
 			];
 
 			database.delete(
 						connection, 
 						TABLENAME,
-						FIELDS,
-						[new Article(article)],
 						where,
 						whereValues
 					)
@@ -88,26 +83,57 @@ class Article {
 			}
 
 			this.getArticlesByCategory(connection, category).then((articles)=>{
-				let ToDelete = [];
-				for (let article of articles) {
-					ToDelete.push(new Article(article));
-				}
+				let where       = "id=?";
+				let whereValues = [];
 
+				for (let article of articles) {
+					whereValues.push([article.id]);
+				}
+				
 				database.delete(
-							connection,
-							TABLENAME,
-							FIELDS,
-							ToDelete
-						)
-						.then(resolve)
-						.catch(reject);
+						connection, 
+						TABLENAME,
+						where,
+						whereValues
+					)
+					.then(resolve)
+					.catch(reject);
 			}).catch(reject);
 		});
 	}
 
+	static getArticlesByCategory (connection, category) {
+		if (!Number.isInteger(category.id)) {
+			throw new Error(`category id invalid`);
+		}
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							*
+						from 
+							${TABLENAME} 
+						where 
+							category=? 
+							and deleteTime is null`;
+
+
+			let params = [category.id];
+
+			database.executeSql(
+						connection, 
+						sql,
+						params
+					)
+					.then(ret=>{
+						resolve(ret);
+					})
+					.catch(reject);
+		});		
+	}
+
 	static isArticleExistByIdAndUser (connection, id, user) {
-		assert(id, null, `id can't be ${id}`);
-		assert(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(id, null, `id can't be ${id}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -135,7 +161,7 @@ class Article {
 	}
 
 	static getArticleNumberByUser (connection, user) {
-		assert(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -161,7 +187,7 @@ class Article {
 	}
 
 	static getPublishedArticleNumberByUser (connection, user) {
-		assert(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -188,7 +214,7 @@ class Article {
 	}
 
 	static getUnPublishedArticleNumberByUser (connection, user) {
-		assert(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -215,8 +241,8 @@ class Article {
 	}
 
 	static getArticleNumberByUserAndCategory (connection, user, category) {
-		assert(user.id, null, `user id can't be ${user.id}`);
-		assert(category.id, null, `category id can't be ${category.id}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(category.id, null, `category id can't be ${category.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -243,8 +269,8 @@ class Article {
 	}
 
 	static getPublishedArticleNumberByUserAndCategory (connection, user, category) {
-		assert(user.id, null, `user id can't be ${user.id}`);
-		assert(category.id, null, `category id can't be ${category.id}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(category.id, null, `category id can't be ${category.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -272,8 +298,8 @@ class Article {
 	}
 
 	static getUnPublishedArticleNumberByUserAndCategory (connection, user, category) {
-		assert(user.id, null, `user id can't be ${user.id}`);
-		assert(category.id, null, `category id can't be ${category.id}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(category.id, null, `category id can't be ${category.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -301,9 +327,9 @@ class Article {
 	}
 
 	static getArticlesByUser (connection, user, start, number) {
-		assert(user.id, null, `user id can't be ${user.id}`);
-		assert(start  , null, `start id can't be ${start}`);
-		assert(number , null, `number id can't be ${number}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(start  , null, `start id can't be ${start}`);
+		assert.notEqual(number , null, `number id can't be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -328,16 +354,16 @@ class Article {
 							article = new Article(article);
 							ret.push(article);
 						}
-						resolve(article);
+						resolve(ret);
 					})
 					.catch(reject);
 		});
 	}
 
 	static getPublishedArticlesByUser (connection, user, start, number) {
-		assert(user.id, null, `user id can't be ${user.id}`);
-		assert(start  , null, `start id can't be ${start}`);
-		assert(number , null, `number id can't be ${number}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(start  , null, `start id can't be ${start}`);
+		assert.notEqual(number , null, `number id can't be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -363,16 +389,16 @@ class Article {
 							article = new Article(article);
 							ret.push(article);
 						}
-						resolve(article);
+						resolve(ret);
 					})
 					.catch(reject);
 		});
 	}
 
 	static getUnPublishedArticlesByUser (connection, user, start, number) {
-		assert(user.id, null, `user id can't be ${user.id}`);
-		assert(start  , null, `start id can't be ${start}`);
-		assert(number , null, `number id can't be ${number}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(start  , null, `start id can't be ${start}`);
+		assert.notEqual(number , null, `number id can't be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -398,17 +424,17 @@ class Article {
 							article = new Article(article);
 							ret.push(article);
 						}
-						resolve(article);
+						resolve(ret);
 					})
 					.catch(reject);
 		});
 	}
 
 	static getArticlesByUserAndCategory (connection, user, category, start, number) {
-		assert(user.id    , null, `user id can't be ${user.id}`);
-		assert(category.id, null, `category id can't be ${category.id}`);
-		assert(start      , null, `start id can't be ${start}`);
-		assert(number     , null, `number id can't be ${number}`);
+		assert.notEqual(user.id    , null, `user id can't be ${user.id}`);
+		assert.notEqual(category.id, null, `category id can't be ${category.id}`);
+		assert.notEqual(start      , null, `start id can't be ${start}`);
+		assert.notEqual(number     , null, `number id can't be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -434,17 +460,17 @@ class Article {
 							article = new Article(article);
 							ret.push(article);
 						}
-						resolve(article);
+						resolve(ret);
 					})
 					.catch(reject);
 		});
 	}
 
 	static getPublishedArticlesByUserAndCategory (connection, user, category, start, number) {
-		assert(user.id    , null, `user id can't be ${user.id}`);
-		assert(category.id, null, `category id can't be ${category.id}`);
-		assert(start      , null, `start id can't be ${start}`);
-		assert(number     , null, `number id can't be ${number}`);
+		assert.notEqual(user.id    , null, `user id can't be ${user.id}`);
+		assert.notEqual(category.id, null, `category id can't be ${category.id}`);
+		assert.notEqual(start      , null, `start id can't be ${start}`);
+		assert.notEqual(number     , null, `number id can't be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -471,17 +497,17 @@ class Article {
 							article = new Article(article);
 							ret.push(article);
 						}
-						resolve(article);
+						resolve(ret);
 					})
 					.catch(reject);
 		});
 	}
 
 	static getUnPublishedArticlesByUserAndCategory (connection, user, category, start, number) {
-		assert(user.id    , null, `user id can't be ${user.id}`);
-		assert(category.id, null, `category id can't be ${category.id}`);
-		assert(start      , null, `start id can't be ${start}`);
-		assert(number     , null, `number id can't be ${number}`);
+		assert.notEqual(user.id    , null, `user id can't be ${user.id}`);
+		assert.notEqual(category.id, null, `category id can't be ${category.id}`);
+		assert.notEqual(start      , null, `start id can't be ${start}`);
+		assert.notEqual(number     , null, `number id can't be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -508,7 +534,7 @@ class Article {
 							article = new Article(article);
 							ret.push(article);
 						}
-						resolve(article);
+						resolve(ret);
 					})
 					.catch(reject);
 		});

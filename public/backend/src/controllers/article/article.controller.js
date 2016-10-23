@@ -36,8 +36,21 @@ angular.module("Backend").controller("articleCtrl", [
 					this.show = false;
 				},
 
-				confirm: function (category) {
+				confirm: function (name) {
 					this.show = false;
+
+					if (!Validation.checkCategory(name)) {
+						sendErrorMessage("category name invalid");
+						return;
+					}
+
+					addCategory(name.trim()).then(function(){
+						self.show     = false;
+						sendSuccessMessage("add category success");
+
+					}).catch(function (err) {
+						sendErrorMessage(err.message);
+					});
 				},
 			},
 
@@ -81,7 +94,7 @@ angular.module("Backend").controller("articleCtrl", [
 				message: "Are you confirm to delete this category?",
 
 				category: {
-					id: 4,
+					id: 12,
 					name: "wanglei567",
 					user: 1
 				},
@@ -116,7 +129,7 @@ angular.module("Backend").controller("articleCtrl", [
 		var _article = $scope.article  = {
 			numberPerPage: 10,
 			curtPage: 0,
-			number  : 0,
+			total  : 0,
 			articles: []
 		};
 
@@ -146,28 +159,14 @@ angular.module("Backend").controller("articleCtrl", [
 
 		function initArticles () {
 			return new $q(function (resolve, reject) {
-				let promises = [];
-				let p = null;
-
-				p = Article.getNumberOfArticles();
-				promises.push(p);
-
 				var startIndex = _article.curtPage * _article.numberPerPage;
 				var number     = _article.numberPerPage;
-				p = Article.getArticles(startIndex, number);
 
-				$q.all(promises).then(function () {
-					console.log(arguments);
+				Article.getArticles(startIndex, number).then(function (ret) {
+					_article.total    = ret.total;
+					_article.articles = ret.articles;
 
 					resolve();
-				}).catch(reject);
-			});
-		}
-
-		function initNumberOfArticles () {
-			return new $q(function (resolve, reject) {
-				Article.getNumberOfArticles().then(function (number) {
-					_article.number = number;
 				}).catch(reject);
 			});
 		}
@@ -176,6 +175,18 @@ angular.module("Backend").controller("articleCtrl", [
 			return new $q(function (resolve, reject) {
 				Category.getCategories().then(function (categories) {
 					_category.categories = categories || [];
+					resolve();
+				}).catch(reject);
+			});
+		}
+
+		function addCategory (name) {
+			return new $q(function (resolve, reject) {
+				Category.addCategory(name).then(function(category){
+					var categories = _category.categories || [];
+
+					categories.push(category);
+
 					resolve();
 				}).catch(reject);
 			});
@@ -200,7 +211,7 @@ angular.module("Backend").controller("articleCtrl", [
 
 		function deleteCategory (category) {
 			return new $q(function (resolve, reject) {
-				Category.deleteCategory(category).then(function(category){
+				Category.deleteCategory(category).then(function(){
 					var categories = _category.categories || [];
 
 					for (var i = 0, len = categories.length; i < len; ++i) {
@@ -215,13 +226,34 @@ angular.module("Backend").controller("articleCtrl", [
 			});
 		}
 
-		function sendErrorMessage (msg) {
-			var msgObj = {
-				type: Config.MESSAGE.ERROR,
-				msg: msg
-			};
+		function addArticle (article, category) {
+			return new $q(function (resolve, reject) {
+				Article.addArticle(article, category).then(function (article) {
+					console.log("add article");
+					console.log(article);
+					resolve();
+				}).catch(reject);
+			});
+		}
 
-			$rootScope.$emit("message", msgObj);
+		function updateArticle (article) {
+			return new $q(function (resolve, reject) {
+				Article.updateArticle(article).then(function (article) {
+					console.log("update article");
+					console.log(article);
+					resolve();
+				}).catch(reject);
+			});
+		}
+
+		function deleteArticle (article) {
+			return new $q(function (resolve, reject) {
+				Article.deleteArticle(article).then(function (article) {
+					console.log("deleteArticle article");
+					console.log(article);
+					resolve();
+				}).catch(reject);
+			});
 		}
 
 		function sendSuccessMessage (msg) {
@@ -232,5 +264,54 @@ angular.module("Backend").controller("articleCtrl", [
 
 			$rootScope.$emit("message", msgObj);
 		}
+
+		function sendErrorMessage (msg) {
+			var msgObj = {
+				type: Config.MESSAGE.ERROR,
+				msg: msg
+			};
+
+			$rootScope.$emit("message", msgObj);
+		}
+
+		(function(){
+			// updateArticle({
+			// 	id: 0,
+			// 	title: "hello word1",
+			// 	content: "wanglei is cool and houna is cute",
+			// 	isPublish: "1",
+			// 	category: 5,
+			// 	author: 1
+			// });
+
+			// deleteArticle({
+			// 	id: 0,
+			// 	title: "hello word",
+			// 	content: "wanglei is cool and houna is cute",
+			// 	isPublish: "1",
+			// 	category: 5,
+			// 	author: 1
+			// });
+
+			// addArticle({
+			// 	title: "hello word",
+			// 	content: "wanglei is cool and houna is cute",
+			// 	isPublish: "0"
+			// }, {
+			// 	id: 14	
+			// });
+
+			// addCategory("wanglei loves houna");
+			
+			// updateCategory({
+			// 	id: 13,
+			// 	user: 1,
+			// 	name: "wanglei1"
+			// })
+
+			// deleteCategory({
+			// 	id: 14
+			// });
+		})();
 	}
 ]);

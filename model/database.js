@@ -225,27 +225,28 @@ let database = {
 		});
 	},
 
-	delete: function (connection, tableName, fields, values) {
-		values = values || [];
-		fields = Object.assign([], fields || []);
+	delete: function (connection, tableName, where, whereValues) {
+		let values = whereValues || [];
 
 		return new Promise((resolve, reject)=>{
 			try {
-				if (!values || values.length <= 0) {
+				if (values.length <= 0) {
 					resolve();
 					return;
 				}
 
+				let sql = 	`update 
+								${tableName} 
+							set
+								deleteTime=? 
+							where ${where}`;
+
 				let deleteTime = Date.now();
 				let promises   = [];
 
-				fields.push("deleteTime");
-
 				for (let i = 0, len = values.length; i < len; ++i) {
-					let valueObj = values[i];
-						valueObj.deleteTime = deleteTime;
-
-					let [sql, params] = generateUpdateData(tableName, valueObj.id, fields, valueObj);
+					var params = values[i];
+						params.unshift(deleteTime);
 
 					let p = this.executeSql(connection, sql, params);
 					promises.push(p);

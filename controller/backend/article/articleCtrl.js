@@ -1,4 +1,5 @@
-const categoryServive = require("../../../service/categoryServive");
+const underscore      = require("underscore");
+const categoryService = require("../../../service/categoryService");
 const articleService  = require("../../../service/articleService");
 
 const NUMBER = 10;
@@ -16,14 +17,17 @@ module.exports = {
 			isPublish,
 		} = req.query;
 
-		if (category != null) {
+		category = parseInt(category, 10);
+		if (Number.isInteger(category)) {
 			category = {
-				id: parseInt(category, 10);
+				id: category
 			}
+		} else {
+			category = void 0;
 		}
 
-		if (isPublish != null) {
-			isPublish = Boolean(isPublish);
+		if (!underscore.isBoolean(isPublish)) {
+			isPublish = void 0;
 		}
 
 		articleService.getNumberOfArticles(user, category, isPublish).then(number=>{
@@ -53,21 +57,47 @@ module.exports = {
 			isPublish
 		} = req.query;
 
-		if (category != null) {
-			category = {
-				id: parseInt(category, 10);
-			}
+		start = parseInt(start, 10);
+		if (!Number.isInteger(start)) {
+			start = 0;
 		}
 
-		if (isPublish != null) {
-			isPublish = Boolean(isPublish);
+		number = parseInt(number, 10);
+		if (!Number.isInteger(number)) {
+			number = NUMBER;
 		}
-		
-		articleService.getArticles(user, start, number, category, user).then(articles=>{
+
+		category = parseInt(category, 10);
+		if (Number.isInteger(category)) {
+			category = {
+				id: category
+			}
+		} else {
+			category = void 0;
+		}
+
+		if (!underscore.isBoolean(isPublish)) {
+			isPublish = void 0;
+		}
+
+		let promises = [];
+		let p = null;
+
+		p = articleService.getNumberOfArticles(user, category, isPublish);
+		promises.push(p);
+
+		p = articleService.getArticles(user, start, number, category, isPublish);
+		promises.push(p);
+
+		Promise.all(promises).then(ret=>{
+			let number   = ret[0] || 0;
+			let articles = ret[1] || [];
+
 			res.json({
 				success: true,
 				data: {
-					articles: articles || []
+					total   : number,
+					articles: articles
 				}
 			});
 		}).catch(err=>{
@@ -84,42 +114,81 @@ module.exports = {
 		user = Object.assign({}, user || {});
 
 		let {
-			article  = {},
-			category = {},
-		} = req.body.article;
+			article,
+			category,
+		} = req.body;
 
-		if (article.title != null) {
-			article.title = article.title.trim();
-		}
-			
-		if (!article.title) {
+		if (!underscore.isObject(article) || !underscore.isObject(category)) {
 			res.json({
 				success: false,
 				error: {
-					code: 190400,
+					code: 190401,
+					message: `article or category invalid`
+				}
+			});
+			return;
+		}
+			
+		if (!underscore.isString(article.title)) {
+			res.json({
+				success: false,
+				error: {
+					code: 190402,
 					message: `article title can't be ${article.title}`
 				}
 			});
 			return;
 		}
+		article.title = article.title.trim();
 
-		categoryServive.isCategoryExistByUserAndCategory(user, category)
+		if (!underscore.isString(article.content)) {
+			res.json({
+				success: false,
+				error: {
+					code: 190403,
+					message: `article content can't be ${article.content}`
+				}
+			});
+			return;
+		}
+		article.content = article.content.trim();
+
+		if (article.isPublish !== "0" && article.isPublish !== "1") {
+			res.json({
+				success: false,
+				error: {
+					code: 190404,
+					message: `article isPublish can't be ${article.isPublish}`
+				}
+			});
+			return;	
+		}
+
+		if (!Number.isInteger(category.id)) {
+			res.json({
+				success: false,
+				error: {
+					code: 190405,
+					message: `category id can't be ${category.id}`
+				}
+			});
+			return;
+		}
+
+		categoryService.isCategoryExistByUserAndCategory(user, category)
 			.then(isExist=>{
 				if (!isExist) {
 					res.json({
 						success: false,
 						error: {
-							code: 190401,
+							code: 190406,
 							message: `category not exist`
 						}
 					});
 					return;
 				}
 
-				article = Object.assign({
-					content: "",
-					isPublish: 0,
-				}, article, {
+				article = Object.assign({}, article, {
 					date  : Date.now(),
 					author: user.id,
 					category: category.id
@@ -151,65 +220,71 @@ module.exports = {
 		user = Object.assign({}, user || {});
 
 		let {
-			article = {},
+			article
 		} = req.body;
 
-		if (article.title != null) {
-			article.title = article.title.trim();
-		}
+		if (!underscore.isObject(article) 
+			|| !Number.isInteger(article.id) 
+			|| !underscore.isString(article.title)
+			|| !underscore.isString(article.content)
+			|| !Number.isInteger(article.author)
+			|| (article.isPublish !== "0" && article.isPublish !== "1")) {
 
-		if (article.id == null) {
 			res.json({
 				success: false,
 				error: {
-					code: 190405,
-					message: `article id can't be ${article.id}`
+					code: 190407,
+					message: `article invalid`
 				}
 			});
 			return;
 		}
 
-		if (!article.title) {
-			res.json({
-				success: false,
-				error: {
-					code: 190400,
-					message: `article title can't be ${article.title}`
-				}
-			});
-			return;
-		}
+		let promises = [];
+		let p = null;
 
-		if (article.category == null) {
-			res.json({
-				success: false,
-				error: {
-					code: 190404,
-					message: `article category can't be ${article.category}`
-				}
-			});
-			return;
-		}
+		p = categoryService.isCategoryExistByUserAndCategory(user, {
+			id: article.category
+		});
+		promises.push(p);
 
-		articleService.isArticleExistByIdAndUser(
+		p = articleService.isArticleExistByIdAndUser(
 			article.id,
 			user
-		).then(isExist=>{
-			if (!isExist) {
+		);
+		promises.push(p);
+
+		Promise.all(promises).then(ret=>{
+			let isCategoryExist = ret[0];
+
+			if (!isCategoryExist) {
 				res.json({
 					success: false,
 					error: {
-						code: 190404,
-						message: `article invalid`
+						code: 190408,
+						message: `category not exist: id ${article.category}`
 					}
 				});
 				return;
 			}
 
-			article = Object.assign({
-				isPublish: 0,
-				content: "",
-			}, article, {
+			let isArticleExist = ret[1];
+
+			if (!isArticleExist) {
+				res.json({
+					success: false,
+					error: {
+						code: 190409,
+						message: `category not exist: id ${article.category}`
+					}
+				});
+				return;
+			}
+
+			article.title   = article.title.trim();
+			article.content = article.content.trim();
+
+			article = Object.assign(article, {
 				author: user.id,
 				date: Date.now(),
 			});
@@ -242,11 +317,13 @@ module.exports = {
 			article: articleId
 		} = req.query;
 
-		if (articleId == null) {
+		articleId = parseInt(articleId, 10);
+
+		if (!Number.isInteger(articleId)) {
 			res.json({
 				success: false,
 				error: {
-					code: 190401,
+					code: 190410,
 					message: `article id can't be ${articleId}`
 				}
 			});
@@ -256,13 +333,13 @@ module.exports = {
 		articleService.isArticleExistByIdAndUser(
 			articleId,
 			user
-		).then(!isExist=>{
-			if (isExist) {
+		).then(isExist=>{
+			if (!isExist) {
 				res.json({
 					success: false,
 					error: {
-						code: 190404,
-						message: `article invalid`
+						code: 190411,
+						message: `article not exist`
 					}
 				});
 				return;
@@ -274,7 +351,10 @@ module.exports = {
 
 			articleService.deleteArticle(article).then(()=>{
 				res.json({
-					success: true
+					success: true,
+					data: {
+						article: article
+					}
 				});
 			}).catch(err=>{
 				console.error(err);
@@ -285,13 +365,5 @@ module.exports = {
 			console.error(err);
 			res.sendStatus(500);
 		});
-
-
-		let article = {
-			id: articleId,
-			author: user.id
-		};
-
-		
 	},
 };

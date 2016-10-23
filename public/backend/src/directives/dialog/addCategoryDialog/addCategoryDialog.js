@@ -1,8 +1,5 @@
 angular.module("Backend").directive("addCategoryDialog", [
-	"$rootScope",
-	"Config",
-	"Category",
-	function ($rootScope, Config, Category) {
+	function () {
 		return {
 			restrict: 'E',
 			scope: {
@@ -37,30 +34,8 @@ angular.module("Backend").directive("addCategoryDialog", [
 				}
 
 				function confirm () {
-					var category = scope.category.trim();
-
-					if (category === "") {
-						$rootScope.$emit("message", {
-							type: Config.MESSAGE.ERROR,
-							msg: "category name can't be empty"
-						});
-						return;
-					}
-					
-					Category.addCategory(category).then(function (category) {
-						$rootScope.$emit("message", {
-							type: Config.MESSAGE.SUCCESS,
-							msg: "add category success"
-						});
-
-						scope.onConfirm && scope.onConfirm({
-							category: category
-						});
-					}).catch(function (err){
-						$rootScope.$emit("message", {
-							type: Config.MESSAGE.ERROR,
-							msg: err.message
-						});
+					scope.onConfirm && category.onConfirm({
+						name: category
 					});
 				}
 			}

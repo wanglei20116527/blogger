@@ -5,8 +5,9 @@ angular.module("Backend").controller("mainCtrol", [
 	"Config",
 	"Uuid",
 	"User",
+	"Directory",
 
-	function ($rootScope, $scope, $timeout, Config, Uuid, User) {
+	function ($rootScope, $scope, $timeout, Config, Uuid, User, Directory) {
 		$scope.user = {};
 		$scope.activePage = "index";
 		$scope.collapseMenuBar = false;
@@ -89,5 +90,26 @@ angular.module("Backend").controller("mainCtrol", [
 				}
 			}, 1000);
 		}
+
+		(function () {
+			console.log("main.controller.js");
+
+			// Directory.addDirectory({
+			// 	name: "sub"
+			// }, {
+			// 	id: 15
+			// });
+
+			// Directory.updateDirectory({
+			// 	id: 15,
+			// 	name: "normal",
+			// 	user: 1,
+			// });
+
+			// Directory.deleteDirectory({
+			// 	id: 12,
+			// });
+
+		})();
 	}
 ]);

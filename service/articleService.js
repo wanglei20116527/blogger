@@ -1,4 +1,3 @@
-
 const underscore   = require("underscore");
 const assert       = require("assert");
 const database     = require("../model/database");
@@ -41,25 +40,33 @@ module.exports = {
 			isPublished = null;
 		}
 
+		console.log(`start ${start}, number ${number}, category ${category}, isPublished ${isPublished}`);
+
 		let p = null;
 			
 		if (category != null && isPublished == null) {
-			p = this.getArticlesByUserAndCategory(conn, user, category);
+			console.log('getArticlesByUserAndCategory');
+			p = this.getArticlesByUserAndCategory(user, category, start, number);
 		
 		} else if (category != null && isPublished) {
-			p = this.getPublishedArticlesByUserAndCategory(conn, user, category);
+			console.log('getPublishedArticlesByUserAndCategory');
+			p = this.getPublishedArticlesByUserAndCategory(user, category, start, number);
 		
 		} else if (category != null && !isPublished) {
-			p = this.getUnPublishedArticlesByUserAndCategory(conn, user, category);	
+			console.log('getUnPublishedArticlesByUserAndCategory');
+			p = this.getUnPublishedArticlesByUserAndCategory(user, category, start, number);	
 		
 		} else if (isPublished == null) {
-			p = this.getArticlesByUser(conn, user); 
+			console.log('getArticlesByUser');
+			p = this.getArticlesByUser(user, start, number); 
 		
 		} else if (isPublished) {
-			p = this.getPublishedArticlesByUser(conn, user); 
+			console.log('getPublishedArticlesByUser');
+			p = this.getPublishedArticlesByUser(user, start, number); 
 
 		} else {
-			p = this.getUnPublishedArticlesByUser(conn, user); 
+			console.log('getUnPublishedArticlesByUser');
+			p = this.getUnPublishedArticlesByUser(user, start, number); 
 		}
 
 		return p;
@@ -116,22 +123,28 @@ module.exports = {
 		let p = null;
 			
 		if (category != null && isPublished == null) {
-			p = this.getNumberOfArticlesByUserAndCategory(conn, user, category);
+			console.log('getNumberOfArticlesByUserAndCategory');
+			p = this.getNumberOfArticlesByUserAndCategory(user, category);
 		
 		} else if (category != null && isPublished) {
-			p = this.getNumberOfPublishedArticlesByUserAndCategory(conn, user, category);
+			console.log('getNumberOfPublishedArticlesByUserAndCategory');
+			p = this.getNumberOfPublishedArticlesByUserAndCategory(user, category);
 		
 		} else if (category != null && !isPublished) {
-			p = this.getNumberOfUnPublishedArticlesByUserAndCategory(conn, user, category);	
+			console.log('getNumberOfUnPublishedArticlesByUserAndCategory');
+			p = this.getNumberOfUnPublishedArticlesByUserAndCategory(user, category);	
 		
 		} else if (isPublished == null) {
-			p = this.getNumberOfArticlesByUser(conn, user); 
+			console.log('getNumberOfArticlesByUser');
+			p = this.getNumberOfArticlesByUser(user); 
 		
 		} else if (isPublished) {
-			p = this.getNumberOfPublishedArticlesByUser(conn, user); 
+			console.log('getNumberOfPublishedArticlesByUser');
+			p = this.getNumberOfPublishedArticlesByUser(user); 
 
 		} else {
-			p = this.getNumberOfUnPublishedArticlesByUser(conn, user); 
+			console.log('getNumberOfUnPublishedArticlesByUser');
+			p = this.getNumberOfUnPublishedArticlesByUser(user); 
 		}
 
 		return p;

@@ -4,6 +4,7 @@ const captchaCtrl    = require("../../controller/common/captchaCtrl");
 const userRouter     = require("./user");
 const categoryRouter = require("./category");
 const articleRouter  = require("./article");
+const dirRouter      = require("./directory");
 
 let router = express.Router();
 
@@ -16,8 +17,9 @@ router.get("/home"  , renderCtrl.renderHomePage);
 router.get("/captcha", 	captchaCtrl.updateCaptcha);
 
 // user route
-router.use("/user"    , userRouter);
-router.use("/category", categoryRouter);
-router.use("/article" , articleRouter);
+router.use("/user"     , userRouter);
+router.use("/category" , categoryRouter);
+router.use("/article"  , articleRouter);
+router.use("/directory", dirRouter);
 
 module.exports = router; 

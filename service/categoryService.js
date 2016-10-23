@@ -11,7 +11,7 @@ module.exports = {
 
 	isCategoryExistByUserAndCategory: function (user, category) {
 		return database.executeTemplate(conn=>{
-			return categoryModel.isCategoryExistByUserAndCategory(conn, category);
+			return categoryModel.isCategoryExistByUserAndCategory(conn, user, category);
 		});
 	},
 
