@@ -5,6 +5,7 @@ const userRouter     = require("./user");
 const categoryRouter = require("./category");
 const articleRouter  = require("./article");
 const dirRouter      = require("./directory");
+const pictureRouter  = require("./picture");
 
 let router = express.Router();
 
@@ -21,5 +22,6 @@ router.use("/user"     , userRouter);
 router.use("/category" , categoryRouter);
 router.use("/article"  , articleRouter);
 router.use("/directory", dirRouter);
+router.use("/picture"  , pictureRouter);
 
 module.exports = router; 

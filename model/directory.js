@@ -162,20 +162,37 @@ class Directory {
 	}
 
 	static delete (connection, directory) {
+		return deleteDirs(connection, [directory]);
+	}
+
+	static deleteDirs (connection, directories) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
-		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
+		assert.notEqual(directories, null, `directories id can't be ${directories}`);
+		assert.notEqual(directories.length, null, `pictures can't be ${directories}`);
 
-		let where = "id=?";
-		let whereValues = [
-			[directory.id]
-		];
+		return new Promise((resolve, reject)=>{
+			if (directories.length <= 0) {
+				resolve();
+				return;
+			}
 
-		database.delete(
+			let where = "id=?";
+		
+			let whereValues = [];
+			for (let directory of directories) {
+				let obj = [directory.id];
+				whereValues.push(obj);
+			}
+
+			database.delete(
 					connection, 
 					TABLENAME, 
 					where,
 					whereValues
-				);
+				)
+				.then(resolve)
+				.catch(reject);
+		});
 	}
 
 	static getUserRootDirs (connection, user) {
@@ -233,7 +250,41 @@ class Directory {
 							sql, 
 							params
 						)
-					.then(directories=>{
+					.then(dirs=>{
+						let tDirs = [];
+						for (let dir of dirs) {
+							dir = new Directory(dir);
+							tDirs.push(dir);
+						}
+						resolve(tDirs);
+					})
+					.catch(reject);
+		});
+	}
+
+	static getSubDirs (connection, directory) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
+		assert.notEqual(directory.user, null, `directory user can't be ${directory.user}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							* 
+						from 
+							${TABLENAME}
+						where
+							user = ?
+							and parentDirectory=? 
+							and deleteTime is null`;
+
+			let params = [directory.user, directory.id];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(dirs=>{
 						let tDirs = [];
 						for (let dir of dirs) {
 							dir = new Directory(dir);

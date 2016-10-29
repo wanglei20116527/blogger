@@ -34,6 +34,7 @@ function initApp () {
 	app.use(bodyParser.urlencoded({ extended: true }));
 
 	app.use("/static/photo", express.static(path.join(__dirname, "public/photo")));
+	app.use("/static/picture", express.static(path.join(__dirname, "public/picture")));
 
 	// app.use("/static/common/js"	  , express.static(path.join(__dirname, "public/common/js")));
 	// app.use("/static/common/css"  , express.static(path.join(__dirname, "public/common/css")));

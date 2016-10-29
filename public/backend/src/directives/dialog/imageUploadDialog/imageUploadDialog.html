@@ -1,0 +1,36 @@
+<div class="dialog model-dialog image-upload-dialog">
+	<div class="wrapper">
+		<div class="dialog-header clearfix">
+			<h4 class="title fl">Upload Image</h4>	
+			<button class="btn btn-close icon iconfont fr"
+					ng-click="close()">
+					&#xe61c;
+			</button>
+		</div>
+
+		<div class="dialog-body">
+			<button>
+				<input 
+					type="file"
+					multiple="multiple" 
+					onchange="angular.element(this).scope().onFileSelect(event)"
+				/>
+			</button>
+		
+		</div>
+
+		<div class="dialog-footer clearfix">
+			<div class="btn-group fr">
+				<button class="btn btn-cancel" 
+						ng-click="cancel()">
+					cancel
+				</button>
+
+				<button class="btn btn-confirm"
+						ng-click="confirm()">
+					upload
+				</button>
+			</div>
+		</div>		
+	</div>
+</div>

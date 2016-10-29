@@ -1,4 +1,5 @@
 const database       = require("../model/database");
+const pictureModel   = require("../model/picture");
 const directoryModel = require("../model/directory");
 const fileService    = require("./fileService");
 
@@ -65,7 +66,36 @@ module.exports = {
 
 	deleteDir: function (dir) {
 		return database.executeTemplate(conn=>{
-			return directoryModel.delete(conn, dir);
+			return deleteDir(conn, dir);
 		});	
+
+		function deleteDir (conn, dir) {
+			return new Promise((resolve, reject)=>{
+				directoryModel.getSubDirs(conn, dir).then(dirs=>{
+					let promises = [];
+
+					if (dirs.length > 0) {
+						for (let tmpDir of dirs) {
+							let p = deleteDir(conn, dir);
+							promises.push(p);
+						}
+					}
+
+					Promise.all(promises).then(()=>{
+						return pictureModel.getPicturesUnderDir(conn, dir);
+					})
+					.then(pictures=>{
+						return pictureModel.deletePictures(conn, pictures);
+					})
+					.then(()=>{
+						directory.delete(conn, dir)
+								 .then(resolve)
+								 .catch(reject);
+					})
+					.catch(reject);
+					
+				}).catch(reject);
+			});
+		}
 	},
 };

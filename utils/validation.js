@@ -23,5 +23,21 @@ module.exports = {
 
 	checkDirName: function (name) {
 		return name !== "" && name.length <= 100;
-	}
+	},
+
+	checkPictureName: function (name) {
+		return /\.jpg|\.png/.test(name);
+	},
+
+	checkPictureMimeType: function (mimeType) {
+		let valid = false;
+
+		try {
+			valid = /^image\//.test(mimeType);
+		} catch (err) {
+			valid = false;
+		}
+
+		return valid;
+	},
 };

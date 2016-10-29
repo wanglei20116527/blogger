@@ -19,6 +19,10 @@
 			"session": {
 				"maxAge": 864000000
 			}
+		},
+
+		"fileUpload": {
+			"maxFileSize": 2097152
 		}
 	},
 
