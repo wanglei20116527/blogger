@@ -1,0 +1,26 @@
+<div class="dialog">
+	<div class="wrapper">
+		<div class="dialog-header clearfix">
+			<h4 class="title fl" ng-bind="title"></h4>	
+			<button class="btn btn-close icon iconfont fr"
+					ng-click="close()">
+					&#xe61c;
+			</button>
+		</div>
+
+		<div class="dialog-body" ng-transclude>
+		</div>
+
+		<div class="dialog-footer clearfix">
+			<div class="btn-group fr">
+				<button 
+					class="btn"
+					ng-repeat="btn in buttons"
+					ng-bind="btn.text"
+					ng-style="btn.style"
+					ng-click="btn.onClick()">
+				</button>
+			</div>
+		</div>		
+	</div>
+</div>

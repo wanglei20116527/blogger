@@ -21,12 +21,19 @@ class User {
 	}
 
 	static add (connection, user) {
-		return database.insert(
+		return new Promise((resolve, reject)=>{
+			return database.insert(
 						connection, 
 						TABLENAME, 
 						FIELDS, 
 						[new User(user)]
-						);
+					)
+					.then(users=>{
+						resolve(users[0]);
+					})
+					.catch(reject);
+		});
+		
 	}
 
 	static update (connection, user) {
@@ -42,7 +49,9 @@ class User {
 						FIELDS, 
 						[new User(user)]
 					)
-					.then(resolve)
+					.then(function () {
+						resolve(user);
+					})
 					.catch(reject);
 		});
 	}

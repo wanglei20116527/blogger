@@ -1,0 +1,15 @@
+<div>
+	<div id="editormd">
+    	<textarea style="display:none;"></textarea>
+	</div>
+
+	<wl-dialog
+		ng-show="pictureDialog.show"
+		title="{{pictureDialog.config.title}}"
+		buttons="pictureDialog.config.buttons"
+		on-close="pictureDialog.config.onClose()">
+		<div>
+			<h1>please select an </h1>
+		</div>
+	</wl-dialog>
+</div>

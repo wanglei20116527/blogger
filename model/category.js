@@ -44,8 +44,8 @@ class Category {
 						FIELDS, 
 						[new Category(category)]
 					)
-					.then(categories=>{
-						resolve(categories[0]);
+					.then(()=>{
+						resolve(category);
 					})
 					.catch(reject);
 		});

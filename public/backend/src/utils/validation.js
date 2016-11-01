@@ -3,5 +3,9 @@ angular.module("Backend").service("Validation", [
 		this.checkCategory = function (name) {
 			return name !== "";
 		};
+
+		this.checkArticleTitle = function (title) {
+			return title !== "";
+		};
 	}
 ]);

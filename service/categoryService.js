@@ -34,7 +34,40 @@ module.exports = {
 	},
 
 	deleteCategory: function (category) {
+		// return database.executeTemplate(conn=>{
+		// 	let promises = [];
+		// 	let p = null;
+
+		// 	p = categoryModel.delete(conn, category);
+		// 	promises.push(p);
+
+		// 	p = articleModel.deleteByCategory(conn, category);
+		// 	promises.push(p);
+
+		// 	return Promise.all(promises);
+		// });
+
+		return this.deleteCategories([category]);
+	},
+
+	deleteCategories: function (categories) {
 		return database.executeTemplate(conn=>{
+			if (categories.length <= 0) {
+				resolve();
+				return;
+			}
+
+			let promises = [];
+			
+			for (let category of categories) {
+				let p = deleteCategory(conn, category);
+				promises.push(p);
+			}
+
+			return Promise.all(promises);
+		});
+
+		function deleteCategory (conn, category) {
 			let promises = [];
 			let p = null;
 
@@ -45,6 +78,7 @@ module.exports = {
 			promises.push(p);
 
 			return Promise.all(promises);
-		});
+		}
 	}
 };
+

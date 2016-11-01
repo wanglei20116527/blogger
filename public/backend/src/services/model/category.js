@@ -55,9 +55,22 @@ angular.module("Backend").service("Category", [
 		};
 
 		this.deleteCategory = function (category) {
+			return this.deleteCategories([category]);
+		};
+
+		this.deleteCategories = function (categories) {
 			return new $q(function (resolve, reject) {
-				var url = BASE_URL + "?category=" + category.id;
-				console.log(url);
+				if (categories.length <= 0) {
+					resolve();
+					return;
+				}
+
+				var ids = [];
+				for (var i = 0, len = categories.length; i < len; ++i) {
+					ids.push(categories[i].id);
+				}
+
+				var url = BASE_URL + "?category=" + encodeURIComponent(ids.join(","));
 
 				$http.delete(url).then(function (ret) {
 					ret = ret.data;

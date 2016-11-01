@@ -50,7 +50,9 @@ class Picture {
 						FIELDS, 
 						[new Picture(picture)]
 					)
-					.then(resolve)
+					.then(()=>{
+						resolve(picture);
+					})
 					.catch(reject);
 		});
 	}

@@ -1,4 +1,4 @@
-angular.module("Backend", ["ngRoute", "ngAnimate"]).config([
+angular.module("Backend", ["ngRoute", "ngAnimate", "ui.bootstrap"]).config([
 	'$locationProvider', 	
 	'$routeProvider',
 
@@ -10,16 +10,27 @@ angular.module("Backend", ["ngRoute", "ngAnimate"]).config([
 			controllerAs: "indexCtrl",
 			templateUrl : "/backend/static/templates/index.template.html"
 
-		}).when("/picture", {
+		})
+		.when("/article/list", {
+			controller  : "articleListCtrl",
+			controllerAs: "alc",
+			templateUrl : "/backend/static/templates/article/article.list.html"
+		})
+		.when("/article/write", {
+			controller  : "articleWriteCtrl",
+			controllerAs: "awl",
+			templateUrl : "/backend/static/templates/article/article.edit.html"
+		})
+		.when("/article/category", {
+			controller  : "articleCategoryCtrl",
+			controllerAs: "acc",
+			templateUrl : "/backend/static/templates/article/article.category.html"
+		})
+		.when("/picture", {
 			controller  : "pictureCtrl",
 			controllerAs: "pictureCtrl",
 			templateUrl : "/backend/static/templates/picture.template.html"
 
-		}).when("/article", {
-			controller  : "articleCtrl",
-			controllerAs: "articleCtrl",
-			templateUrl : "/backend/static/templates/article.template.html"
-			
 		}).when("/profile", {
 			controller  : "profileCtrl",
 			controllerAs: "profileCtrl",

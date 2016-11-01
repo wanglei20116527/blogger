@@ -1,0 +1,107 @@
+<div class="article-category page">
+	<div>
+		<button 
+			ng-click="addCategory()">
+			add Category
+		</button>
+
+		<button 
+			ng-click="deleteCheckedCategories()">
+			batch delete
+		</button>
+	</div>
+
+	<div>
+		<table>
+			<thead>
+				<tr>
+					<td>
+						<input 
+							type="checkbox"
+							ng-model="checkAll"
+							ng-change="checkAllChanged()"
+						/>
+					</td>
+
+					<td>
+						<span>name</span>
+					</td>
+
+					<td>
+						<span>operation</span>
+					</td>
+				</tr>
+			</thead>
+			<tr ng-repeat="category in categories">
+				<td>
+					<input 
+						type="checkbox"
+						ng-model="category.isChecked"
+						ng-change="categoryCheckStateChanged()"
+					/>
+				</td>
+
+				<td>
+					<span ng-bind="category.name"></span>
+				</td>
+
+				<td>
+					<div>
+						<button
+							class="btn" 
+							ng-click="updateCategory(category)">
+							update
+						</button>
+
+						<button
+							class="btn" 
+							ng-click="deleteCategory(category)">
+							delete
+						</button>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<wl-dialog 
+		ng-show="acd.show"
+		title="{{acd.config.title}}"
+		buttons="acd.config.buttons"
+		on-close="acd.config.onClose()">
+		
+		<input
+			type="text" 
+			ng-model="acd.name"
+		/>
+	</wl-dialog>
+
+	<wl-dialog 
+		ng-show="ucd.show"
+		title="{{ucd.config.title}}"
+		buttons="ucd.config.buttons"
+		on-close="ucd.config.onClose()">
+		<input
+			ng-model="ucd.category.name"
+		/>
+	</wl-dialog>
+
+	<wl-dialog 
+		ng-show="dcd.show"
+		title="{{dcd.config.title}}"
+		buttons="dcd.config.buttons"
+		on-close="dcd.config.onClose()">
+		
+		<p>Are you sure to delete this category?</p>
+	</wl-dialog>
+
+	<wl-dialog 
+		ng-show="dcsd.show"
+		title="{{dcsd.config.title}}"
+		buttons="dcsd.config.buttons"
+		on-close="dcsd.config.onClose()">
+		
+		<p>Are you sure to delete all selected categories?</p>
+	</wl-dialog>
+	
+</div>

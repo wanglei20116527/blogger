@@ -10,6 +10,31 @@ module.exports = {
 		});
 	},
 
+	getStatisticOfArticles: function (user) {
+		assert(user.id, null, `user id can't be ${user.id}`);
+
+		return database.executeTemplate(conn=>{
+			return new Promise((resolve, reject)=>{
+				let promises = [];
+				let p = null;
+
+				p = articleModel.getArticleNumberByUser(conn, user);
+				promises.push(p);
+
+				p = articleModel.getPublishedArticleNumberByUser(conn, user);
+				promises.push(p);
+
+				Promise.all(promises).then(ret=>{
+					resolve({
+						total: ret[0] || 0,
+						numOfPublished: ret[1] || 0
+					});
+				})
+				.catch(reject);
+			});
+		});
+	},
+
 	addArticle: function (article) {
 		return database.executeTemplate(conn=>{
 			return articleModel.add(conn, article);
@@ -30,17 +55,6 @@ module.exports = {
 
 	getArticles: function (user, start, number, category, isPublished) {
 		assert(user.id, null, `user id can't be ${user.id}`);
-
-		if (underscore.isBoolean(category)) {
-			isPublished = category;
-			category    = null;
-		}
-
-		if (underscore.isBoolean(isPublished)) {
-			isPublished = null;
-		}
-
-		console.log(`start ${start}, number ${number}, category ${category}, isPublished ${isPublished}`);
 
 		let p = null;
 			
@@ -111,15 +125,6 @@ module.exports = {
 	getNumberOfArticles: function (user, category, isPublished) {
 		assert(user.id, null, `user id can't be ${user.id}`);
 
-		if (underscore.isBoolean(category)) {
-			isPublished = category;
-			category    = null;
-		}
-
-		if (underscore.isBoolean(isPublished)) {
-			isPublished = null;
-		}
-
 		let p = null;
 			
 		if (category != null && isPublished == null) {
@@ -162,7 +167,7 @@ module.exports = {
 		});
 	},
 
-	getNumberOfUnPublishedArticlesByUser: function () {
+	getNumberOfUnPublishedArticlesByUser: function (user) {
 		return database.executeTemplate(conn=>{
 			return articleModel.getUnPublishedArticleNumberByUser(conn, user);
 		});

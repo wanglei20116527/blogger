@@ -28,6 +28,29 @@ angular.module("Backend").service("Article", [
 			}); 
 		};
 
+		this.getStatistic = function () {
+			return new $q(function (resolve, reject) {
+				var url = BASE_URL + "/statistic";
+
+				$http.get(url).then(function (ret) {
+					ret = ret.data;
+					
+					if (!ret.success) {
+						var errMsg = ret.error.message;
+						console.error(errMsg);
+						reject(new Error(errMsg)); 
+						return;
+					}
+
+					resolve(ret.data.statistic);
+
+				}).catch(function(err){
+					console.error(err);
+					reject(new Error("server error"));
+				});
+			}); 
+		};
+
 		this.getArticles = function (start, number, categoryId, isPublish) {
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "?start=" + start + "&number=" + number;

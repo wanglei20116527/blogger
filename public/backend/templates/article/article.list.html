@@ -1,0 +1,81 @@
+<div class="article-list page">
+	<div ng-include="'/backend/static/templates/loading.template.html'"
+		 ng-if="isLoading">
+	</div>
+
+	<div ng-if="!isLoading && articleList.show">
+		<h3>Articles</h3>
+
+		<div>
+			<ul>
+				<li>
+					<a href="#!/article/write">
+						Write Article
+					</a>
+				</li>
+
+				<li>
+					<div>
+						<span 
+							ng-bind="articleList.categorySelector.curtCategory.name"
+							ng-click="articleList.showCategorySelector(true)">
+						</span>
+
+						<ul ng-show="articleList.categorySelector.show">
+							<li ng-repeat="category in categories"
+								ng-click="articleList.updateCategory(category)">
+								<a ng-bind="category.name"></a>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+				<li>
+					<div>
+						<span 
+							ng-bind="articleList.publishSelector.curtItem.name"
+							ng-click="articleList.showPublishSelector(true)">
+						</span>
+
+						<ul ng-show="articleList.publishSelector.show">
+							<li ng-repeat="publishItem in publishList"
+								ng-click="articleList.updatePublishSelecorItem(publishItem)">
+								<a ng-bind="publishItem.name"></a>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+				<li>
+					<button 
+						class="btn"
+						ng-click="articleList.filtrateArticles()">
+						filtrate
+					</button>
+				</li>
+			</ul>
+			
+		</div>
+
+		<div>
+			<span ng-bind="'All(' + statistic.total + ')'"></span>
+			<span>|</span>
+			<span ng-bind="'Published(' + statistic.numOfPublished + ')'"></span>
+			<span>|</span>
+			<span ng-bind="'UnPublished(' + (statistic.total - statistic.numOfPublished) + ')'"></span>
+		</div>
+
+		<div class="toolbar">
+			<ul>
+				<li></li>
+			</ul>
+		</div>
+
+		<div>
+			{{articleList.articles}}
+		</div>
+	</div>
+
+	<div ng-if="!isLoading && articleEdit.show">
+	</div>
+</div>

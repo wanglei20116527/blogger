@@ -195,7 +195,102 @@ module.exports = {
 				console.error(err);
 				res.sendStatus(500);
 			});
-
-		
 	},
+
+	deleteCategories: function (req, res) {
+		try {
+			let {
+				user
+			} = req.session.user;
+
+			let {
+				category: ids
+			} = req.query;
+
+			let promises = [];
+			let p = null;
+
+			let categories = [];
+			ids = ids.split(",");
+
+			for (let i = 0, len = ids.length; i < len; ++i) {
+				let id = parseInt(ids[i], 10);
+
+				if (!Number.isInteger(id)) {
+					res.json({
+						success: false,
+						error: {
+							code: 190000,
+							message: `category id ${id} invalid`	
+						}
+					});
+					return;
+				}
+
+				ids[i] = id;
+
+				let category = {
+					id: id,
+					user: user.id
+				};
+
+				p = categoryService.isCategoryExistByUserAndCategory(user, category);
+				promises.push(p);
+				
+				categories.push(category);
+			}
+
+			Promise.all(promises).then(isExists=>{
+				for (let i = 0, len = isExists.length; i < len; ++i) {
+					if (!isExists[i]) {
+						let err = new Error(`category ${ids[i]} not exist`);
+						err.code = 190000;
+						throw err;
+					}
+				}
+
+				return categoryService.deleteCategories(categories);
+			})
+			.then(()=>{
+				res.json({
+					success: true,
+				});
+			})
+			.catch(err=>{
+				console.error(err);
+
+				if (err.statusCode) {
+					res.sendStatus(err.statusCode);
+					return;
+				}
+
+				if (err.code) {
+					res.json({
+						success: false,
+						error: {
+							code: err.code,
+							message: err.message || err.stack	
+						}
+					});
+					return;
+				}
+			});
+
+		} catch (err) {
+			console.error(err);
+
+			if (err.code) {
+				res.json({
+					success: false,
+					error: {
+						code: err.code,
+						message: err.message || err.stack	
+					}
+				});
+				return;
+			}
+
+			res.sendStatus(err.statusCode || 500);
+		}
+	}
 };

@@ -43,6 +43,25 @@ module.exports = {
 		});
 	},
 
+	getStatisticOfArticles: function (req, res) {
+		let {
+			user
+		} = req.session.user;
+
+		articleService.getStatisticOfArticles(user).then(statistic=>{
+			res.json({
+				success: true,
+				data: {
+					statistic: statistic
+				}
+			});
+		})
+		.catch(err=>{
+			console.error(err);
+			res.sendStatus(500);
+		});
+	},
+
 	getArticles: function (req, res) {
 		let {
 			user
@@ -73,11 +92,15 @@ module.exports = {
 				id: category
 			}
 		} else {
-			category = void 0;
+			category = null;
 		}
 
-		if (!underscore.isBoolean(isPublish)) {
-			isPublish = void 0;
+		if (isPublish === "true") {
+			isPublish = true;
+		} else if (isPublish === "false") {
+			isPublish = false;
+		} else {
+			isPublish = null;
 		}
 
 		let promises = [];
@@ -92,6 +115,10 @@ module.exports = {
 		Promise.all(promises).then(ret=>{
 			let number   = ret[0] || 0;
 			let articles = ret[1] || [];
+
+			for (let article of articles) {
+				article.isPublish = article.isPublish === "1";
+			}
 
 			res.json({
 				success: true,
@@ -153,7 +180,7 @@ module.exports = {
 		}
 		article.content = article.content.trim();
 
-		if (article.isPublish !== "0" && article.isPublish !== "1") {
+		if (!underscore.isBoolean(article.isPublish)) {
 			res.json({
 				success: false,
 				error: {
@@ -163,6 +190,8 @@ module.exports = {
 			});
 			return;	
 		}
+
+		article.isPublish = article.isPublish ? "1" : "0";
 
 		if (!Number.isInteger(category.id)) {
 			res.json({
@@ -195,12 +224,19 @@ module.exports = {
 				});
 
 				articleService.addArticle(article).then(article=>{
+					article.isPublish = article.isPublish === "1";
+
+					delete article.createTime;
+					delete article.updateTime;
+					delete article.deleteTime;
+
 					res.json({
 						success: true,
 						data: {
 							article: article
 						}
-					})
+					});
+
 				}).catch(err=>{
 					console.error(err);
 					res.sendStatus(500);
@@ -228,7 +264,7 @@ module.exports = {
 			|| !underscore.isString(article.title)
 			|| !underscore.isString(article.content)
 			|| !Number.isInteger(article.author)
-			|| (article.isPublish !== "0" && article.isPublish !== "1")) {
+			|| !underscore.isBoolean(article.isPublish)) {
 
 			res.json({
 				success: false,
@@ -239,6 +275,8 @@ module.exports = {
 			});
 			return;
 		}
+
+		article.isPublish = article.isPublish ? "1": "0";
 
 		let promises = [];
 		let p = null;
@@ -289,7 +327,13 @@ module.exports = {
 				date: Date.now(),
 			});
 
-			articleService.updateArticle(article).then(()=>{
+			articleService.updateArticle(article).then(article=>{
+				article.isPublish = article.isPublish === "1";
+
+				delete article.createTime;
+				delete article.updateTime;
+				delete article.deleteTime;
+
 				res.json({
 					success: true,
 					data: {

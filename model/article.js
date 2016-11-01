@@ -22,12 +22,19 @@ class Article {
 
 	static add (connection, article) {
 		let fields = FIELDS.slice(1);
-		return database.insert(
+
+		return new Promise((resolve, reject)=>{
+			database.insert(
 						connection, 
 						TABLENAME, 
 						fields, 
 						[new Article(article)]
-					);
+					)
+					.then(articles=>{
+						resolve(articles[0]);
+					})
+					.catch(reject);
+		});
 	}
 
 	static update (connection, article) {
@@ -50,7 +57,9 @@ class Article {
 						where,
 						whereValues
 					)
-					.then(resolve)
+					.then(()=>{
+						resolve(article);
+					})
 					.catch(reject);
 		});
 	}
@@ -199,7 +208,7 @@ class Article {
 							and isPublish=?
 							and deleteTime is null`;
 
-			let params = [user.id, 1];
+			let params = [user.id, "1"];
 
 			database.executeSql(
 						connection, 
@@ -226,7 +235,7 @@ class Article {
 							and isPublish=?
 							and deleteTime is null`;
 
-			let params = [user.id, 0];
+			let params = [user.id, "0"];
 
 			database.executeSql(
 						connection, 
@@ -283,7 +292,7 @@ class Article {
 							and category=?
 							and deleteTime is null`;
 
-			let params = [user.id, 1, category.id];
+			let params = [user.id, "1", category.id];
 
 			database.executeSql(
 						connection, 
@@ -312,7 +321,7 @@ class Article {
 							and category=?
 							and deleteTime is null`;
 
-			let params = [user.id, 0, category.id];
+			let params = [user.id, "0", category.id];
 
 			database.executeSql(
 						connection, 
@@ -376,7 +385,7 @@ class Article {
 							and deleteTime is null
 						limit ?,?`;
 
-			let params = [user.id, 1, start, number];
+			let params = [user.id, "1", start, number];
 
 			database.executeSql(
 						connection, 
@@ -411,7 +420,7 @@ class Article {
 							and deleteTime is null
 						limit ?,?`;
 
-			let params = [user.id, 0, start, number];
+			let params = [user.id, "0", start, number];
 
 			database.executeSql(
 						connection, 
@@ -425,6 +434,7 @@ class Article {
 							ret.push(article);
 						}
 						resolve(ret);
+						console.log(articles);
 					})
 					.catch(reject);
 		});
@@ -484,7 +494,7 @@ class Article {
 							and deleteTime is null
 						limit ?,?`;
 
-			let params = [user.id, category.id, 1, start, number];
+			let params = [user.id, category.id, "1", start, number];
 
 			database.executeSql(
 						connection, 
@@ -521,7 +531,7 @@ class Article {
 							and deleteTime is null
 						limit ?,?`;
 
-			let params = [user.id, category.id, 0, start, number];
+			let params = [user.id, category.id, "0", start, number];
 
 			database.executeSql(
 						connection, 

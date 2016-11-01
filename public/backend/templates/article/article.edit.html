@@ -1,0 +1,53 @@
+<div class="article-edit page">
+	<div ng-include="'/backend/static/templates/loading.template.html'"
+		 ng-if="isLoading">
+	</div>
+
+	<div ng-if="categoires.length <= 0 && !isLoading">
+		<h1> no category, please add a category first</h1>
+	</div>
+	
+	<div ng-if="categoires.length > 0 && !isLoading">
+
+		<div>
+			<h3>title</h3>
+			<input type="text" ng-model="article.title">
+
+			<div>
+				<div>
+					<span ng-bind="curtCategory.name"></span>
+
+					<button 
+						ng-click="showCtgySelector(true)">
+						show
+					</button>	
+				</div>
+				
+				<ul ng-show="isCtgySelectorShow">
+					<li ng-repeat="category in categoires">
+						<a ng-bind="category.name"
+							ng-click="changeCategory(category)">
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<label>
+				isPublish: 
+				<input type="checkbox" ng-model="article.isPublish">
+			</label>
+		</div>
+
+		<div>
+			<wl-editor on-change="onContentChange(content)"></wl-editor>
+		</div>
+
+		<dir>
+			<button ng-click="saveArticle()">save</button>
+		</dir>
+
+		<p ng-bind="article.content"></p>
+
+		{{article}}
+	</div>
+</div>
