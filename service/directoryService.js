@@ -28,10 +28,10 @@ module.exports = {
 		return database.executeTemplate(conn=>{
 			let p = null;
 
-			if (!parentDir) {
-				p = directoryModel.getUserSubDirs(conn, user, parentDir);
-			} else {
+			if (parentDir == null) {
 				p = directoryModel.getUserRootDirs(conn, user);
+			} else {
+				p = directoryModel.getUserSubDirs(conn, user, parentDir);
 			}
 
 			return p;

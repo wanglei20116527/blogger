@@ -14,15 +14,21 @@ module.exports = {
 		} = req.session.user;
 
 		let {
-			parentDirectory: pDirId
+			parentDirectory: oPDirId
 		} = req.query;
+
+		let pDirId = null;
+
+		if (oPDirId != null) {
+			pDirId = parseInt(oPDirId, 10);
+		}
 
 		if (pDirId != null && !Number.isInteger(pDirId)) {
 			res.json({
 				success: false,
 				error: {
 					code: 190500,
-					message: `parent dir id invalid`
+					message: `parent dir id ${oPDirId} invalid`
 				}
 			});
 			return;
@@ -30,40 +36,51 @@ module.exports = {
 
 		let p = Promise.resolve(true);
 		if (pDirId != null) {
-			pDirId = parseInt(pDirId);
-			p = isDirExistByUserAndId(user, pDirId);
+			p = dirService.isDirExistByUserAndId(user, pDirId);
 		}
 
 		p.then(isExist=>{
 			if (!isExist) {
-				res.json({
-					success: false,
-					error: {
-						code: 190500,
-						message: `parent dir not exist`
-					}
-				});
-				return;
+				let err = new Error(`parent dir not exist`);
+				err.code = 190500;
+				throw err;
 			}
 
 			let pDir = pDirId == null ? null: {
 				id: pDirId
 			};
 
-			dirService.getDirs(user, pDir).then(dirs=>{
+			return dirService.getDirs(user, pDir);
+		})
+		.then(dirs=>{
+			dirs = dirs || [];
+
+			for (let dir of dirs) {
+				delete dir.path;
+			}
+
+			res.json({
+				success: true,
+				data: {
+					directories: dirs
+				}
+			});
+		})
+		.catch(err=>{
+			console.error(err);
+
+			if (err.code) {
 				res.json({
-					success: true,
-					data: {
-						directories: dirs || []
+					success: false,
+					error: {
+						code: err.code,
+						message: err.message || err.stack	
 					}
 				});
-			}).catch(err=>{
-				console.error(err);
-				res.sendStatus(500);
-			});
-		}).catch(err=>{
-			console.error(err);
-			res.sendStatus(500);
+				return;
+			}
+
+			res.sendStatus(err.statusCode || 500);
 		});
 	},
 
@@ -131,32 +148,37 @@ module.exports = {
 
 			dirService.isDirExistByUserAndName(user, dir.name, pDir).then(isExist=>{
 				if (isExist) {
+					let err = new Error(`directory ${dir.name} already exist`);
+					err.code = 190501;
+					throw err;
+				}
+
+				return dirService.addDir(dir);
+			})
+			.then(dir=>{
+				res.json({
+					success: true,
+					data: {
+						directory: dir
+					}
+				});
+			})
+			.catch(err=>{
+				console.error(err);
+
+				if (err.code) {
 					res.json({
 						success: false,
 						error: {
-							code: 190501,
-							message: `directory ${dir.name} already exist`
+							code: err.code,
+							message: err.message || err.stack	
 						}
 					});
 					return;
 				}
 
-				dirService.addDir(dir).then(directory=>{
-					res.json({
-						success: true,
-						data: {
-							directory: directory
-						}
-					});
-				}).catch(err=>{
-					console.error(err);
-					res.sendStatus(500);
-				});
-
-			}).catch(err=>{
-				console.error(err);
-				res.status(err.code || 500).send(err.message)
-			})
+				res.sendStatus(err.statusCode || 500);
+			});
 		}
 	},
 

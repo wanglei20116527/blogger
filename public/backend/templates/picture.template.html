@@ -1,17 +1,42 @@
 <div>
-	<h1>picture template</h1>
+	<div ng-include="'/backend/static/templates/loading.template.html'"
+		 ng-if="isLoading">
+	</div>
 
-	<form 
-		method="post" 
-		action="/backend/picture/upload" 
-		enctype="multipart/form-data"
-		target="iframe">
-		<input type="file" name="picture">
-		<input type="text" name="directory" value="15">
-		<button type="submit">submit</button>
-	</form>
+	<div>
+		<div>
+			<div>
+				<button 
+					class="btn">
+					<span>Upload</span>
+				</button>
 
-	<iframe name="iframe"></iframe>
+				<button 
+					class="btn"
+					ng-click="openCreateDirDialog()">
+					<span>New Directory</span>
+				</button>
+			</div>
+
+			{{dirs}}
+		</div>	
+
+		<div>
+			<wl-dialog
+				ng-show="createDirDialogConfig.show"
+				title="{{createDirDialogConfig.title}}"
+				buttons="createDirDialogConfig.buttons"
+				on-close="createDirDialogConfig.onClose()">
+				
+				<input 
+					type="text" 
+					ng-model="createDirDialogConfig.name"
+				/>
+			</wl-dialog>
+		</div>
+	</div>
+
+	
 
 	<!-- <image-upload-dialog
 		ng-if="imageUploadDialog.show"
