@@ -6,6 +6,7 @@ const FIELDS = [
 	"id",
 	"title", 
 	"content",
+	"markdown",
 	"date",
 	"author",
 	"category",

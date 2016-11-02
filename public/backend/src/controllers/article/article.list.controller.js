@@ -1,13 +1,14 @@
 angular.module("Backend").controller("articleListCtrl", [
 	"$scope",
 	"$q",
+	"User",
 	"Category",
 	"Article",
-
 
 	function (
 			$scope,
 			$q,
+			User,
 			Category,
 			Article
 		) {
@@ -37,6 +38,53 @@ angular.module("Backend").controller("articleListCtrl", [
 
 		$scope.publishList = PUBLISH_LIST;
 
+		$scope.user = {};
+
+		$scope.deleteArticleDialogOption = {
+			show: false,
+
+			article: null,
+			
+			title: "Delete Article",
+
+			buttons: [
+				{
+					text: "Cancel",
+					style: {
+						color: "#fff",
+						backgroundColor: "#666"
+					},
+					onClick: function () {
+						console.log("close delete article");
+						closeDeleteArticleDialog();
+					}
+				},
+
+				{
+					text: "Confirm",
+					style: {
+						color: "#fff",
+						backgroundColor: "#2196F3"
+					},
+					onClick: function () {
+						var article = $scope.deleteArticleDialogOption.article;
+
+						deleteArticle(article).then(function () {
+							closeDeleteArticleDialog();
+							console.log("deleteArticle success");
+						})
+						.catch(function (err) {
+							console.error(err);
+						});
+					}
+				}
+			],
+
+			onClose: function () {
+				this.show = false;
+			}
+		};
+
 		$scope.statistic = {
 			total: 0,
 			numOfPublished: 0
@@ -49,7 +97,7 @@ angular.module("Backend").controller("articleListCtrl", [
 			
 			articles: [],
 			
-			curtPage: 0,
+			curtPage: 1,
 			
 			numPerPage: NUMBER_PER_PAGE,
 
@@ -61,6 +109,39 @@ angular.module("Backend").controller("articleListCtrl", [
 			publishSelector: {
 				show: false,
 				curtItem: PUBLISH_LIST[0]
+			},
+
+			pageChanged: function () {
+				$scope.isLoading = true;
+
+				var options =  {
+					start: (this.curtPage - 1) * NUMBER_PER_PAGE
+				};
+
+				var publishItem  = this.publishSelector.curtItem;
+				
+				if (publishItem === PUBLISH_LIST[1]) {
+					options.isPublish = true;
+
+				} else if (publishItem === PUBLISH_LIST[2]) {
+					options.isPublish = false;
+				}
+
+				var curtCategory = this.categorySelector.curtCategory;
+
+				if (curtCategory !== DEFAULT_CATEGORY) {
+					options.category = curtCategory.id;
+				}
+
+				updateArticleList(options).then(function (){
+					$scope.isLoading = false;
+
+					modifyArticleCategoryAttr();
+					
+				}).catch(function (err) {
+					console.error(err);
+					$scope.isLoading = false;
+				});
 			},
 
 			showCategorySelector: function (show) {
@@ -103,10 +184,10 @@ angular.module("Backend").controller("articleListCtrl", [
 					options.category = curtCategory.id;
 				}
 
-				updateArticles(options).then(function (){
+				updateArticleList(options).then(function (){
 					$scope.isLoading = false;
 
-					$scope.articleList.curtPage = 0;
+					$scope.articleList.curtPage = 1;
 
 					modifyArticleCategoryAttr();
 					
@@ -114,13 +195,71 @@ angular.module("Backend").controller("articleListCtrl", [
 					console.error(err);
 					$scope.isLoading = false;
 				});
+			},
+
+			editArticle: function (article) {
+				this.show = false;
+
+				article = angular.copy(article);
+
+				$scope.articleEdit.show = true;
+				$scope.articleEdit.article = article;
+				$scope.articleEdit.categorySelector.curtCategory = article.category;
+			},
+
+			deleteArticle: function (article) {
+				openDeleteArticleDialog(article);
 			}
 		};
 
 		$scope.articleEdit = {
 			show: false,
-			article: null
+			
+			article: null,
+
+			categorySelector: {
+				show: false,
+				curtCategory: null,
+			},
+
+			backToArticleList: function () {
+				this.show = false;
+				this.article = null;
+
+				$scope.articleList.show = true;
+			},
+
+			showCategorySelector: function (show) {
+				this.categorySelector.show = !!show;
+			},
+
+			changeCategory: function (category) {
+				this.article.category = category;
+
+				this.categorySelector.show = false;
+				this.categorySelector.curtCategory = category;
+
+			},
+
+			onContentChange: function (html, markdown) {
+				if (this.article == null) {
+					return;
+				}
+
+				this.article.content  = html;
+				this.article.markdown = markdown;
+			},
+
+			updateArticle: function () {
+				updateArticle(this.article).then(function () {
+					console.log("update article success");
+				}).catch(function (err) {
+					console.error(err);
+				});
+			},
 		};
+
+		$scope.defaultCategory = DEFAULT_CATEGORY;
 
 		$scope.categories = [];
 
@@ -130,10 +269,13 @@ angular.module("Backend").controller("articleListCtrl", [
 			var promises = [];
 			var p = null;
 
+			p = initUser();
+			promises.push(p);
+
 			p = initArticleStatistic();
 			promises.push(p);
 
-			p = initArticles();
+			p = initArticleList();
 			promises.push(p);
 
 			p = initCategories();
@@ -147,6 +289,17 @@ angular.module("Backend").controller("articleListCtrl", [
 			}).catch(function (err) {
 				console.error(err);
 				$scope.isLoading = false;
+			});
+		}
+
+		function initUser () {
+			return new $q(function (resolve, reject) {
+				User.get().then(function (user) {
+					$scope.user = user;
+
+					resolve();
+				})
+				.catch(reject);
 			});
 		}
 
@@ -164,16 +317,16 @@ angular.module("Backend").controller("articleListCtrl", [
 			});
 		}
 
-		function initArticles () {
-			return updateArticles({
-				pageIndex: 0
+		function initArticleList () {
+			return updateArticleList({
+				start: 0
 			});
 		}
 
 		function initCategories () {
 			return new $q(function (resolve, reject) {
 				Category.getCategories().then(function (categories) {
-					$scope.categories = [DEFAULT_CATEGORY].concat(categories || []);
+					$scope.categories = categories || [];
 
 					resolve();
 				})
@@ -181,9 +334,9 @@ angular.module("Backend").controller("articleListCtrl", [
 			});
 		}
 
-		function updateArticles (options) {
+		function updateArticleList (options) {
 			return new $q(function (resolve, reject) {
-				var start     = (options.pageIndex || 0) * NUMBER_PER_PAGE;
+				var start     = options.start || 0;
 				var number    = NUMBER_PER_PAGE;
 				var category  = options.category;
 				var isPublish = options.isPublish;
@@ -200,9 +353,120 @@ angular.module("Backend").controller("articleListCtrl", [
 					$scope.articleList.total    = data.total    || 0;
 					$scope.articleList.articles = data.articles || [];
 
+					var articles = $scope.articleList.articles;
+
+					for (var i = 0, len = articles.length;  i < len; ++i) {
+						var article = articles[i];
+
+						article.index = start + i + 1;
+						article.date  = new Date(article.date);
+					}
+
 					resolve();
 				})
 				.catch(reject);
+			});
+		}
+
+		function updateArticle (article) {
+			return new $q(function (resolve, reject) {
+				article = angular.copy(article);
+
+				var category = article.category;
+
+				article.date = article.date.getTime();
+				article.category = category.id;
+
+				delete article.index;
+
+				Article.updateArticle(article).then(function (article) {
+					var articles = $scope.articleList.articles;
+
+					console.log("+++++++++++++++++++++++");
+					console.log(article);
+
+
+					for (var i = 0, len = articles.length; i < len; ++i) {
+						var tmpArticle = articles[i];
+
+						if (tmpArticle.id === article.id) {
+							if (tmpArticle.isPublish != article.isPublish) {
+
+								if (tmpArticle.isPublish) {
+									$scope.statistic.numOfPublished--;
+								} else {
+									$scope.statistic.numOfPublished++;
+								}
+							}
+							article.index = i + 1;
+							article.category = category;
+							article.date = new Date(article.date);
+							articles[i] = article;
+							break;
+						}
+					}
+
+					resolve();
+				})
+				.catch(reject);
+			});
+
+		
+		}
+
+		function deleteArticle (article) {
+			article = angular.copy(article);
+
+			article.date = article.date.getTime();
+			article.category = article.category.id;
+
+			delete article.index;
+
+			console.log("deleteArticle: ");
+			console.log(article);
+
+			return new $q(function (resolve, reject) {
+				Article.deleteArticle(article).then(function () {
+					$scope.statistic.total--;
+
+					if (article.isPublish) {
+						$scope.statistic.numOfPublished--;
+					}
+
+					var options = {};
+
+					var articleList = $scope.articleList;
+
+					var curtPage = articleList.curtPage;
+					if (articleList.articles.length <= 1) {
+						curtPage = curtPage - 1;
+					}
+					options.start = (curtPage - 1) * NUMBER_PER_PAGE;
+
+					var publishItem = articleList.publishSelector.curtItem;
+					if (publishItem === PUBLISH_LIST[1]) {
+						options.isPublish = true;
+
+					} else if (publishItem === PUBLISH_LIST[2]) {
+						options.isPublish = false;
+					}
+
+					var curtCategory = articleList.categorySelector.curtCategory;
+
+					if (curtCategory !== DEFAULT_CATEGORY) {
+						options.category = curtCategory.id;
+					}
+
+					updateArticleList(options).then(function () {
+						articleList.curtPage = curtPage;
+
+						modifyArticleCategoryAttr();
+
+						resolve();
+					}).catch(reject)
+
+
+				}).catch(reject);
 			});
 		}
 
@@ -221,6 +485,17 @@ angular.module("Backend").controller("articleListCtrl", [
 					}
 				}
 			}
+		}
+
+
+		function openDeleteArticleDialog (article) {
+			$scope.deleteArticleDialogOption.show = true;
+			$scope.deleteArticleDialogOption.article = article;
+		}
+
+		function closeDeleteArticleDialog () {
+			$scope.deleteArticleDialogOption.show = false;
+			$scope.deleteArticleDialogOption.article = null;
 		}
 	}
 ]);

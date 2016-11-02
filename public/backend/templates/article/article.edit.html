@@ -39,15 +39,11 @@
 		</div>
 
 		<div>
-			<wl-editor on-change="onContentChange(content)"></wl-editor>
+			<wl-editor on-change="onContentChange(html, markdown)"></wl-editor>
 		</div>
 
 		<dir>
 			<button ng-click="saveArticle()">save</button>
 		</dir>
-
-		<p ng-bind="article.content"></p>
-
-		{{article}}
 	</div>
 </div>

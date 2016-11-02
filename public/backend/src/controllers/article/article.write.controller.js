@@ -21,11 +21,12 @@ angular.module("Backend").controller("articleWriteCtrl", [
 		$scope.article      = {
 			title: "",
 			content: "",
+			markdown: "",
 			isPublish: false
 		};
 
-		$scope.onContentChange = function (content) {
-			updateContent(content);
+		$scope.onContentChange = function (html, markdown) {
+			updateContent(html, markdown);
 		};
 
 		$scope.isCtgySelectorShow = false;
@@ -112,8 +113,9 @@ angular.module("Backend").controller("articleWriteCtrl", [
 			});
 		}
 
-		function updateContent (content) {
-			$scope.article.content = content;
+		function updateContent (html, markdown) {
+			$scope.article.content  = html;
+			$scope.article.markdown = markdown;
 		}
 
 		function changeCategory (category) {

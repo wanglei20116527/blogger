@@ -1,12 +1,14 @@
 angular.module("Backend").directive("wlEditor", [
+	"Uuid",
 	"Directory",
 	"Picture",
 
-	function (Directory, Picture) {
+	function (Uuid, Directory, Picture) {
 
 		return {
 			restrict: 'E',
 			scope: {
+				content: "@?",
 				onChange: "&?"
 			},
 
@@ -58,7 +60,8 @@ angular.module("Backend").directive("wlEditor", [
 					onchange: function () {
 						scope.$apply(function () {
 							scope.onChange && scope.onChange({
-								content: editor.getHTML()
+								html: editor.getHTML(),
+								markdown: editor.getMarkdown(),
 							});
 						});
 					},
@@ -120,17 +123,42 @@ angular.module("Backend").directive("wlEditor", [
 					config: PICTURE_DIALOG_CONFIG
 				};
 
+				scope.$on("$destroy", function () {
+					if (editor == null) {
+						return;
+					}
+					editor.editor.remove()
+				});
 
-				initEditor();
+				init();
 
-				function initEditor () {
-					editor = editormd("editormd", EDITOR_OPTIONS);
+				function init () {
+					var id = initEditorId();
+					
+					initEditor(id);
+				}
+
+				function initEditorId () {
+					var $el = elements.find(".editormd").eq(0);
+					var id  = "editormd-" + Uuid.getUuid();
+
+					$el.attr("id", id);
+
+					return id;
+				}
+				
+
+				function initEditor (id) {
+					var options = angular.merge({}, EDITOR_OPTIONS, {
+						markdown: scope.content || ""
+					});
+
+					editor = editormd(id, options);
 				}
 
 				function showPictureDialog (show) {
 					scope.pictureDialog.show = !!show;
 				}
-				
 			}
 		};
 	}

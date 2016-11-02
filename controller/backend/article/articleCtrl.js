@@ -178,7 +178,17 @@ module.exports = {
 			});
 			return;
 		}
-		article.content = article.content.trim();
+
+		if (!underscore.isString(article.markdown)) {
+			res.json({
+				success: false,
+				error: {
+					code: 190403,
+					message: `article markdown can't be ${article.markdown}`
+				}
+			});
+			return;
+		}
 
 		if (!underscore.isBoolean(article.isPublish)) {
 			res.json({
@@ -263,7 +273,9 @@ module.exports = {
 			|| !Number.isInteger(article.id) 
 			|| !underscore.isString(article.title)
 			|| !underscore.isString(article.content)
+			|| !underscore.isString(article.markdown)
 			|| !Number.isInteger(article.author)
+			|| !Number.isInteger(article.category)
 			|| !underscore.isBoolean(article.isPublish)) {
 
 			res.json({

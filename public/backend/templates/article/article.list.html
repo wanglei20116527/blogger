@@ -1,9 +1,14 @@
 <div class="article-list page">
 	<div ng-include="'/backend/static/templates/loading.template.html'"
-		 ng-if="isLoading">
+		 ng-show="isLoading">
 	</div>
 
-	<div ng-if="!isLoading && articleList.show">
+	<div ng-show="!isLoading && statistic.total < 0">
+		<h1>no article, please to write</h1>
+		<a href="#!/article/write">Writing Article</a>
+	</div>
+
+	<div ng-show="!isLoading && statistic.total > 0 && articleList.show">
 		<h3>Articles</h3>
 
 		<div>
@@ -22,6 +27,10 @@
 						</span>
 
 						<ul ng-show="articleList.categorySelector.show">
+							<li ng-click="articleList.updateCategory(defaultCategory)">
+								<a ng-bind="defaultCategory.name"></a>
+							</li>
+
 							<li ng-repeat="category in categories"
 								ng-click="articleList.updateCategory(category)">
 								<a ng-bind="category.name"></a>
@@ -72,10 +81,136 @@
 		</div>
 
 		<div>
-			{{articleList.articles}}
+			<table>
+				<thead>
+					<tr>
+						<td><span>Index</span></td>
+						<td><span>Title</span></td>
+						<td><span>Author</span></td>
+						<td><span>Category</span></td>
+						<td><span>State</span></td>
+						<td><span>Date</span></td>
+						<td><span>Operation</span></td>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr ng-repeat="article in articleList.articles">
+						<td>
+							<span ng-bind="article.index"></span>
+						</td>
+
+						<td>
+							<span ng-bind="article.title"></span>
+						</td>
+
+						<td>
+							<span ng-bind="user.name"></span>
+						</td>
+
+						<td>
+							<span ng-bind="article.category.name"></span>
+						</td>
+
+						<td>
+							<span ng-bind="article.isPublish ? 'Published' : 'UnPublished'"></span>
+						</td>
+
+						<td>
+							<span ng-bind="article.date | date"></span>
+						</td>
+
+						<td>
+							<div>
+								<button 
+									class="btn"
+									ng-click="articleList.editArticle(article)">
+									Edit
+								</button>
+								
+								<button 
+									class="btn"
+									ng-click="articleList.deleteArticle(article)">
+									Delete
+								</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div>
+				<ul uib-pagination
+					boundary-links="true"
+					items-per-page="articleList.numPerPage"
+					total-items="articleList.total" 
+					ng-model="articleList.curtPage" 
+					ng-change="articleList.pageChanged()">
+						
+				</ul>
+			</div>
+		</div>
+
+		<div>
+			<wl-dialog
+				ng-show="deleteArticleDialogOption.show"
+				title="{{deleteArticleDialogOption.title}}"
+				buttons="deleteArticleDialogOption.buttons"
+				on-close="deleteArticleDialogOption.onClose()">
+				<p>Are you sure to delete this article ?</p>
+			</wl-dialog>
 		</div>
 	</div>
 
-	<div ng-if="!isLoading && articleEdit.show">
+	<div ng-if="!isLoading && statistic.total > 0 && articleEdit.show">
+		<div>
+			<button 
+				class="btn"
+				ng-click="articleEdit.backToArticleList()">
+				Back
+			</button>
+
+			<span>Edit Article</span>
+		</div>
+
+		<div>
+			<div>
+				<h3>title</h3>
+				<input type="text" ng-model="articleEdit.article.title">
+
+				<div>
+					<div>
+						<span 
+							ng-bind="articleEdit.categorySelector.curtCategory.name"
+							ng-click="articleEdit.showCategorySelector(true)">	
+						</span>	
+					</div>
+					
+					<ul ng-show="articleEdit.categorySelector.show">
+						<li ng-repeat="category in categories">
+							<a ng-bind="category.name"
+								ng-click="articleEdit.changeCategory(category)">
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<label>
+					isPublish: 
+					<input type="checkbox" ng-model="articleEdit.article.isPublish">
+				</label>
+			</div>
+
+			<div>
+				<wl-editor
+					content="{{articleEdit.article.markdown}}"
+					on-change="articleEdit.onContentChange(html, markdown)">		
+				</wl-editor>
+			</div>
+
+			<dir>
+				<button ng-click="articleEdit.updateArticle()">Update</button>
+			</dir>
+		</div>
 	</div>
 </div>
