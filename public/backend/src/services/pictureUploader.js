@@ -173,7 +173,7 @@ angular.module("Backend").service("PictureUploader", [
 			events.abort.push(callback);
 		};
 
-		this.offAbort = function () {
+		this.offAbort = function (callback) {
 			var funcs = events.abort || [];
 			
 			for (var i = 0, len = funcs.length; i < len; ++i) {

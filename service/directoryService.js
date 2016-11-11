@@ -38,6 +38,12 @@ module.exports = {
 		});
 	},
 
+	getDirsByUserAndIds: function (user, ids) {
+		return database.executeTemplate(conn=>{
+			return directoryModel.getDirsByUserAndIds(conn, user, ids);
+		});	
+	},
+
 	getDirByUserAndId: function (user, id) {
 		return database.executeTemplate(conn=>{
 			return directoryModel.getDirByUserAndId(conn, user, id);

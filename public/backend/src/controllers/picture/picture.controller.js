@@ -231,6 +231,7 @@ angular.module("Backend").controller("pictureCtrl", [
 		$scope.enterToDir = function (dir) {
 			enterToDir(dir).then(function () {
 				console.log("enter to dir success");
+				updataUrlPath();
 			})
 			.catch(function (dir) {
 				console.error(dir);
@@ -247,6 +248,7 @@ angular.module("Backend").controller("pictureCtrl", [
 
 			changeToDir(dir).then(function () {
 				console.log("change to dir success");
+				updataUrlPath();
 			})
 			.catch(function (err) {
 				console.error(err);
@@ -265,6 +267,7 @@ angular.module("Backend").controller("pictureCtrl", [
 			
 			changeToDir(pDir).then(function () {
 				console.log("back to parent dir success");
+				updataUrlPath();
 			})
 			.catch(function (err) {
 				console.error(err);
@@ -295,8 +298,6 @@ angular.module("Backend").controller("pictureCtrl", [
 				}
 			}
 
-			debugger;
-
 			$scope.$apply(function () {
 				uploadPictures(pictures);
 			});
@@ -307,29 +308,104 @@ angular.module("Backend").controller("pictureCtrl", [
 		init();
 
 		function init () {
-			let promises = [];
-			let p = null;
+			initPath().then(function () {
+				let path = $scope.path;
+				
+				let pDir;
+				if (path.length > 1) {
+					pDir = path[path.length - 1];
+				}
 
-			p = initDirs();
-			promises.push(p);
+				let promises = [];
+				let p = null;
 
-			p = initPictures();
-			promises.push(p);
+				p = initDirs(pDir);
+				promises.push(p);
 
-			$q.all(promises).then(function () {
+				p = initPictures(pDir);
+				promises.push(p);
+
+				return $q.all(promises);
+			})
+			.then(function () {
+				updataUrlPath();
 				$scope.isLoading = false;
 			})
 			.catch(function (err) {
 				console.error(err);
-
+				updataUrlPath();
 				$scope.isLoading = false;
 			});
-
+			
 			initPictureUploadEvents();
 
 			$scope.$on("$destroy", function () {
 				offPictureUploadEvents();
 			});
+		}
+
+		function initPath () {
+			return new $q(function (resolve, reject) {
+				var pathStr = $location.search()['path'];
+
+				if (!angular.isString(pathStr)) {
+					resolve();
+					return;
+				}
+				
+				var ids = pathStr.split(" ");
+				
+				Directory.getDirectoriesByIds(ids).then(function (dirs) {
+					if (dirs.length <= 0 || dirs[0] == null) {
+						resolve();
+						return;
+					}
+
+					for (var i = 1, len = dirs.length; i < len; ++i) {
+						var curtDir = dirs[i];
+						var prevDir = dirs[i - 1];
+
+						if (curtDir == null 
+							|| curtDir.parentDirectory != prevDir.id) {
+							resolve();
+							return;
+						}
+					}
+
+					var path = $scope.path;
+					path.push(DEFAULT_PATH_DIR);
+
+					$scope.path = path.concat(dirs);
+
+					resolve();
+				})
+				.catch(function (err) {
+					console.error(err);
+					resolve();
+				});
+			});
+		}
+
+		function updataUrlPath () {
+			var path = $scope.path;
+
+			if (path.length <= 1) {
+				$location.search("path", "");
+				return;
+			}
+
+			var pathStr = "";
+			for (var i = 1, len = path.length; i < len; ++i) {
+				var pathItem = path[i];
+				
+				if (i > 1) {
+					pathStr += " ";
+				}
+				
+				pathStr += pathItem.id;
+			}
+
+			$location.search("path", pathStr);
 		}
 
 		function initDirs (pDir) {

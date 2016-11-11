@@ -125,6 +125,23 @@ class Directory {
 		});
 	}
 
+	static getDirsByUserAndIds (connection, user, ids) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(ids, null, `ids can't be ${ids}`);
+		assert.notEqual(ids.length, null, `ids can't be ${ids}`);
+
+		let promises = [];
+		let p = null;
+
+		for (let id of ids) {
+			p = this.getDirByUserAndId(connection, user, id);
+			promises.push(p);
+		}
+
+		return Promise.all(promises);
+	}
+
 	static add (connection, directory) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(directory, null, `directory can't be ${directory}`);

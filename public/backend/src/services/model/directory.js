@@ -38,6 +38,37 @@ angular.module("Backend").service("Directory", [
 			});
 		};
 
+		this.getDirectoriesByIds = function (ids) {
+			return new $q(function (resolve, reject) {
+				var url = BASE_URL + "/ids/" + ids.join(" ");
+				
+				$http.get(url).then(function (ret) {
+					ret = ret.data;
+
+					if (!ret.success) {
+						var errMsg = ret.error.message;
+						console.error(errMsg);
+						reject(new Error(errMsg)); 
+						return;
+					}
+
+					var dirs = ret.data.directories;
+
+					angular.forEach(dirs, function (dir) {
+						if (angular.isObject(dir)) {
+							dir.thumbnail = "/backend/static/image/photo_dir.png";
+						}
+					});
+
+					resolve(dirs);
+
+				}).catch(function(err){
+					console.error(err);
+					reject(new Error("server error"));
+				});
+			});
+		};
+
 		this.addDirectory = function (dir, pDir) {
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL;

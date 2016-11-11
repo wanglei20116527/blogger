@@ -84,6 +84,71 @@ module.exports = {
 		});
 	},
 
+	getDirectoriesByIds: function (req, res) {
+		let {
+			user
+		} = req.session.user;
+
+		let {
+			ids
+		} = req.params;
+
+		ids = ids.split(" ");
+
+		try {
+			for (let i = 0, len = ids.length; i < len; ++i) {
+				let id = parseInt(ids[i], 10);
+				
+				if (!Number.isInteger(id)) {
+					let err = new Error(`input param ids invalid`);
+					err.code = 190500;
+					throw err;
+				}
+
+				ids[i] = id;
+			}
+
+		} catch (err) {
+			res.json({
+				success: false,
+				error: {
+					code: err.code,
+					message: err.message || err.stack
+				}
+			});
+			return;
+		}
+
+		dirService.getDirsByUserAndIds(user, ids).then(dirs=>{
+			for (let i = 0, len = dirs.length; i < len; ++i) {
+				dirs[i] = filterDirectory(dirs[i]);
+			}
+
+			res.json({
+				success: true,
+				data: {
+					directories: dirs
+				}
+			});
+		})
+		.catch(err=>{
+			console.error(err);
+
+			if (err.code) {
+				res.json({
+					success: false,
+					error: {
+						code: err.code,
+						message: err.message || err.stack	
+					}
+				});
+				return;
+			}
+
+			res.sendStatus(err.statusCode || 500);
+		});
+	},
+
 	addDirectory: function (req, res) {
 		let {
 			user
@@ -282,8 +347,6 @@ module.exports = {
 			});
 		}
 
-		console.error(`dirId: ` + dirId);
-
 		if (!Number.isInteger(dirId)) {
 			res.json({
 				success: false,
@@ -337,7 +400,12 @@ module.exports = {
 };
 
 function filterDirectory (dir) {
+	if (dir == null) {
+		return null;
+	}
+
 	dir = Object.assign({}, dir);
+	
 	delete dir.path;
 
 	return dir;
