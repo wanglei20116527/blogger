@@ -126,7 +126,7 @@ class Picture {
 		});
 	}
 
-	static getUserPicturesUnderDir (connection, user, directory) {
+	static getPicturesByUserUnderDir (connection, user, directory) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
 		assert.notEqual(directory.id, null, `directory id can not be ${directory.id}`);
@@ -162,6 +162,41 @@ class Picture {
 		});
 	}
 
+	static getPictruesByUserUnderRootDir (connection, user) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							* 
+						from 
+							${TABLENAME}
+						where 
+							user=?
+							and directory is null 
+							and deleteTime is null`;
+
+			let params = [user.id];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(pictures=>{
+						let ret = [];
+
+						for (let picture of pictures) {
+							picture = new Picture(picture);
+							ret.push(picture);
+						}
+
+						resolve(ret);
+					})
+					.catch(reject);
+		});
+	}
+
 	static getPicturesUnderDir (connection, directory) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(directory.id, null, `directory id can not be ${directory.id}`);
@@ -172,7 +207,7 @@ class Picture {
 						from 
 							${TABLENAME}
 						where 
-							and directory=? 
+							directory=? 
 							and deleteTime is null`;
 
 			let params = [directory.id];
@@ -233,6 +268,42 @@ class Picture {
 		});
 	}
 
+	static getPictureByUserAndNameAndRootDir (connection, user, name) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
+		assert.notEqual(name, null, `picture name can not be ${name}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							* 
+						from 
+							${TABLENAME}
+						where 
+							user=?
+							and name=?
+							and directory is null 
+							and deleteTime is null`;
+
+			let params = [user.id, name];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(pics=>{
+						let pic = pics.length > 0 ? pics[0] : null;
+
+						if (pic) {
+							pic = new Picture(pic);
+						}
+						
+						resolve(pic);
+					})
+					.catch(reject);
+		});
+	}
+
 	static isPictureExistByUserAndNameAndDir (connection, user, name, directory) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
@@ -241,6 +312,18 @@ class Picture {
 
 		return new Promise((resolve, reject)=>{
 			this.getPictureByUserAndNameAndDir(connection, user, name, directory).then(pic=>{
+				resolve(pic != null);
+			}).catch(reject);
+		});
+	}
+
+	static isPictureExistByUserAndNameAndRootDir (connection, user, name) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
+		assert.notEqual(name, null, `picture name can not be ${name}`);
+
+		return new Promise((resolve, reject)=>{
+			this.getPictureByUserAndNameAndRootDir(connection, user, name).then(pic=>{
 				resolve(pic != null);
 			}).catch(reject);
 		});

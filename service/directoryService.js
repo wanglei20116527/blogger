@@ -53,8 +53,6 @@ module.exports = {
 					}).catch(reject);
 				}).catch(reject);
 			});
-
-			return Promise.all(promises);
 		});
 	},
 
@@ -76,7 +74,7 @@ module.exports = {
 
 					if (dirs.length > 0) {
 						for (let tmpDir of dirs) {
-							let p = deleteDir(conn, dir);
+							let p = deleteDir(conn, tmpDir);
 							promises.push(p);
 						}
 					}
@@ -88,7 +86,7 @@ module.exports = {
 						return pictureModel.deletePictures(conn, pictures);
 					})
 					.then(()=>{
-						directory.delete(conn, dir)
+						directoryModel.delete(conn, dir)
 								 .then(resolve)
 								 .catch(reject);
 					})

@@ -96,11 +96,33 @@
 					</li>
 
 					<li>
-						<a ng-class="{active: activePage =='profile'}"
-						   href="#!/profile">
+						<a ng-class="{active: activePage =='profile'}">
 							<i class="icon iconfont">&#xe73a;</i>
 							<span class="text">Profile</span>
 						</a>
+
+						<ul>
+							<li>
+								<a href="#!/profile/basic">
+									<i></i>
+									<span>Basic Info</span>
+								</a>
+							</li>
+
+							<li>
+								<a href="#!/profile/picture">	
+									<i></i>
+									<span>Picture</span>
+								</a>
+							</li>
+
+							<li>
+								<a href="#!/profile/password">
+									<i></i>
+									<span>Password</span>
+								</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</nav>
@@ -134,15 +156,19 @@
 		<script type="text/javascript" src="/backend/static/src/app.js"></script>
 		<script type="text/javascript" src="/backend/static/src/utils/validation.js"></script>
 		<script type="text/javascript" src="/backend/static/src/utils/uuid.js"></script>
+
 		<script type="text/javascript" src="/backend/static/src/filter/htmlToBeTrust.js"></script>
+		<script type="text/javascript" src="/backend/static/src/filter/percent.js"></script>
+		<script type="text/javascript" src="/backend/static/src/filter/byteFormat.js"></script>
+		
 		<script type="text/javascript" src="/backend/static/src/config/config.js"></script>
 
 		<script type="text/javascript" src="/backend/static/src/services/model/user.js"></script>
-
 		<script type="text/javascript" src="/backend/static/src/services/model/category.js"></script>
 		<script type="text/javascript" src="/backend/static/src/services/model/article.js"></script>
 		<script type="text/javascript" src="/backend/static/src/services/model/directory.js"></script>
 		<script type="text/javascript" src="/backend/static/src/services/model/picture.js"></script>
+		<script type="text/javascript" src="/backend/static/src/services/pictureUploader.js"></script>
 
 		<script type="text/javascript" src="/backend/static/src/controllers/main.controller.js"></script>
 		<script type="text/javascript" src="/backend/static/src/controllers/article/article.controller.js"></script>
@@ -159,6 +185,8 @@
 
 		<script type="text/javascript" src="/backend/static/src/directives/dialog/dialog.js"></script>
 		<script type="text/javascript" src="/backend/static/src/directives/editor/editor.js"></script>
+		<script type="text/javascript" src="/backend/static/src/directives/contextMenu/contextMenu.js"></script>
+		<script type="text/javascript" src="/backend/static/src/directives/event/onContextMenu.js"></script>
 
 		
 		<script type="text/javascript" src="/backend/static/src/directives/dialog/uploadPhotoDialog/uploadPhotoDialog.js"></script>

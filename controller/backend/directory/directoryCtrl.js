@@ -156,6 +156,10 @@ module.exports = {
 				return dirService.addDir(dir);
 			})
 			.then(dir=>{
+				dir = Object.assign({}, dir || {});
+				
+				delete dir.path;
+				
 				res.json({
 					success: true,
 					data: {
@@ -258,8 +262,6 @@ module.exports = {
 	},
 
 	deleteDirectory: function (req, res) {
-		// todo delete directory recursion (directoryService need to fixed)
-
 		let {
 			user
 		} = req.session.user;
@@ -268,7 +270,19 @@ module.exports = {
 			directory: dirId
 		} = req.query;
 
-		dirId = parseInt(dirId, 10);
+		try {
+			dirId = parseInt(dirId, 10);
+		} catch (err) {
+			res.json({
+				success: false,
+				error: {
+					code: 190502,
+					message: err.message || err.stack
+				}
+			});
+		}
+
+		console.error(`dirId: ` + dirId);
 
 		if (!Number.isInteger(dirId)) {
 			res.json({
@@ -283,14 +297,9 @@ module.exports = {
 
 		dirService.isDirExistByUserAndId(user, dirId).then(isExist=>{
 			if (!isExist) {
-				res.json({
-					success: false,
-					error: {
-						code: 190503,
-						message: `directory not exist`
-					}
-				});
-				return;
+				let err = new Error(`directory not exist`);
+				err.code = 190503;
+				throw err;
 			}
 
 			let directory = {
@@ -298,21 +307,31 @@ module.exports = {
 				user: user.id
 			};
 
-			dirService.deleteDir(directory).then(()=>{
+			return dirService.deleteDir(directory);
+		})
+		.then(()=>{
+			res.json({
+				success: true
+			});
+		})
+		.catch(err=>{
+			console.error(err);
+
+			if (err.statusCode) {
+				res.sendStatus(err.statusCode);
+				return;
+			}
+
+			if (err.code) {
 				res.json({
-					success: true,
-					data: {
-						directory: directory
+					success: false,
+					error: {
+						code: err.code,
+						message: err.message || err.stack	
 					}
 				});
-			}).catch(err=>{
-				console.error(err);
-				res.sendStatus(500);	
-			});
-
-		}).catch(err=>{
-			console.error(err);
-			res.sendStatus(500);
+				return;
+			}
 		});
 	},
 };

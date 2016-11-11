@@ -19,7 +19,7 @@ angular.module("Backend").service("Category", [
 						return;
 					}
 
-					resolve(ret.data.categories);
+					resolve(ret.data.categories || []);
 
 				}).catch(function(err){
 					console.error(err);

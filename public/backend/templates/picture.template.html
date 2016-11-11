@@ -1,4 +1,4 @@
-<div>
+<div class="picture-page page">
 	<div ng-include="'/backend/static/templates/loading.template.html'"
 		 ng-if="isLoading">
 	</div>
@@ -9,6 +9,11 @@
 				<button 
 					class="btn">
 					<span>Upload</span>
+					<input 
+						type="file" 
+						multiple="multiple"
+						onchange="angular.element(this).scope().onPictureInputChanged(event)"
+					/>
 				</button>
 
 				<button 
@@ -18,8 +23,83 @@
 				</button>
 			</div>
 
-			{{dirs}}
-		</div>	
+			<div>
+				<span ng-show="path.length <= 0">All</span>
+				<ul ng-show="path.length > 0">
+					<li>
+						<a href="javascript:;" 
+							ng-click="backToParentDir()">
+							Back
+						</a>
+
+						<span>|</span>
+					</li>
+
+					<li ng-show="path.length > 4">
+						<span>...</span>
+						<span>&gt;</span>
+					</li>
+					
+					<li ng-if="path.length > 4"
+						ng-repeat="dir in path | limitTo: 4 : path.length - 4">
+						<a href="javascript:;" 
+						   ng-click="changeToDir(dir)"
+						   ng-bind="dir.name">
+						</a>
+
+						<span>&gt;</span>
+					</li>
+
+					<li ng-if="path.length <= 4"
+						ng-repeat="dir in path">
+						<a href="javascript:;" 
+						   ng-click="changeToDir(dir)"
+						   ng-bind="dir.name">
+						</a>
+
+						<span>&gt;</span>
+					</li>
+				</ul>
+			</div>
+
+			<div>
+				<ul>
+					<li ng-repeat="dirItem in dir.dirs">
+						<div ng-dblclick="enterToDir(dirItem)"
+							on-context-menu="contextMenu.dir.show($event, dirItem)">
+							<div>
+								<img ng-src="{{dirItem.thumbnail}}">
+							</div>
+							<span ng-bind="dirItem.name"></span>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="context-menu-pane">
+			<context-menu 
+				ng-show="contextMenu.dir._show"
+				on-blur="contextMenu.dir.hide()"
+				style="position: fixed; left: 500px; top: 300px; z-index: 99999;">
+				
+				<ul>
+					<li>
+						<a href="javascript:;"
+							ng-click="contextMenu.dir.delete()">
+							Delete
+						</a>
+					</li>
+
+					<li>
+						<a href="javascript:;"
+							ng-click="contextMenu.dir.update()">
+							Rename
+						</a>
+					</li>
+				</ul>
+			</context-menu>
+		</div>
 
 		<div>
 			<wl-dialog
@@ -33,6 +113,75 @@
 					ng-model="createDirDialogConfig.name"
 				/>
 			</wl-dialog>
+
+			<wl-dialog
+				ng-show="updateDirDialogConfig.show"
+				title="{{updateDirDialogConfig.title}}"
+				buttons="updateDirDialogConfig.buttons"
+				on-close="updateDirDialogConfig.onClose()">
+				
+				<input 
+					type="text" 
+					ng-model="updateDirDialogConfig.dir.name"
+				/>
+			</wl-dialog>
+
+			<wl-dialog
+				ng-show="deleteDirDialogConfig.show"
+				title="{{deleteDirDialogConfig.title}}"
+				buttons="deleteDirDialogConfig.buttons"
+				on-close="deleteDirDialogConfig.onClose()">
+				
+				<p>Are you sure to delete this dir?</p>
+			</wl-dialog>
+		</div>
+	</div>
+
+	<div ng-show="uploadPicturesDialogConfig.show"
+		style="position: absolute; right: 0; bottom: 0;">
+		<div class="clearfix">
+			<h4 class="title fl">Upload Picture</h4>	
+			<button class="btn btn-close icon iconfont fr"
+					ng-click="closeUploadPicturesDialog()">
+					&#xe61c;
+			</button>
+		</div>
+
+		<div>
+			<table>
+				<tbody>
+					<tr ng-repeat="picture in uploadPicturesDialogConfig.pictures">
+						<td>
+							<i></i>
+							<span ng-bind="::picture.name"></span>
+						</td>
+
+						<td>
+							<span ng-bind="::picture.size | byteFormat"></span>
+						</td>
+
+						<td ng-show="picture.uploading">
+							<span ng-bind="picture.progress | percent"></span>
+						</td>
+
+						<td ng-show="picture.uploading">
+							<button 
+								class="btn"
+								ng-click="abortUploadPicture(picture)">
+								Abort
+							</button>
+						</td>
+
+						<td ng-show="picture.complete">
+							<span>success</span>
+						</td>
+
+						<td ng-show="picture.error">
+							<span>error</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 

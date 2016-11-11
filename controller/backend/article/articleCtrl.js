@@ -62,7 +62,7 @@ module.exports = {
 		});
 	},
 
-	getArticles: function (req, res) {
+	getArticles: function (req, res) {;
 		let {
 			user
 		} = req.session.user;

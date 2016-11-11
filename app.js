@@ -27,7 +27,7 @@ function initApp () {
 		resave: false,
 		maxAge: 100000,
 		httpOnly: false,
-		saveUninitialized: false,
+		saveUninitialized: true,
 	}));
 	
 	app.use(bodyParser.json());

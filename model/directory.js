@@ -162,13 +162,13 @@ class Directory {
 	}
 
 	static delete (connection, directory) {
-		return deleteDirs(connection, [directory]);
+		return this.deleteDirs(connection, [directory]);
 	}
 
 	static deleteDirs (connection, directories) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
-		assert.notEqual(directories, null, `directories id can't be ${directories}`);
-		assert.notEqual(directories.length, null, `pictures can't be ${directories}`);
+		assert.notEqual(directories, null, `directories can't be ${directories}`);
+		assert.notEqual(directories.length, null, `directories can't be ${directories}`);
 
 		return new Promise((resolve, reject)=>{
 			if (directories.length <= 0) {

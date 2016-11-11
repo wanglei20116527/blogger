@@ -23,7 +23,13 @@ angular.module("Backend").service("Directory", [
 						return;
 					}
 
-					resolve(ret.data.directories);
+					var dirs = ret.data.directories;
+
+					angular.forEach(dirs, function (dir) {
+						dir.thumbnail = "/backend/static/image/photo_dir.png";
+					});
+
+					resolve(dirs);
 
 				}).catch(function(err){
 					console.error(err);
@@ -49,7 +55,10 @@ angular.module("Backend").service("Directory", [
 						return;
 					}
 
-					resolve(ret.data.directory);
+					var dir = ret.data.directory;
+					dir.thumbnail = "/backend/static/image/photo_dir.png"
+
+					resolve(dir);
 
 				}).catch(function(err){
 					console.error(err);
@@ -74,7 +83,9 @@ angular.module("Backend").service("Directory", [
 						return;
 					}
 
-					resolve(ret.data.directory);
+					var dir = ret.data.directory;
+					dir.thumbnail = "/backend/static/image/photo_dir.png"
+					resolve(dir);
 
 				}).catch(function(err){
 					console.error(err);

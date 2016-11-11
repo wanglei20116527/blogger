@@ -6,18 +6,37 @@ const hashService  = require("./hashService");
 const fileService  = require("./fileService");
 
 const BASE_URL = "/static";
+const BASE_DIR = path.join(process.cwd(), "public/picture");
 const PREFIX_TO_REMOVE  = path.join(process.cwd(), "public");
 
 module.exports = {
 	isPicExistByUserAndNameAndDir: function (user, name, dir) {
 		return database.executeTemplate(conn=>{
-			return pictureModel.isPictureExistByUserAndNameAndDir(conn, user, name, dir);
+			let promise = null;
+
+			if (dir == null) {
+				promise = pictureModel.isPictureExistByUserAndNameAndRootDir(conn, user, name);
+
+			} else {
+				promise = pictureModel.isPictureExistByUserAndNameAndDir(conn, user, name, dir);
+			}
+
+			return promise;
 		});
 	},
 
 	getPicturesByUserAndDir: function (user, dir) {
 		return database.executeTemplate(conn=>{
-			return pictureModel.getUserPicturesUnderDir(conn, user, dir);
+			let promise = null;
+
+			if (dir == null) {
+				promise = pictureModel.getPictruesByUserUnderRootDir(conn, user);
+
+			} else {
+				promise = pictureModel.getPicturesByUserUnderDir(conn, user, dir);
+			}
+			
+			return promise;
 		});
 	},
 
@@ -41,18 +60,26 @@ module.exports = {
 
 	addPicture: function (user, srcPath, name, dir) {
 		let extname = path.extname(name);
-		let picPath = path.join(
-							dir.path, 
-							hashService.hash(`${user.id}-${Date.now()}-${name}`) + uuid() + extname);
+		let picName = hashService.hash(`${user.id}-${Date.now()}-${name}`) + uuid() + extname;
+
+		let baseDir = path.join(BASE_DIR, user.name);
+		if (dir != null) {
+			baseDir = dir.path; 
+		}
+		
+		let picPath = path.join(baseDir, picName);
 		let url = path.join(BASE_URL, picPath.replace(PREFIX_TO_REMOVE, ""));
 
 		let picture = {
 			user: user.id,
 			name: name,
 			path: picPath,
-			url : url,
-			directory: dir.id
+			url : url
 		};
+
+		if (dir != null) {
+			picture.directory = dir.id
+		}
 
 		let rs = null;
 		let ws = null;

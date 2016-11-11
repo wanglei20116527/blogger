@@ -1,10 +1,11 @@
 angular.module("Backend").service("Picture", [
 	"$http",
 	"$q",
-	function ($http, $q) {
+	"$timeout",
+	function ($http, $q, $timeout) {
 		var BASE_URL = "/backend/picture";
 
-		this.addPicture = function (picture, directory) {
+		this.uploadPicture = function (picture, directory) {
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "/upload";
 
@@ -64,36 +65,112 @@ angular.module("Backend").service("Picture", [
 		};
 
 		this.uploadPictureSegment = function (id, blob) {
-			return new $q(function (resolve, reject) {
+			var promise = new $q(function (resolve, reject) {
 				var url = BASE_URL + "/upload/segment";
 
 				var data = new FormData();
 				data.append("pictureId", id);
 				data.append("picture", blob);
 
-				$http({
-					method: "POST",
-					data: data,
-					url: url,
-					headers: {
-						"Content-Type": undefined
-					}
-				}).then(function (ret){
-					ret = ret.data;
-					
-					if (!ret.success) {
-						var errMsg = ret.error.message;
-						console.error(errMsg);
-						reject(new Error(errMsg)); 
+				var xhr = new XMLHttpRequest();
+				
+				xhr.open("POST", url, true);
+
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState !== 4) {
 						return;
 					}
 
-					resolve(ret.data.picture);
-				}).catch(function (err) {
-					console.error(err);
-					reject(new Error("server error"));
-				});
-			});	
+					if (xhr.status !== 200) {
+						reject(new Error(xhr.statusText));
+						return;
+					}
+
+					try {
+						var ret = JSON.parse(xhr.responseText);
+
+						if (!ret.success) {
+							var errMsg = ret.error.message;
+							console.error(errMsg);
+							reject(new Error(errMsg)); 
+							return;
+						}
+						
+						resolve(ret.data.picture);
+						
+					} catch (err) {
+						reject(err);
+					}
+				};
+
+				if ("ontimeout" in xhr) {
+					xhr.timeout   = 600000; // 10minutes
+					xhr.ontimeout = function () {
+						reject(new Error("timeout"));
+					};
+				}
+
+				if ("onerror" in xhr) {
+					xhr.onerror = function (err) {
+						// use $timeout enable into angular context
+						$timeout(function () {
+							reject(err);
+						});
+					};
+				}
+
+				if ("upload" in xhr) {
+					xhr.upload.onprogress = function (event) {
+						if (!event.lengthComputable) {
+							return;
+						}
+
+						// use $timeout enable into angular context
+						$timeout(function () {
+							var funcs = promise._progress || [];
+
+							angular.forEach(funcs, function (func) {
+								func && func(event.loaded);
+							});
+						});
+					};
+				}
+
+				xhr.send(data);
+
+				// $http({
+				// 	method: "POST",
+				// 	data: data,
+				// 	url: url,
+				// 	headers: {
+				// 		"Content-Type": undefined
+				// 	}
+				// }).then(function (ret){
+				// 	ret = ret.data;
+					
+				// 	if (!ret.success) {
+				// 		var errMsg = ret.error.message;
+				// 		console.error(errMsg);
+				// 		reject(new Error(errMsg)); 
+				// 		return;
+				// 	}
+
+				// 	resolve(ret.data.picture);
+				// }).catch(function (err) {
+				// 	console.error(err);
+				// 	reject(new Error("server error"));
+				// });
+			});
+
+			promise.onProgress = function (callback) {
+				if (promise._progress == null) {
+					promise._progress = [];
+				}
+
+				promise._progress.push(callback || angular.noop);
+			};
+
+			return promise;
 		};
 
 		this.finishUploadPictureSegment = function (id) {
@@ -158,6 +235,9 @@ angular.module("Backend").service("Picture", [
 						reject(new Error(errMsg)); 
 						return;
 					}
+					
+					console.log("++++++++++++++++");
+					console.log(pictures);
 
 					resolve(ret.data.pictures);
 

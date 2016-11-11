@@ -11,11 +11,17 @@ const pictureService = require("../../../service/pictureService");
 const TMP_DIR   = path.join(process.cwd(), "tmp/picture");
 const MAX_SIZE  = 2 * 1024 * 1024;
 
+let _pictures = {};
+
 module.exports = {
 	startUploadPictureSegment: function (req, res) {
 		let {
+			session
+		} = req;
+
+		let {
 			user
-		} = req.session.user;
+		} = session.user;
 
 		let {
 			picture,
@@ -35,8 +41,9 @@ module.exports = {
 			return;
 		}
 
-		if (!underscore.isObject(directory)
-			|| !Number.isInteger(directory.id)) {
+		if (directory != null 
+			&&	(!underscore.isObject(directory)
+					|| !Number.isInteger(directory.id))) {
 			res.json({
 				success: false,
 				error: {
@@ -46,16 +53,34 @@ module.exports = {
 			});
 		}
 
-		let picSegment = null;
+		if (_pictures[user.id] == null) {
+			_pictures[user.id] = {};
+		}
 
-		dirService.getDirByUserAndId(user, directory.id).then(dir=>{
-			if (!dir) {
+		let picId   = hashService.hash(`${user.id}-${picture.name}-${Date.now()}`) + uuid();
+		let picPath = path.join(TMP_DIR, picId);
+
+		_pictures[user.id][picId] = {
+			id: picId,
+			path: picPath,
+			name: picture.name,
+			directory: null,
+			acceptedBytes: 0, // current accept file size
+		}; 
+
+		let promise = Promise.resolve(null);
+		if (directory != null) {
+			promise = dirService.getDirByUserAndId(user, directory.id);
+		}
+
+		promise.then(dir=>{
+			if (directory != null && dir == null) {
 				let err = new Error(`directory not exist`);
 				err.code = 160000;
 				throw err;
 			}
 
-			directory = dir;
+			_pictures[user.id][picId].directory = dir;
 
 			return pictureService.isPicExistByUserAndNameAndDir(user, picture.name, dir);
 		})
@@ -66,36 +91,36 @@ module.exports = {
 				throw err;
 			}
 
-			let picId   = hashService.hash(`${user.id}-${picture.name}-${Date.now()}`) + uuid();
-			let picPath = path.join(TMP_DIR, picId);
-
-			picSegment = {
-				id: picId,
-				path: picPath,
-				name: picture.name,
-				directory: directory,
-				acceptedBytes: 0, // current accept file size
-			};
-
 			return fileService.mkFile(picPath);
 		})
-		.then(()=>{
-			let pics = req.session.pictures || [];
-
-			pics.push(picSegment);
-
-			req.session.pictures = pics;
-
+		.then(()=>{			
 			res.json({
 				success: true,
 				data: {
-					id: picSegment.id
+					id: picId
 				}
 			});
-
 		})
 		.catch(err=>{
 			console.error(err);
+
+			let pictures = _pictures[user.id];
+			delete pictures[picId];
+			if (Object.keys(pictures).length <= 0) {
+				delete _pictures[user.id];
+			}
+
+			fileService.exists(picPath).then(isExist=>{
+				if (!isExist) {
+					return;
+				}
+
+				fileService.unlink(picPath).catch(err=>{
+					console.error(err);
+				});
+			}).catch(err=>{
+				console.error(err);
+			});
 
 			if (err.statusCode) {
 				res.sendStatus(err.statusCode);
@@ -117,23 +142,20 @@ module.exports = {
 
 	uploadPictureSegment: function (req, res) {
 		let {
-			pictures = []
-		} = req.session;
+			session
+		} = req;
+
+		let {
+			user
+		} = session.user;
 
 		let {
 			pictureId
 		} = req.body;
 
-		let picture = null;
+		let picture = _pictures[user.id][pictureId];
 
-		for (let pic of pictures) {
-			if (pic.id === pictureId) {
-				picture = pic;
-				break;
-			}
-		}
-
-		if (picture === null) {
+		if (picture == null) {
 			res.json({
 				success: false,
 				error: {
@@ -182,6 +204,24 @@ module.exports = {
 		.catch(err=>{
 			console.error(err);
 
+			let pictures = _pictures[user.id];
+			delete pictures[pictureId];
+			if (Object.keys(pictures).length <= 0) {
+				delete _pictures[user.id];
+			}
+
+			fileService.exists(picture.path).then(isExist=>{
+				if (!isExist) {
+					return;
+				}
+
+				fileService.unlink(picture.path).catch(err=>{
+					console.error(err);
+				});
+			}).catch(err=>{
+				console.error(err);
+			});
+
 			if (file) {
 				fileService.unlink(file.path).catch(err=>{
 					console.error(err);
@@ -208,27 +248,18 @@ module.exports = {
 
 	finishUploadPictureSegment: function (req, res) {
 		let {
-			user
-		} = req.session.user;
+			session
+		} = req;
 
 		let {
-			pictures = []
-		} = req.session;
+			user
+		} = session.user;
 
 		let {
 			pictureId
 		} = req.body;
 
-		let picture = null;
-
-		for (let i = 0, len = pictures.length; i < len; ++i) {
-			let pic = pictures[i];
-			if (pic.id === pictureId) {
-				picture  = pictures[i];
-				pictures.splice(i, i + 1);
-				break;
-			}
-		}
+		let picture = _pictures[user.id][pictureId];
 
 		if (picture == null) {
 			res.json({
@@ -264,10 +295,34 @@ module.exports = {
 				}
 			});
 
-			req.session.pictures = pictures;
+			let pictures = _pictures[user.id];
+			delete pictures[pictureId];
+			if (Object.keys(pictures).length <= 0) {
+				delete _pictures[user.id];
+			}
 		})
 		.catch(err=>{
 			console.error(err);
+
+			let pictures = _pictures[user.id];
+			delete pictures[pictureId];
+			if (Object.keys(pictures).length <= 0) {
+				delete _pictures[user.id];
+			}
+
+			fileService.exists(picture.path).then(isExist=>{
+				if (!isExist) {
+					return;
+				}
+
+				fileService.unlink(picture.path).catch(err=>{
+					console.error(err);
+				});
+			}).catch(err=>{
+				console.error(err);
+			});
+
+			
 
 			if (err.statusCode) {
 				res.sendStatus(err.statusCode);
@@ -289,7 +344,7 @@ module.exports = {
 
 	abortUploadPictureSegment: function (req, res) {
 		let {
-			pictures = []
+			pictures
 		} = req.session;
 
 		let {

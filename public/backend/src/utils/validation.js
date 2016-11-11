@@ -8,6 +8,10 @@ angular.module("Backend").service("Validation", [
 			return title !== "";
 		};
 
+		this.checkImageMimeType = function (type) {
+			return /^image\/*/.test(type);
+		};
+
 		this.checkDirectoryName = function (name) {
 			return name !== "";
 		};
