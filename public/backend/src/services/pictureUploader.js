@@ -71,7 +71,6 @@ angular.module("Backend").service("PictureUploader", [
 			}
 
 			// handle picture in waitingQueue
-
 			for (var i = 0, len = waitingQueue.length; i < len; ++i) {
 				var waitingItem = waitingQueue[i];
 
@@ -258,6 +257,7 @@ angular.module("Backend").service("PictureUploader", [
 			var id = item.uploadId;
 			
 			Picture.finishUploadPictureSegment(id).then(function (pic) {
+				debugger;
 				handleComplete(item, pic);
 				removeItemFromUploadingQueue(item);
 				startUploadNextPicture();

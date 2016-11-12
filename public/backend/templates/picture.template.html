@@ -3,7 +3,7 @@
 		 ng-if="isLoading">
 	</div>
 
-	<div>
+	<div ng-show="!isLoading">
 		<div>
 			<div>
 				<button 
@@ -73,6 +73,14 @@
 							<span ng-bind="dirItem.name"></span>
 						</div>
 					</li>
+
+					<li ng-repeat="pic in picture.pictures"
+						on-context-menu="contextMenu.pic.show($event, pic)">
+						<div>
+							<img ng-src="{{pic.thumbnail}}"
+						</div>
+						<span ng-bind="pic.name"></span>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -95,6 +103,29 @@
 						<a href="javascript:;"
 							ng-click="contextMenu.dir.update()">
 							Rename
+						</a>
+					</li>
+				</ul>
+			</context-menu>
+
+			<context-menu 
+				ng-show="contextMenu.pic._show"
+				on-blur="contextMenu.pic.hide()"
+				style="position: fixed; left: 500px; top: 300px; z-index: 99999;">
+				
+				<ul>
+					<li>
+						<a href="javascript:;"
+							ng-click="contextMenu.pic.delete()">
+							Delete
+						</a>
+					</li>
+
+					<li>
+						<a href="javascript:;"
+							ng-show="::contextMenu.pic.isSupportCopyLink"
+							ng-click="contextMenu.pic.copyLink()">
+							Copy Link
 						</a>
 					</li>
 				</ul>
@@ -133,6 +164,15 @@
 				on-close="deleteDirDialogConfig.onClose()">
 				
 				<p>Are you sure to delete this dir?</p>
+			</wl-dialog>
+
+			<wl-dialog
+				ng-show="deletePictureDialogConfig.show"
+				title="{{deletePictureDialogConfig.title}}"
+				buttons="deletePictureDialogConfig.buttons"
+				on-close="deletePictureDialogConfig.onClose()">
+				
+				<p>Are you sure to delete this picture?</p>
 			</wl-dialog>
 		</div>
 	</div>

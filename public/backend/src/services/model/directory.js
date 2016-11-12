@@ -40,6 +40,11 @@ angular.module("Backend").service("Directory", [
 
 		this.getDirectoriesByIds = function (ids) {
 			return new $q(function (resolve, reject) {
+				if (ids.length <= 0) {
+					resolve([]);
+					return;
+				}
+				
 				var url = BASE_URL + "/ids/" + ids.join(" ");
 				
 				$http.get(url).then(function (ret) {

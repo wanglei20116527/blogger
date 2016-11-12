@@ -4,6 +4,7 @@ const database     = require("../model/database");
 const pictureModel = require("../model/picture");
 const hashService  = require("./hashService");
 const fileService  = require("./fileService");
+const imageService = require("./imageService");
 
 const BASE_URL = "/static";
 const BASE_DIR = path.join(process.cwd(), "public/picture");
@@ -60,21 +61,28 @@ module.exports = {
 
 	addPicture: function (user, srcPath, name, dir) {
 		let extname = path.extname(name);
-		let picName = hashService.hash(`${user.id}-${Date.now()}-${name}`) + uuid() + extname;
+
+		let picName       = hashService.hash(`${user.id}-${Date.now()}-${name}`) + uuid() + extname;
+		let thumbnailName = hashService.hash(`${user.id}-${Date.now()}-${name}`) + uuid() + extname;
 
 		let baseDir = path.join(BASE_DIR, user.name);
 		if (dir != null) {
 			baseDir = dir.path; 
 		}
 		
-		let picPath = path.join(baseDir, picName);
-		let url = path.join(BASE_URL, picPath.replace(PREFIX_TO_REMOVE, ""));
+		let picPath       = path.join(baseDir, picName);
+		let thumbnailPath = path.join(baseDir, thumbnailName);
+
+		let pathUrl      = path.join(BASE_URL, picPath.replace(PREFIX_TO_REMOVE, ""));
+		let thumbnailUrl = path.join(BASE_URL, thumbnailPath.replace(PREFIX_TO_REMOVE, ""));
 
 		let picture = {
 			user: user.id,
 			name: name,
 			path: picPath,
-			url : url
+			url : pathUrl,
+			thumbnail: thumbnailUrl,
+			thumbnailPath: thumbnailPath
 		};
 
 		if (dir != null) {
@@ -108,6 +116,9 @@ module.exports = {
 				});
 				ps.push(p);
 
+				p = imageService.mkThumbnail(srcPath, thumbnailPath);
+				ps.push(p);
+
 				Promise.all(ps).then(args=>{
 					let [
 						pic,
@@ -136,6 +147,24 @@ module.exports = {
 					if (ws) {
 						ws.end();
 					}
+
+					fileService.exists(picPath).then(isExist=>{
+						if (!isExist) {
+							return;
+						}
+
+						fileService.unlink(picPath).catch(reject);
+					})
+					.catch(reject);
+
+					fileService.exists(thumbnailPath).then(isExist=>{
+						if (!isExist) {
+							return;
+						}
+
+						fileService.unlink(thumbnailPath).catch(reject);
+					})
+					.catch(reject);
 
 					reject(err);
 				});

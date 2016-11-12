@@ -8,7 +8,9 @@ const FIELDS = [
 	"path",
 	"url",
 	"user",
-	"directory"
+	"directory",
+	"thumbnail",
+	"thumbnailPath"
 ];
 
 class Picture {

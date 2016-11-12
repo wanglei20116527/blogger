@@ -5,39 +5,6 @@ angular.module("Backend").service("Picture", [
 	function ($http, $q, $timeout) {
 		var BASE_URL = "/backend/picture";
 
-		this.uploadPicture = function (picture, directory) {
-			return new $q(function (resolve, reject) {
-				var url = BASE_URL + "/upload";
-
-				var data = new FormData();
-				data.append("picture", picture);
-				data.append("directory", directory.id);
-
-				$http({
-					method: "POST",
-					data: data,
-					url: url,
-					headers: {
-						"Content-Type": undefined
-					}
-				}).then(function (ret){
-					ret = ret.data;
-					
-					if (!ret.success) {
-						var errMsg = ret.error.message;
-						console.error(errMsg);
-						reject(new Error(errMsg)); 
-						return;
-					}
-
-					resolve(ret.data.picture);
-				}).catch(function (err) {
-					console.error(err);
-					reject(new Error("server error"));
-				});
-			});	
-		};
-
 		this.startUploadPictureSegment = function (picture, directory) {
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "/upload/segment/start";
@@ -137,29 +104,6 @@ angular.module("Backend").service("Picture", [
 				}
 
 				xhr.send(data);
-
-				// $http({
-				// 	method: "POST",
-				// 	data: data,
-				// 	url: url,
-				// 	headers: {
-				// 		"Content-Type": undefined
-				// 	}
-				// }).then(function (ret){
-				// 	ret = ret.data;
-					
-				// 	if (!ret.success) {
-				// 		var errMsg = ret.error.message;
-				// 		console.error(errMsg);
-				// 		reject(new Error(errMsg)); 
-				// 		return;
-				// 	}
-
-				// 	resolve(ret.data.picture);
-				// }).catch(function (err) {
-				// 	console.error(err);
-				// 	reject(new Error("server error"));
-				// });
 			});
 
 			promise.onProgress = function (callback) {
@@ -224,7 +168,13 @@ angular.module("Backend").service("Picture", [
 
 		this.getPictures = function (dir) {
 			return new $q(function (resolve, reject) {
-				var url = BASE_URL + "/directory/" + dir.id;
+				var url = BASE_URL;
+
+				if (angular.isObject(dir) 
+					&& angular.isNumber(dir.id)
+					&& parseInt(dir.id) === dir.id) {
+					url += "?directory=" + dir.id;
+				}
 
 				$http.get(url).then(function (ret) {
 					ret = ret.data;
@@ -236,9 +186,6 @@ angular.module("Backend").service("Picture", [
 						return;
 					}
 					
-					console.log("++++++++++++++++");
-					console.log(pictures);
-
 					resolve(ret.data.pictures);
 
 				}).catch(function(err){

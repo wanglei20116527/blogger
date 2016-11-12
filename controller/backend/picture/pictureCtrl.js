@@ -122,11 +122,6 @@ module.exports = {
 				console.error(err);
 			});
 
-			if (err.statusCode) {
-				res.sendStatus(err.statusCode);
-				return;
-			}
-
 			if (err.code) {
 				res.json({
 					success: false,
@@ -137,6 +132,8 @@ module.exports = {
 				});
 				return;
 			}
+
+			res.sendStatus(err.statusCode || 500);
 		});
 	},
 
@@ -228,11 +225,6 @@ module.exports = {
 				});
 			}
 
-			if (err.statusCode) {
-				res.sendStatus(err.statusCode);
-				return;
-			}
-
 			if (err.code) {
 				res.json({
 					success: false,
@@ -243,6 +235,8 @@ module.exports = {
 				});
 				return;
 			}
+
+			res.sendStatus(err.statusCode || 500);
 		});
 	},
 
@@ -286,12 +280,12 @@ module.exports = {
 			return fileService.unlink(path);
 		})
 		.then(()=>{
-			delete addedPic.path;
+			let pic = filterPicture(addedPic);
 
 			res.json({
 				success: true,
 				data: {
-					picture: addedPic
+					picture: pic
 				}
 			});
 
@@ -322,13 +316,6 @@ module.exports = {
 				console.error(err);
 			});
 
-			
-
-			if (err.statusCode) {
-				res.sendStatus(err.statusCode);
-				return;
-			}
-
 			if (err.code) {
 				res.json({
 					success: false,
@@ -339,6 +326,8 @@ module.exports = {
 				});
 				return;
 			}
+
+			res.sendStatus(err.statusCode || 500);
 		});
 	},
 
@@ -385,167 +374,32 @@ module.exports = {
 		req.session.pictures = pictures;
 	},
 
-	uploadPicture: function (req, res) {
-		let {
-			user
-		} = req.session.user;
-
-		let {
-			file
-		} = req;
-
-		let {
-			directory: oDirId
-		} = req.body;
-
-		let dirId = oDirId, directory;
-
-		if (!file) {
-			res.json({
-				success: false,
-				error: {
-					code: 160000,
-					message: `no picture submit`
-				}
-			});
-			return;
-		}
-
-		if (!validation.checkPictureMimeType(file.mimetype)) {
-			if (file) {
-				fileService.unlink(file.path).catch(err=>{
-					console.error(err);
-				});
-			}
-
-			res.json({
-				success: false,
-				error: {
-					code: 160000,
-					message: `upload type invalid`
-				}
-			});
-			return;	
-		}
-
-		try {
-			dirId = parseInt(dirId, 10);
-		} catch (err) {
-			if (file) {
-				fileService.unlink(file.path).catch(err=>{
-					console.error(err);
-				});
-			}
-
-			res.json({
-				success: false,
-				error: {
-					code: 160000,
-					message: `directory id ${oDirId} invalid`
-				}
-			});
-			return;
-		}
-
-		if (!Number.isInteger(dirId)) {
-			if (file) {
-				fileService.unlink(file.path).catch(err=>{
-					console.error(err);
-				});
-			}
-			
-			res.json({
-				success: false,
-				error: {
-					code: 160000,
-					message: `directory id ${oDirId} invalid`
-				}
-			});
-			return;
-		}
-
-		dirService.getDirByUserAndId(user, dirId).then(dir=>{
-			if (!dir) {
-				let err = new Error(`directory not exist`);
-				err.code = 160000;
-				throw err;
-			}
-
-			directory = dir;
-
-			let name = file.originalname;
-
-			return pictureService.isPicExistByUserAndNameAndDir(user, name, directory);
-		})
-		.then(isExist=>{
-			let {
-				path,
-				originalname: name
-			} = file;
-
-			if (isExist) {
-				let err = new Error(`picture ${name} already exist`);
-				err.code = 160000;
-				throw err;
-			}
-
-			return pictureService.addPicture(user, path, name, directory);
-		})
-		.then(pic=>{
-			if (file) {
-				fileService.unlink(file.path).catch(err=>{
-					console.error(err);
-				});
-			}
-
-			delete pic.path;
-
-			res.json({
-				success: true,
-				data: {
-					picture: pic
-				}
-			});
-		})
-		.catch(err=>{
-			console.error(err);
-			if (file) {
-				fileService.unlink(file.path).catch(err=>{
-					console.error(err);
-				});
-			}
-
-			if (err.statusCode) {
-				res.sendStatus(err.statusCode);
-				return;
-			}
-
-			if (err.code) {
-				res.json({
-					success: false,
-					error: {
-						code: err.code,
-						message: err.message || err.stack	
-					}
-				});
-				return;
-			}
-		});
-	},
-
-	getPicturesUnderDir: function (req, res) {
+	getPictures: function (req, res) {
 		let {
 			user
 		} = req.session.user;
 
 		let {
 			directory: dirId
-		} = req.params;
+		} = req.query;
 
-		try {
-			dirId = parseInt(dirId, 10);
+		if (dirId != null) {
+			try {
+				dirId = parseInt(dirId, 10);
 
-		} catch (err) {
+			} catch (err) {
+				res.json({
+					success: false,
+					error: {
+						code: 160000,
+						message: `directory id ${dirId} invalid`
+					}
+				});
+				return;
+			}
+		}
+
+		if (dirId != null && !Number.isInteger(dirId)) {
 			res.json({
 				success: false,
 				error: {
@@ -556,31 +410,26 @@ module.exports = {
 			return;
 		}
 
-		if (!Number.isInteger(dirId)) {
-			res.json({
-				success: false,
-				error: {
-					code: 160000,
-					message: `directory id ${dirId} invalid`
-				}
-			});
-			return;
+		let promise = Promise.resolve(null);
+
+		if (dirId != null) {
+			promise = dirService.getDirByUserAndId(user, dirId);
 		}
 
-		dirService.getDirByUserAndId(user, dirId).then(dir=>{
-			if (!dir) {
+		promise.then(dir=>{
+			if (dirId != null && dir == null) {
 				let err = new Error(`directory not exist`);
 				err.code = 160000;
-				throw err;
+				throw err;	
 			}
 
 			return pictureService.getPicturesByUserAndDir(user, dir);
 		})
 		.then(pics=>{
 			pics = pics || [];
-			
-			for (let pic of pics) {
-				delete pic.path;
+
+			for (let i = 0, len = pics.length; i < len; ++i) {
+				pics[i] = filterPicture(pics[i]);
 			}
 
 			res.json({
@@ -593,11 +442,6 @@ module.exports = {
 		.catch(err=>{
 			console.error(err);
 
-			if (err.statusCode) {
-				res.sendStatus(err.statusCode);
-				return;
-			}
-
 			if (err.code) {
 				res.json({
 					success: false,
@@ -608,8 +452,88 @@ module.exports = {
 				});
 				return;
 			}
+
+			res.sendStatus(err.statusCode || 500);
 		});
 	},
+
+	// getPicturesUnderDir: function (req, res) {
+	// 	let {
+	// 		user
+	// 	} = req.session.user;
+
+	// 	let {
+	// 		directory: dirId
+	// 	} = req.params;
+
+	// 	try {
+	// 		dirId = parseInt(dirId, 10);
+
+	// 	} catch (err) {
+	// 		res.json({
+	// 			success: false,
+	// 			error: {
+	// 				code: 160000,
+	// 				message: `directory id ${dirId} invalid`
+	// 			}
+	// 		});
+	// 		return;
+	// 	}
+
+	// 	if (!Number.isInteger(dirId)) {
+	// 		res.json({
+	// 			success: false,
+	// 			error: {
+	// 				code: 160000,
+	// 				message: `directory id ${dirId} invalid`
+	// 			}
+	// 		});
+	// 		return;
+	// 	}
+
+	// 	dirService.getDirByUserAndId(user, dirId).then(dir=>{
+	// 		if (!dir) {
+	// 			let err = new Error(`directory not exist`);
+	// 			err.code = 160000;
+	// 			throw err;
+	// 		}
+
+	// 		return pictureService.getPicturesByUserAndDir(user, dir);
+	// 	})
+	// 	.then(pics=>{
+	// 		pics = pics || [];
+			
+	// 		for (let pic of pics) {
+	// 			delete pic.path;
+	// 		}
+
+	// 		res.json({
+	// 			success: true,
+	// 			data: {
+	// 				pictures: pics
+	// 			}
+	// 		});
+	// 	})
+	// 	.catch(err=>{
+	// 		console.error(err);
+
+	// 		if (err.statusCode) {
+	// 			res.sendStatus(err.statusCode);
+	// 			return;
+	// 		}
+
+	// 		if (err.code) {
+	// 			res.json({
+	// 				success: false,
+	// 				error: {
+	// 					code: err.code,
+	// 					message: err.message || err.stack	
+	// 				}
+	// 			});
+	// 			return;
+	// 		}
+	// 	});
+	// },
 
 	updatePicture: function (req, res) {
 		let {
@@ -754,3 +678,16 @@ module.exports = {
 		});
 	},
 };
+
+function filterPicture (picture) {
+	if (!underscore.isObject(picture)) {
+		return picture;
+	}
+
+	picture = Object.assign({}, picture);
+	
+	delete picture.path;
+	delete picture.thumbnailPath;
+
+	return picture;
+}
