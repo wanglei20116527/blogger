@@ -387,15 +387,7 @@ angular.module("Backend").controller("pictureCtrl", [
 			event.target.value = null;
 		};
 
-		$scope.showPictureContextMenu = function (event, pic) {
-			
-		};
-
-		$scope.hidePictureContextMenu = function () {
-
-		};
-
-		init();
+		init();	
 
 		function init () {
 			initPath().then(function () {

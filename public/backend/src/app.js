@@ -1,4 +1,4 @@
-angular.module("Backend", ["ngRoute", "ngAnimate", "ui.bootstrap"]).config([
+angular.module("Backend", ["ngRoute", "ui.bootstrap"]).config([
 	'$locationProvider', 	
 	'$routeProvider',
 
