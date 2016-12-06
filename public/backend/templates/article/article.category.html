@@ -1,44 +1,54 @@
 <div class="article-category page">
-	<div>
+	<div class="clearfix btn-group">
 		<button 
+			class="btn fl add-category-btn"
 			ng-click="addCategory()">
-			add Category
+			Add Category
 		</button>
 
 		<button 
+			class="btn fl batch-delete-btn"
+			ng-class="{disabled: !hasChecked}"
 			ng-click="deleteCheckedCategories()">
-			batch delete
+			Batch Delete
 		</button>
 	</div>
 
-	<div>
+	<div class="categories">
 		<table>
 			<thead>
 				<tr>
 					<td>
-						<input 
-							type="checkbox"
-							ng-model="checkAll"
-							ng-change="checkAllChanged()"
-						/>
+						<checkbox
+							default-value="{{checkAll}}"
+							on-change="toggleCategoryAllStateChanged()">
+						</checkbox>
 					</td>
 
 					<td>
-						<span>name</span>
+						<span>Index</span>
 					</td>
 
 					<td>
-						<span>operation</span>
+						<span>Name</span>
+					</td>
+
+					<td>
+						<span>Operation</span>
 					</td>
 				</tr>
 			</thead>
 			<tr ng-repeat="category in categories">
 				<td>
-					<input 
-						type="checkbox"
-						ng-model="category.isChecked"
-						ng-change="categoryCheckStateChanged()"
-					/>
+					<checkbox 
+						default-value="{{category.isChecked}}"
+						on-change="toggleCategoryCheckState(category)">
+					</checkbox>
+					
+				</td>
+
+				<td>
+					<span ng-bind="$index + 1"></span>
 				</td>
 
 				<td>
@@ -46,15 +56,15 @@
 				</td>
 
 				<td>
-					<div>
+					<div class="operation-btn-group">
 						<button
-							class="btn" 
+							class="btn edit-btn" 
 							ng-click="updateCategory(category)">
 							update
 						</button>
 
 						<button
-							class="btn" 
+							class="btn delete-btn" 
 							ng-click="deleteCategory(category)">
 							delete
 						</button>

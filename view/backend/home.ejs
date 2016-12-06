@@ -10,7 +10,48 @@
 	</head>
 
 	<body ng-controller="mainCtrol">
-		
+		<div class="body" ng-class="{extend: collapseMenuBar}">
+			<div 
+				ng-view 
+				class="view"
+				onload="onViewLoaded()">
+			</div>
+		</div>
+
+		<aside class="menu-bar" ng-class="{collapse: collapseMenuBar}">
+			<nav>
+				<ul class="main-menu">
+					<li ng-repeat="menuItem in menu"
+						ng-class = "{active: menuItem.active, 'has-sub-menu': menuItem.hasSubMenu}">
+						<a 	class="clearfix"
+							href="{{::menuItem.url}}">
+							<span 
+								class="text fl" 
+								ng-bind="::menuItem.name">
+							</span>
+							<img 
+								ng-if="::menuItem.hasSubMenu"
+								class="fr"
+								ng-src="/backend/static/image/ic_keyboard_arrow_down_black_24px.svg"
+							/>
+						</a>
+
+						<ul ng-show="::menuItem.hasSubMenu">
+							<li ng-repeat="subMenuItem in menuItem.subMeun">
+								<a 	ng-class="{active: subMenuItem.active}"
+									href="{{::subMenuItem.url}}">
+									<span
+										class="text"
+										ng-bind="::subMenuItem.name">
+									</span>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+		</aside>
+
 		<header class="header clearfix">
 			<div class="header-nav fl clearfix">
 				<h1 class="title fl">DASHBOARD</h1>
@@ -46,92 +87,6 @@
 				</div>
 			</div>
 		</header>
-		
-		<aside class="menu-bar" ng-class="{collapse: collapseMenuBar}">
-			<nav>
-				<ul>
-					<li>
-						<a ng-class="{active: activePage =='index'}"
-						   href="#!/index">
-							<i class="icon iconfont">&#xe71b;</i>
-							<span class="text">Home</span>
-						</a>
-					</li>
-
-					<li>
-						<a ng-class="{active: activePage =='article'}">
-							<i class="icon iconfont">&#xe601;</i>
-							<span class="text">Article</span>
-						</a>
-
-						<ul>
-							<li>
-								<a href="#!/article/list">
-									<i></i>
-									<span>All</span>
-								</a>
-							</li>
-
-							<li>
-								<a href="#!/article/write">	
-									<i></i>
-									<span>Writing</span>
-								</a>
-							</li>
-
-							<li>
-								<a href="#!/article/category">
-									<i></i>
-									<span>Category</span>
-								</a>
-							</li>
-						</ul>
-					</li>
-					
-					<li>
-						<a ng-class="{active: activePage =='picture'}"
-						   href="#!/picture">
-							<i class="icon iconfont">&#xe6ad;</i>
-							<span class="text">Picture</span>
-						</a>
-					</li>
-
-					<li>
-						<a ng-class="{active: activePage =='profile'}">
-							<i class="icon iconfont">&#xe73a;</i>
-							<span class="text">Profile</span>
-						</a>
-
-						<ul>
-							<li>
-								<a href="#!/profile/basic">
-									<i></i>
-									<span>Basic Info</span>
-								</a>
-							</li>
-
-							<li>
-								<a href="#!/profile/picture">	
-									<i></i>
-									<span>Picture</span>
-								</a>
-							</li>
-
-							<li>
-								<a href="#!/profile/password">
-									<i></i>
-									<span>Password</span>
-								</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</nav>
-		</aside>
-
-		<div class="body">
-			<div ng-view class="view"></div>
-		</div>
 
 		<div class="message-area">
 			<div class="message-list fr">
@@ -179,14 +134,16 @@
 		<script type="text/javascript" src="/backend/static/src/controllers/article/article.write.controller.js"></script>
 		<script type="text/javascript" src="/backend/static/src/controllers/article/article.category.controller.js"></script>
 
-
-
 		<script type="text/javascript" src="/backend/static/src/controllers/index/index.controller.js"></script>
 		<script type="text/javascript" src="/backend/static/src/controllers/picture/picture.controller.js"></script>
 		<script type="text/javascript" src="/backend/static/src/controllers/profile/profile.controller.js"></script>
+		<script type="text/javascript" src="/backend/static/src/controllers/profile/profile.basic.controller.js"></script>
+		<script type="text/javascript" src="/backend/static/src/controllers/profile/profile.password.controller.js"></script>
+		<script type="text/javascript" src="/backend/static/src/controllers/profile/profile.photo.controller.js"></script>
 
 		<script type="text/javascript" src="/backend/static/src/directives/dialog/dialog.js"></script>
 		<script type="text/javascript" src="/backend/static/src/directives/editor/editor.js"></script>
+		<script type="text/javascript" src="/backend/static/src/directives/checkbox/checkbox.js"></script>
 		<script type="text/javascript" src="/backend/static/src/directives/contextMenu/contextMenu.js"></script>
 		<script type="text/javascript" src="/backend/static/src/directives/event/onContextMenu.js"></script>
 

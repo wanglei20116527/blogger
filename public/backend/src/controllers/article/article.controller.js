@@ -273,45 +273,5 @@ angular.module("Backend").controller("articleCtrl", [
 
 			$rootScope.$emit("message", msgObj);
 		}
-
-		(function(){
-			// updateArticle({
-			// 	id: 0,
-			// 	title: "hello word1",
-			// 	content: "wanglei is cool and houna is cute",
-			// 	isPublish: "1",
-			// 	category: 5,
-			// 	author: 1
-			// });
-
-			// deleteArticle({
-			// 	id: 0,
-			// 	title: "hello word",
-			// 	content: "wanglei is cool and houna is cute",
-			// 	isPublish: "1",
-			// 	category: 5,
-			// 	author: 1
-			// });
-
-			// addArticle({
-			// 	title: "hello word",
-			// 	content: "wanglei is cool and houna is cute",
-			// 	isPublish: "0"
-			// }, {
-			// 	id: 14	
-			// });
-
-			// addCategory("wanglei loves houna");
-			
-			// updateCategory({
-			// 	id: 13,
-			// 	user: 1,
-			// 	name: "wanglei1"
-			// })
-
-			// deleteCategory({
-			// 	id: 14
-			// });
-		})();
 	}
 ]);

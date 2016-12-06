@@ -1,4 +1,5 @@
 angular.module("Backend").controller("articleWriteCtrl", [
+	"$window",
 	"$scope",
 	"$q",
 	"Validation",
@@ -6,6 +7,7 @@ angular.module("Backend").controller("articleWriteCtrl", [
 	"Article",
 
 	function (
+			$window,
 			$scope,
 			$q,
 			Validation,
@@ -35,9 +37,17 @@ angular.module("Backend").controller("articleWriteCtrl", [
 			showCtgySelector(!!show);
 		};
 
+		$scope.toggleCtgySelector = function () {
+			toggleCtgySelector();
+		};
+
 		$scope.changeCategory = function (category) {
 			changeCategory(category);
 			showCtgySelector(false);
+		};
+
+		$scope.togglePublishState = function () {
+			updatePublishState(!$scope.article.isPublish);
 		};
 
 		$scope.saveArticle = function () {
@@ -118,6 +128,10 @@ angular.module("Backend").controller("articleWriteCtrl", [
 			$scope.article.markdown = markdown;
 		}
 
+		function updatePublishState (isPublish) {
+			$scope.article.isPublish = isPublish;
+		};
+
 		function changeCategory (category) {
 			$scope.curtCategory     = category;
 			$scope.article.category = category.id;
@@ -126,6 +140,12 @@ angular.module("Backend").controller("articleWriteCtrl", [
 		function showCtgySelector (show) {
 			$scope.isCtgySelectorShow = !!show;
 		}
+
+		function toggleCtgySelector () {
+			$scope.isCtgySelectorShow = !$scope.isCtgySelectorShow;
+		}
+
+		angular.element()
 
 	}
 ]);

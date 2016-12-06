@@ -1,0 +1,33 @@
+.wl-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid $grey;
+    cursor: pointer;
+
+    &.checked {
+        .icon {
+            position: absolute;
+            bottom: 3px;
+            left: 0;
+            right: 0;
+            margin: auto;
+            width: 6px;
+            height: 10px;
+            content: "";
+            border-color: $grey;
+            border-style: solid;
+            border-top: 0;
+            border-right-width: 2px;
+            border-bottom-width: 2px;
+            border-left: 0;
+
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+    }
+}

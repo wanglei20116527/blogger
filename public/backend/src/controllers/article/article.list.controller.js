@@ -148,6 +148,10 @@ angular.module("Backend").controller("articleListCtrl", [
 				this.categorySelector.show = !!show;
 			},
 
+			toggleCategorySelector: function () {
+				this.categorySelector.show = !this.categorySelector.show;
+			},
+
 			updateCategory: function (category) {
 				this.categorySelector.show = false;
 				this.categorySelector.curtCategory = category;
@@ -155,6 +159,10 @@ angular.module("Backend").controller("articleListCtrl", [
 
 			showPublishSelector: function (show) {
 				this.publishSelector.show = !!show;
+			},
+
+			togglePublishSelector: function () {
+				this.publishSelector.show = !this.publishSelector.show;
 			},
 
 			updatePublishSelecorItem: function (item) {
@@ -233,12 +241,19 @@ angular.module("Backend").controller("articleListCtrl", [
 				this.categorySelector.show = !!show;
 			},
 
+			toggleCategorySelector: function () {
+				this.categorySelector.show = !this.categorySelector.show;
+			},
+
+			togglePublishState: function () {
+				this.article.isPublish = !this.article.isPublish;
+			},
+
 			changeCategory: function (category) {
 				this.article.category = category;
 
 				this.categorySelector.show = false;
 				this.categorySelector.curtCategory = category;
-
 			},
 
 			onContentChange: function (html, markdown) {
@@ -251,6 +266,7 @@ angular.module("Backend").controller("articleListCtrl", [
 			},
 
 			updateArticle: function () {
+				debugger;
 				updateArticle(this.article).then(function () {
 					console.log("update article success");
 				}).catch(function (err) {
@@ -382,10 +398,6 @@ angular.module("Backend").controller("articleListCtrl", [
 				Article.updateArticle(article).then(function (article) {
 					var articles = $scope.articleList.articles;
 
-					console.log("+++++++++++++++++++++++");
-					console.log(article);
-
-
 					for (var i = 0, len = articles.length; i < len; ++i) {
 						var tmpArticle = articles[i];
 
@@ -421,9 +433,6 @@ angular.module("Backend").controller("articleListCtrl", [
 			article.category = article.category.id;
 
 			delete article.index;
-
-			console.log("deleteArticle: ");
-			console.log(article);
 
 			return new $q(function (resolve, reject) {
 				Article.deleteArticle(article).then(function () {

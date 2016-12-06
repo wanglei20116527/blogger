@@ -1,14 +1,16 @@
 @import "./home";
 @import "./profile";
+@import "./article/article";
 
 .header {
 	position: fixed;
 	top: 0;
-	z-index: 10;
+	left: 0;
 	width: 100%;
+	min-width: 60rem;
 	padding: 0 3rem;
-	background: $white;
-	box-shadow: 0 0 0.4rem 0 rgba(0, 0, 0, 0.4);
+	background: $blue;
+	box-shadow: 0 .2rem .4rem 0 rgba(0, 0, 0, 0.4);
 }
 
 .header-nav,
@@ -21,7 +23,7 @@
 	& > .title {
 		font-weight: 500;
 		font-size: 2.5rem;
-		color: $blue;
+		color: $white;
 	}
 
 	.menu-bar-toggle {
@@ -45,7 +47,7 @@
 				width: 100%;
 			    height: 0.2rem;
 			    margin-bottom: 0.4rem;
-			    background: $grey;
+			    background: $white;
 
 			    &:last-child {
 			    	margin-bottom: 0;
@@ -80,10 +82,10 @@
 			width: 8rem;
 			text-align: center;
 			font-size: 1.8rem;
-			color: $grey;
+			color: $white;
 
 			&:hover {
-				color: $black;
+				color: $white;
 			}
 		}
 	}
@@ -91,10 +93,10 @@
 	.logout-btn {
 		.icon {
 			font-size: 1.8rem;
-			color: $grey;
+			color: $white;
 
 			&:hover {
-				color: $black;
+				color: $white;
 			}
 		}
 	}
@@ -104,15 +106,16 @@
 .body {
 	height: 100%;
 	padding-top: 6.4rem;
+	background-color: rgba(236,239,241,0.56);
 }
 
 .menu-bar {
 	position: absolute;
+	top: 0;
+	left: 0;
 	width: 22.5rem;
-	z-index: 5;
 	overflow: hidden;
-	background: $white;
-	box-shadow: 0 0 0.4rem 0 rgba(0, 0, 0, 0.4);
+	box-shadow: .2rem 0 .4rem 0 rgba(0, 0, 0, 0.4);
 	
 	-webkit-transition: width 0.3s ease-in-out;
 	   -moz-transition: width 0.3s ease-in-out;
@@ -121,69 +124,73 @@
 	        transition: width 0.3s ease-in-out;
 
 	&.collapse {
-		width: 8rem;
-
-		& + .body {
-			
-			.view {
-				padding-left: 8rem;	
-			}
-		}
-
-		.text {
-			display: none;
-		}
+		width: 0;
 	}
 
 	nav {
-		width: 100%;
-		padding-top: 2rem;
+		width: 22.5rem;
+		cursor: pointer;
 
-		li {
-			width: 22.5rem;
-			list-style: none;
+		.main-menu {
+			& > li {
+				width: 100%;
+				list-style: none;
+				border-bottom: 1px solid rgba(207,216,220,0.56);
 
-			a {
-				position: relative;
-				display: block;
-			    padding: 0 3rem;
-			    margin: 2rem 0;
-			    font-size: 1.6rem;
-			    color: $grey;
-			    text-decoration: none;
+				a {
+					position: relative;
+					display: block;
+					padding: 1.5rem 1rem 1.5rem 3rem;
+					font-size: 1.6rem;
+					color: $grey;
+					text-decoration: none;
 
-			    &:hover  {
-			    	color: $black;
-			    }
+					&:hover  {
+						color: $black;
+					}
+				}
 
-			    &.active {
-			    	color: $blue;
-			    }
+				ul {
+					position: relative;
+					height: auto;
+					max-height: 0;
+					background-color: rgba(207,216,220,0.56);
+					overflow: hidden;
 
-			    &:hover:after,
-			    &.active:after {
-			    	content: "";
-			    	position: absolute;
-			    	top: 0;
-			    	left: 0;
-			    	width: 3px;
-			    	height: 100%;
-			    }
+					-webkit-transition: max-height .3s ease-in-out;
+					   -moz-transition: max-height .3s ease-in-out;
+					    -ms-transition: max-height .3s ease-in-out;
+					     -o-transition: max-height .3s ease-in-out;
+					        transition: max-height .3s ease-in-out;
 
+					li:hover {
+						a {
+							background-color: rgba(255,255,255,0.24);
+						}
+					}
+				}
 
-			    &:hover:after {
-			    	background: $black;
-			    }
+				&.active {
+					& > a {
+						color: $blue;
+						background: rgba(207,216,220,0.24);
+					}
 
-			    &.active:after {
-			    	background: $blue;
-			    }
+					&.has-sub-menu {
+						& > a {
+							box-shadow: 0 1px 2px rgba(0,0,0,0.24);
+						}
 
-			    .icon {
-			    	font-size: 2rem;
-			    	color: $blue;
-			    	margin-right: 1rem;
-			    }
+						ul {
+							max-height: 16.2rem;
+
+							a.active {
+								background: rgba(207,216,220,0.87);
+    							color: #1976D2;
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -254,8 +261,8 @@
 
 .body {
 	position: relative;
-	z-index: 1;
 	width: 100%;
+	min-width: 110rem;
 	height: 100%;
 
 	.view {
@@ -274,7 +281,6 @@
 			position: relative;
 			width: 100%;
 			height: 100%;
-			padding-right: 3rem;
 
 			.dialog-area,
 			.model-dialog-area {
@@ -292,6 +298,12 @@
 
 				
 			}
+		}
+	}
+
+	&.extend {
+		.view {
+			padding-left: 0;
 		}
 	}
 }

@@ -124,7 +124,8 @@ class Article {
 							${TABLENAME} 
 						where 
 							category=? 
-							and deleteTime is null`;
+							and deleteTime is null
+						order by date desc`;
 
 
 			let params = [category.id];
@@ -349,6 +350,7 @@ class Article {
 						where 
 							author=? 
 							and deleteTime is null
+						order by date desc
 						limit ?,?`;
 
 			let params = [user.id, start, number];
@@ -384,6 +386,7 @@ class Article {
 							author=? 
 							and isPublish=?
 							and deleteTime is null
+						order by date desc
 						limit ?,?`;
 
 			let params = [user.id, "1", start, number];
@@ -419,6 +422,7 @@ class Article {
 							author=? 
 							and isPublish=?
 							and deleteTime is null
+						order by date desc
 						limit ?,?`;
 
 			let params = [user.id, "0", start, number];
@@ -456,6 +460,7 @@ class Article {
 							author=? 
 							and category=?
 							and deleteTime is null
+						order by date desc
 						limit ?,?`;
 
 			let params = [user.id, category.id, start, number];
@@ -493,6 +498,7 @@ class Article {
 							and category=?
 							and isPublish=?
 							and deleteTime is null
+						order by date desc
 						limit ?,?`;
 
 			let params = [user.id, category.id, "1", start, number];
@@ -530,6 +536,7 @@ class Article {
 							and category=?
 							and isPublish=?
 							and deleteTime is null
+						order by date desc
 						limit ?,?`;
 
 			let params = [user.id, category.id, "0", start, number];

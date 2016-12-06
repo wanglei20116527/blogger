@@ -10,8 +10,8 @@ angular.module("Backend").controller("articleCategoryCtrl", [
 			Category,
 			Validation
 		) {
-
-		$scope.checkAll = false;
+		$scope.checkAll   = false;
+		$scope.hasChecked = false;
 
 		$scope.categories = [];
 
@@ -215,12 +215,17 @@ angular.module("Backend").controller("articleCategoryCtrl", [
 			}
 		};
 
-		$scope.checkAllChanged = function () {
-			checkAllCategories($scope.checkAll);
+		$scope.toggleCategoryAllStateChanged = function () {
+			toggleCategoryAllStateChanged();
+			
+			$scope.hasChecked = hasCategoryChecked();
 		};
 
-		$scope.categoryCheckStateChanged = function () {
-			$scope.checkAll = isAllCategoriesChecked();
+		$scope.toggleCategoryCheckState = function (category) {
+			category.isChecked = !category.isChecked;
+
+			$scope.checkAll   = isAllCategoriesChecked();
+			$scope.hasChecked = hasCategoryChecked();
 		};
 
 		$scope.addCategory = function () {
@@ -238,8 +243,13 @@ angular.module("Backend").controller("articleCategoryCtrl", [
 		};
 
 		$scope.deleteCheckedCategories = function () {
+			var categories = getAllCheckedCategories();
+			if (categories.length <= 0) {
+				return;
+			}
+
 			showDeleteCategoriesDialog(true);
-			$scope.dcsd.categories = getAllCheckedCategoried();
+			$scope.dcsd.categories = categories;
 		};
 
 		init();
@@ -271,8 +281,8 @@ angular.module("Backend").controller("articleCategoryCtrl", [
 			});
 		}
 
-		function checkAllCategories (checked) {
-			checked = !!checked;
+		function toggleCategoryAllStateChanged () {
+			var checked = $scope.checkAll = !$scope.checkAll;
 
 			var categories = $scope.categories;
 
@@ -293,7 +303,19 @@ angular.module("Backend").controller("articleCategoryCtrl", [
 			return true;
 		}
 
-		function getAllCheckedCategoried () {
+		function hasCategoryChecked () {
+			var categories = $scope.categories;
+
+			for (var i = 0, ii = categories.length; i < ii; ++i) {
+				if (categories[i].isChecked) {
+					return true;
+				}
+			}
+
+			return false;	
+		}
+
+		function getAllCheckedCategories () {
 			var tCategories = [];
 
 			var categories = $scope.categories;

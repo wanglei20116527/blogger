@@ -1,0 +1,71 @@
+<div class="article-write page">
+	<div ng-include="'/backend/static/templates/loading.template.html'"
+		 ng-if="isLoading">
+	</div>
+
+	<div ng-if="categoires.length <= 0 && !isLoading">
+		<h1> no category, please add a category first</h1>
+	</div>
+	
+	<div ng-if="categoires.length > 0 && !isLoading">
+		<header class="article-write-header clearfix">
+			<div class="article-title fl">
+				<span>Title</span>
+				<input
+					placeholder="please input title" 
+					type="text" 
+					ng-model="article.title"
+				/>
+			</div>
+
+			<div class="category-selector fl">
+				<button 
+					class="btn category-selector-btn"
+					ng-click="toggleCtgySelector()">
+					<span ng-bind="curtCategory.name"></span>
+					<span class="icon caret"></span>
+				</button>
+
+				<ul class="categoires"
+					ng-show="isCtgySelectorShow">
+					<li class="category-item"
+						ng-repeat="category in categoires">
+						<a ng-bind="category.name"
+							ng-click="changeCategory(category)">
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="publish-selector fl clearfix">
+				<div class="checkbox-wrapper fl">
+					<checkbox
+						default-value="{{article.isPublish}}"
+						on-change="togglePublishState()"
+					/>
+				</div>
+
+				<span 
+					class="text fl">
+					Publish
+				</span>
+			</div>
+
+			<div class="btn-group clearfix fr">
+				<button
+					class="fl btn save-article-btn" 
+					ng-click="saveArticle()">
+					Save
+				</button>
+			</div>
+		</header>
+
+		<div class="article-write-body">
+			<wl-editor
+				on-ctrl-s="saveArticle()"
+				on-change="onContentChange(html, markdown)">
+			</wl-editor>
+		</div>
+
+	</div>
+</div>

@@ -1,0 +1,133 @@
+.article-category {
+    padding: 0 3rem;
+    
+    .btn-group {
+        margin-top: 2.5rem;
+
+        .btn {
+            position: relative;
+            display: inline-block;
+            height: 3.6rem;
+            padding-left: 3rem;
+            padding-right: 3rem;
+            margin-right: 1rem;
+            line-height: 3.6rem;
+            text-align: center;
+            color: $white;
+            font-size: 1.4rem;
+            opacity: 1;
+            box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+
+            -webkit-transition: all 0.2s ease-in-out;
+            -moz-transition: all 0.2s ease-in-out;
+            -ms-transition: all 0.2s ease-in-out;
+            -o-transition: all 0.2s ease-in-out;
+            transition: all 0.2s ease-in-out;
+            
+            &:last-child {
+                margin-right: 0;
+            }
+
+            &:not(.disabled) {
+                &:hover {
+                    opacity: 0.8;
+                }
+
+                &.add-category-btn {
+                    background-color: $blue;
+                }
+
+                &.batch-delete-btn {
+                    background-color: $green;
+                }
+            }
+
+            &.disabled {
+                background-color: $grey;
+                opacity: .4;
+            }
+        }
+    }
+
+    .categories {
+        margin-top: 2.5rem;
+        margin-bottom: 2.5rem;
+
+        table {
+            width: 100%;
+            color: $grey;
+            font-size: 1.5rem;
+            text-align: center;
+            background-color: $white;
+            border: none;
+            border-collapse: collapse;
+            box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+
+            thead {
+                tr {
+                    background-color: $blue;
+                    color: $white;
+
+                    td {
+                        padding: 1.3rem 0;
+                        font-weight: 600;
+
+                        .wl-checkbox {
+                            vertical-align: middle;
+                            border-color: $white;
+
+                             &.checked {
+                                 .icon {
+                                      border-color: $white;
+                                 }
+                             }
+                        }
+                    }
+                }
+            }
+
+            tbody {
+                tr {
+                    border-top: 1px solid #f3efef;
+                    
+                    td {
+                        padding: 1.3rem 0;
+                        
+                        .wl-checkbox {
+                            vertical-align: middle;
+                        }
+                    }
+
+                    &:first-child {
+                        border-top: none;
+                    }
+                }
+
+                .operation-btn-group {
+                    .btn {
+                        display: inline-block;
+                        display: inline-block;
+                        line-height: 2.4rem;
+                        color: $black;
+                        opacity: 1;
+                        text-decoration: underline;
+                        
+                        &:hover {
+                            opacity: .8;
+                        }
+                        
+                        &.edit-btn {
+                            color: $green;
+                            margin-right: 1rem;
+                            
+                        }
+
+                        &.delete-btn {
+                            color: $red;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

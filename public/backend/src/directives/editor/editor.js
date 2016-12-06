@@ -1,22 +1,34 @@
 angular.module("Backend").directive("wlEditor", [
+	"$rootScope",
+	"$window",
+	"$timeout",
 	"Uuid",
 	"Directory",
 	"Picture",
 
-	function (Uuid, Directory, Picture) {
+	function (
+		$rootScope, 
+		$window,
+		$timeout,
+		Uuid, 
+		Directory, 
+		Picture) {
 
 		return {
 			restrict: 'E',
 			scope: {
 				content: "@?",
-				onChange: "&?"
+				onCtrlS: "&?",
+				onChange: "&?",
+				
 			},
 
 			templateUrl: "/backend/static/src/directives/editor/editor.html",
 
 			link: function (scope, elements, attrs) {
 				var EDITOR_OPTIONS = {
-					height: 400,
+					width: "100%",
+					height: 450,
 					saveHTMLToTextarea: true,
 					theme: "ambiance-mobile",
 					path: "/backend/static/editormd/lib/",
@@ -80,7 +92,20 @@ angular.module("Backend").directive("wlEditor", [
 								showPictureDialog(true);
 							});
 						}
-					}
+					},
+
+					onload : function() {
+						var keyMap = {
+							"Ctrl-S": function(cm) {
+								scope.onCtrlS && scope.onCtrlS();
+							}
+						};
+
+						this.addKeyMap(keyMap);
+						
+						detectResizeEvent();
+                    }
+
 				};
 				
 				var PICTURE_DIALOG_CONFIG = {
@@ -115,27 +140,29 @@ angular.module("Backend").directive("wlEditor", [
 						showPictureDialog(false);
 					}
 				};
-
-				var editor = null;
 				
+				var editor    = null;
+				var timeoutId = null;
+				var size      = {
+					width: angular.element(elements).width(),
+					height: 450
+				};
+				
+
 				scope.pictureDialog = {
 					show: false,
 					config: PICTURE_DIALOG_CONFIG
 				};
 
 				scope.$on("$destroy", function () {
-					if (editor == null) {
-						return;
-					}
-					editor.editor.remove()
+					offDetectResizeEvent();
+					destroyEditor();
 				});
 
 				init();
 
 				function init () {
-					var id = initEditorId();
-					
-					initEditor(id);
+					initEditor(initEditorId());
 				}
 
 				function initEditorId () {
@@ -146,7 +173,6 @@ angular.module("Backend").directive("wlEditor", [
 
 					return id;
 				}
-				
 
 				function initEditor (id) {
 					var options = angular.merge({}, EDITOR_OPTIONS, {
@@ -154,6 +180,31 @@ angular.module("Backend").directive("wlEditor", [
 					});
 
 					editor = editormd(id, options);
+				}
+
+				function destroyEditor () {
+					if (editor != null) {
+						editor.editor.remove();
+					}
+				}
+
+				function detectResizeEvent () {
+					var width  = angular.element(elements).width();
+
+					if (width !== size.width) {
+						size.width  = width;
+							
+						editor.resize(size.width, size.height);
+					}
+
+					timeoutId = setTimeout(detectResizeEvent, 50);
+				}
+
+				function offDetectResizeEvent () {
+					if (timeoutId != null) {
+						clearTimeout(timeoutId);
+						timeoutId = null;
+					}
 				}
 
 				function showPictureDialog (show) {

@@ -52,6 +52,10 @@ function initApp () {
 
 	app.use(router);
 
+	app.get("*", function (req, res) {
+		res.render("common/error404");
+	});
+
 	let server = http.createServer(app);
 
 	server.listen(process.env.port || 3002, ()=>{

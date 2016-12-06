@@ -1,5 +1,7 @@
 angular.module("Backend").controller("mainCtrol", [
 	"$rootScope",
+	"$location",
+	"$window",
 	"$scope",
 	"$timeout",
 	"Config",
@@ -7,11 +9,16 @@ angular.module("Backend").controller("mainCtrol", [
 	"User",
 	"Directory",
 
-	function ($rootScope, $scope, $timeout, Config, Uuid, User, Directory) {
-		$scope.user = {};
-		$scope.activePage = "index";
-		$scope.collapseMenuBar = false;
-		$scope.msgQueue = [];
+	function (
+			$rootScope,
+			$location, 
+			$window,
+			$scope, 
+			$timeout, 
+			Config, 
+			Uuid, 
+			User, 
+			Directory) {
 
 		$rootScope.$on("message", function (event, msg) {
 			var msgObj = null;
@@ -45,9 +52,79 @@ angular.module("Backend").controller("mainCtrol", [
 			updateUser();
 		});
 
-		$rootScope.$on("pageChanged", function (event, args) {
-			$scope.activePage = args.page;
-		});
+		$scope.onViewLoaded = function () {
+			updateActiveMenu("#!" + $location.path());
+		};
+
+		$scope.user = {};
+		$scope.collapseMenuBar = false;
+		$scope.msgQueue = [];
+
+		$scope.menu = [
+			{
+				name: "Home",
+				active: false,
+				url: "#!/"
+			},
+
+			{
+				name: "Article",
+				active: false,
+				url: "#!/article/list",
+				hasSubMenu: true,
+				subMeun: [
+					{
+						name: "All",
+						active: false,
+						url: "#!/article/list"
+					},
+
+					{
+						name: "Writing",
+						active: false,
+						url: "#!/article/write"
+					},
+
+					{
+						name: "Category",
+						active: false,
+						url: "#!/article/category"
+					}
+				]
+			},
+
+			{
+				name: "Picture",
+				active: false,
+				url: "#!/picture"
+			},
+
+			{
+				name: "Profile",
+				active: false,
+				url: "#!/profile/basic",
+				hasSubMenu: true,
+				subMeun: [
+					{
+						name: "Basic",
+						active: false,
+						url: "#!/profile/basic"
+					},
+
+					{
+						name: "Password",
+						active: false,
+						url: "#!/profile/password"
+					},
+
+					{
+						name: "photo",
+						active: false,
+						url: "#!/profile/photo"
+					}
+				]
+			}
+		];
 
 		$scope.logout = function () {
 			User.logout().then(function(){
@@ -78,6 +155,36 @@ angular.module("Backend").controller("mainCtrol", [
 			});
 		}
 
+		function updateActiveMenu (activeUrl) {
+			var menu = $scope.menu;
+			
+			for (var i = 0, ii = menu.length; i < ii; ++i) {
+				var menuItem   = menu[i];
+				var hasSubMenu = menuItem.hasSubMenu;
+
+				if (hasSubMenu) {
+					var subMeun = menuItem.subMeun;
+					var active  = false;
+
+					for (var j = 0, jj = subMeun.length; j < jj; ++j) {
+						var subMeunItem = subMeun[j];
+						
+						if (subMeunItem.url === activeUrl) {
+							active = true;
+							subMeunItem.active = true;
+							
+						} else {
+							subMeunItem.active = false;
+						}
+					}
+
+					menuItem.active = active;
+				} else {
+					menuItem.active = menuItem.url === activeUrl;
+				}
+			}
+		}
+
 		function dispatchMessage (msg) {
 			$scope.msgQueue.push(msg);
 				
@@ -90,26 +197,6 @@ angular.module("Backend").controller("mainCtrol", [
 				}
 			}, 1000);
 		}
-
-		(function () {
-			console.log("main.controller.js");
-
-			// Directory.addDirectory({
-			// 	name: "sub"
-			// }, {
-			// 	id: 15
-			// });
-
-			// Directory.updateDirectory({
-			// 	id: 15,
-			// 	name: "normal",
-			// 	user: 1,
-			// });
-
-			// Directory.deleteDirectory({
-			// 	id: 12,
-			// });
-
-		})();
+		
 	}
 ]);

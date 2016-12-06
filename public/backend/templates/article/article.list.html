@@ -8,79 +8,80 @@
 		<a href="#!/article/write">Writing Article</a>
 	</div>
 
-	<div ng-show="!isLoading && statistic.total > 0 && articleList.show">
-		<h3>Articles</h3>
-
-		<div>
-			<ul>
-				<li>
-					<a href="#!/article/write">
+	<div class="article-list-area" ng-show="!isLoading && statistic.total > 0 && articleList.show">
+		<div class="toolbar clearfix">
+			<ul class="clearfix fl btn-group">
+				<li class="fl btn-wrapper">
+					<a  class="btn write-article-btn"
+						href="#!/article/write">
 						Write Article
 					</a>
 				</li>
 
-				<li>
-					<div>
-						<span 
-							ng-bind="articleList.categorySelector.curtCategory.name"
-							ng-click="articleList.showCategorySelector(true)">
-						</span>
-
-						<ul ng-show="articleList.categorySelector.show">
-							<li ng-click="articleList.updateCategory(defaultCategory)">
-								<a ng-bind="defaultCategory.name"></a>
-							</li>
-
-							<li ng-repeat="category in categories"
-								ng-click="articleList.updateCategory(category)">
-								<a ng-bind="category.name"></a>
-							</li>
-						</ul>
-					</div>
-				</li>
-
-				<li>
-					<div>
-						<span 
-							ng-bind="articleList.publishSelector.curtItem.name"
-							ng-click="articleList.showPublishSelector(true)">
-						</span>
-
-						<ul ng-show="articleList.publishSelector.show">
-							<li ng-repeat="publishItem in publishList"
-								ng-click="articleList.updatePublishSelecorItem(publishItem)">
-								<a ng-bind="publishItem.name"></a>
-							</li>
-						</ul>
-					</div>
-				</li>
-
-				<li>
+				<li class="fl btn-wrapper">
 					<button 
-						class="btn"
+						class="btn category-selector-btn"
+						ng-click="articleList.toggleCategorySelector()">
+						<span
+							ng-bind="articleList.categorySelector.curtCategory.name">
+						</span>
+						<span class="icon caret"></span>
+					</button>
+
+					<ul class="category-selector"
+						ng-show="articleList.categorySelector.show">
+						<li class="item"
+							ng-click="articleList.updateCategory(defaultCategory)">
+							<a ng-bind="defaultCategory.name"></a>
+						</li>
+
+						<li class="item"
+							ng-repeat="category in categories"
+							ng-click="articleList.updateCategory(category)">
+							<a ng-bind="category.name"></a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="fl btn-wrapper">
+					<button 
+						class="btn publish-selector-btn"
+						ng-click="articleList.togglePublishSelector()">
+						<span
+							ng-bind="articleList.publishSelector.curtItem.name">
+						</span>
+						<span class="icon caret"></span>
+					</button>
+
+					<ul class="publish-selector"
+						ng-show="articleList.publishSelector.show">
+						<li class="item"
+							ng-repeat="publishItem in publishList"
+							ng-click="articleList.updatePublishSelecorItem(publishItem)">
+							<a ng-bind="publishItem.name"></a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="fl btn-wrapper">
+					<button 
+						class="btn filtrate-btn"
 						ng-click="articleList.filtrateArticles()">
-						filtrate
+						Filtrate
 					</button>
 				</li>
 			</ul>
 			
+			<div class="article-summery fr">
+				<span ng-bind="'All(' + statistic.total + ')'"></span>
+				<span>|</span>
+				<span ng-bind="'Published(' + statistic.numOfPublished + ')'"></span>
+				<span>|</span>
+				<span ng-bind="'UnPublished(' + (statistic.total - statistic.numOfPublished) + ')'"></span>
+			</div>
 		</div>
 
-		<div>
-			<span ng-bind="'All(' + statistic.total + ')'"></span>
-			<span>|</span>
-			<span ng-bind="'Published(' + statistic.numOfPublished + ')'"></span>
-			<span>|</span>
-			<span ng-bind="'UnPublished(' + (statistic.total - statistic.numOfPublished) + ')'"></span>
-		</div>
-
-		<div class="toolbar">
-			<ul>
-				<li></li>
-			</ul>
-		</div>
-
-		<div>
+		<div class="articles">
 			<table>
 				<thead>
 					<tr>
@@ -121,15 +122,15 @@
 						</td>
 
 						<td>
-							<div>
+							<div class="operation-btn-group">
 								<button 
-									class="btn"
+									class="btn edit-btn"
 									ng-click="articleList.editArticle(article)">
 									Edit
 								</button>
 								
 								<button 
-									class="btn"
+									class="btn delete-btn"
 									ng-click="articleList.deleteArticle(article)">
 									Delete
 								</button>
@@ -139,14 +140,14 @@
 				</tbody>
 			</table>
 
-			<div>
-				<ul uib-pagination
+			<div class="pagination-wrapper clearfix">
+				<ul class="fl clearfix"
+					uib-pagination
 					boundary-links="true"
 					items-per-page="articleList.numPerPage"
 					total-items="articleList.total" 
 					ng-model="articleList.curtPage" 
-					ng-change="articleList.pageChanged()">
-						
+					ng-change="articleList.pageChanged()">	
 				</ul>
 			</div>
 		</div>
@@ -162,32 +163,40 @@
 		</div>
 	</div>
 
-	<div ng-if="!isLoading && statistic.total > 0 && articleEdit.show">
-		<div>
-			<button 
-				class="btn"
-				ng-click="articleEdit.backToArticleList()">
-				Back
-			</button>
+	<div ng-if="!isLoading && statistic.total > 0 && articleEdit.show" 
+		class="article-edit-area">
+		<header class="article-edit-header">
+			<div class="back-btn-wrapper clearfix">
+				<button
+					class="btn back-btn fr"
+					ng-click="articleEdit.backToArticleList()">
+					X
+				</button>
+			</div>
+			<div class="toolbar clearfix">
+				<div class="article-title fl">
+					<span>Title</span>
+					<input
+						placeholder="please input title" 
+						type="text" 
+						ng-model="articleEdit.article.title"
+					/>
+				</div>
 
-			<span>Edit Article</span>
-		</div>
-
-		<div>
-			<div>
-				<h3>title</h3>
-				<input type="text" ng-model="articleEdit.article.title">
-
-				<div>
-					<div>
+				<div class="category-selector fl">
+					<button 
+						class="btn category-selector-btn"
+						ng-click="articleEdit.toggleCategorySelector()">
 						<span 
-							ng-bind="articleEdit.categorySelector.curtCategory.name"
-							ng-click="articleEdit.showCategorySelector(true)">	
-						</span>	
-					</div>
-					
-					<ul ng-show="articleEdit.categorySelector.show">
-						<li ng-repeat="category in categories">
+							ng-bind="articleEdit.categorySelector.curtCategory.name">
+						</span>
+						<span class="icon caret"></span>
+					</button>
+
+					<ul class="categoires"
+						ng-show="articleEdit.categorySelector.show">
+						<li class="category-item"
+							ng-repeat="category in categories">
 							<a ng-bind="category.name"
 								ng-click="articleEdit.changeCategory(category)">
 							</a>
@@ -195,22 +204,36 @@
 					</ul>
 				</div>
 
-				<label>
-					isPublish: 
-					<input type="checkbox" ng-model="articleEdit.article.isPublish">
-				</label>
-			</div>
+				<div class="publish-selector fl clearfix">
+					<div class="checkbox-wrapper fl">
+						<checkbox
+							default-value="{{articleEdit.article.isPublish}}"
+							on-change="articleEdit.togglePublishState()"
+						/>
+					</div>
 
-			<div>
-				<wl-editor
-					content="{{articleEdit.article.markdown}}"
-					on-change="articleEdit.onContentChange(html, markdown)">		
-				</wl-editor>
-			</div>
+					<span 
+						class="text fl">
+						Publish
+					</span>
+				</div>
 
-			<dir>
-				<button ng-click="articleEdit.updateArticle()">Update</button>
-			</dir>
+				<div class="btn-group clearfix fr">
+					<button
+						class="fl btn save-article-btn" 
+						ng-click="articleEdit.updateArticle()">
+						Update
+					</button>
+				</div>
+			</div>	
+		</header>
+
+		<div class="article-edit-body">
+			<wl-editor
+				content="{{articleEdit.article.markdown}}"
+				on-ctrl-s="articleEdit.updateArticle()"
+				on-change="articleEdit.onContentChange(html, markdown)">		
+			</wl-editor>
 		</div>
 	</div>
 </div>
