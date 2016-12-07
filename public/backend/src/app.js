@@ -30,10 +30,10 @@ angular.module("Backend", ["ngRoute", "ui.bootstrap"]).config([
 			templateUrl : "/backend/static/templates/article/article.category.html"
 		})
 		.when("/picture", {
+			reloadOnSearch: false,
 			controller  : "pictureCtrl",
 			controllerAs: "pictureCtrl",
 			templateUrl : "/backend/static/templates/picture/picture.template.html"
-
 		})
 		.when("/profile/basic", {
 			controller  : "profileBasicCtrl",

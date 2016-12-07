@@ -1,0 +1,277 @@
+.picture-page {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    .picture-page-body {
+        position: relative;
+        width: 100%;
+        padding: 2.5rem 3rem;
+
+        .content-area {
+            width: 100%;
+            padding-right: 0;
+
+            -webkit-transition: all 0.3s ease-in-out;
+            -moz-transition: all 0.3s ease-in-out;
+                -ms-transition: all 0.3s ease-in-out;
+                -o-transition: all 0.3s ease-in-out;
+                    transition: all 0.3s ease-in-out;
+
+            &.collapse {
+                padding-right: 20rem;
+            }
+
+            & > .header {
+                .btn-group {
+                    .btn {
+                        position: relative;
+                        display: inline-block;
+                        height: 3.6rem;
+                        margin-left: 1rem;
+                        padding-left: 3rem;
+                        padding-right: 3rem;
+                        line-height: 3.6rem;
+                        text-align: center;
+                        color: $white;
+                        font-size: 1.4rem;
+                        opacity: 1;
+                        box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+
+                        &:first-child {
+                            margin-left: 0;
+                        }
+
+                        &:hover {
+                            opacity: .8;
+                        }
+
+                        &:active {
+                            box-shadow: 0 0 4px rgba(0,0,0,.32),0 2px 4px rgba(0,0,0,.3);
+                        }
+                    }
+
+                    .picture-select-btn {
+                        position: relative;
+                        padding-left: 0 !important;
+                        padding-right: 0 !important;
+                        background-color: $blue;
+
+                        [type="file"] {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            height: 100%;
+                            opacity: 0;
+                        }
+
+                        .text {
+                            position: relative;
+                            display: inline-block;
+                            width: 100%;
+                            height: 100%;
+                            padding-left: 3rem;
+                            padding-right: 3rem;
+                            cursor: pointer;
+                        }
+                    }
+
+                    .create-dir-dialog-btn {
+                        background-color: $green;
+                    }
+
+                    .preview-btn {
+                        background-color: $lightGreen;
+                    }
+
+                    .batch-delete-btn {
+                        background-color: $blackishGreen;
+                    }
+                }
+
+                .path {
+                    color: $grey;
+                    font-size: 1.4rem;
+                    line-height: 3.6rem;
+
+                    ul {
+
+                        li {
+                            margin-right: .4rem;
+
+                            a {
+                                color: $blue;
+
+                                &:hover {
+                                    opacity: .8;
+                                }
+                            }
+
+                            .icon {
+                                margin-left: .4rem;
+                                color: $grey;
+                            }
+
+                            &:last-child {
+                                margin-right: 0;
+
+                                a {
+                                    color: $grey;
+                                    cursor: default;
+                                }
+
+                                .icon {
+                                    display: none;
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+                
+            }
+
+            & > .body {
+                margin-top: 2.5rem;
+                box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+
+                table {
+                    width: 100%;
+                    color: $grey;
+                    font-size: 1.5rem;
+                    text-align: center;
+                    vertical-align: middle;
+                    border-collapse: collapse;
+
+                    tr {
+                        border-top: 1px solid #f3efef;
+
+                        &:first-child {
+                            border: none;
+                        }
+
+                        td {
+                            padding: 1.3rem 0;
+                        }
+                    }
+
+                    thead {
+                        color: $white;
+                        font-weight: 600;
+                        background-color: $blue;
+
+                        .wl-checkbox {
+                            vertical-align: middle;
+                            border-color: $white;
+
+                            .icon {
+                                border-color: $white;
+                            }
+                        }
+                    }
+
+                    tbody {
+                        background-color: $white;
+
+                        tr {
+                            cursor: pointer;
+                        }
+
+                        .wl-checkbox {
+                            vertical-align: middle;
+                        }
+
+                        .dir-icon {
+                            display: inline-block;
+                            width: 30px;
+                            height: 25px;
+                            background-repeat: no-repeat;
+                            background-position: -594px -416px;
+                            background-image: url("/backend/static/image/icon.png");
+                        }
+
+                        .pic-icon {
+                            display: inline-block;
+                            width: 26px;
+                            height: 26px;
+                            background-repeat: no-repeat;
+                            background-image: url("/backend/static/image/picture.icon.png");
+                        }
+
+                        
+                        .operation-selector {
+                            position: relative;
+                            display: inline-block;
+
+                            .operation-selector-btn {
+                                position: relative;
+                                display: inline-block;
+                                padding-left: 2rem;
+                                padding-right: 2rem;
+                                line-height: 3.6rem;
+                                text-align: center;
+                                color: $grey;
+                                font-size: 1.4rem;
+                                opacity: 1;
+                                box-shadow: 0 0 2px rgba(0,0,0,.12);
+
+                                .icon {
+                                    margin-left: .5rem;
+                                }
+                            }
+
+                            .operations {
+                                position: absolute;
+                                display: none;
+                                width: 100%;
+                                top: 4rem;
+                                text-align: left;
+                                background-color: $white;
+                                box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2); 
+
+                                .operation-item {
+                                    a {
+                                        display: inline-block;
+                                        width: 100%;
+                                        padding: 1rem 2rem;
+                                        color: $grey;
+                                        font-size: 1.4rem;
+                                        cursor: pointer;
+                                        
+                                        &:hover {
+                                            background-color: rgba(222, 216, 216, 0.24);
+                                        }
+                                    } 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .preview-area {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            padding-top: 6.4rem;
+            // background-color: rgba(236, 239, 241, 0.56);
+            background-color: $white;
+
+            -webkit-transition: width 0.3s ease-in-out;
+            -moz-transition: width 0.3s ease-in-out;
+                -ms-transition: width 0.3s ease-in-out;
+                -o-transition: width 0.3s ease-in-out;
+                    transition: width 0.3s ease-in-out;
+            
+
+            &.extend {
+                width: 20rem;
+                box-shadow: -0.2rem 0 0.4rem 0 rgba(0, 0, 0, 0.4);
+            }
+        }
+    }
+}

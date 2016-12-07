@@ -3,89 +3,250 @@
 		 ng-if="isLoading">
 	</div>
 
-	<div ng-show="!isLoading">
-		<div>
-			<div>
-				<button 
-					class="btn">
-					<span>Upload</span>
-					<input 
-						type="file" 
-						multiple="multiple"
-						onchange="angular.element(this).scope().onPictureInputChanged(event)"
-					/>
-				</button>
+	<div ng-show="!isLoading" class="picture-page-body">
+		<div class="content-area"
+			ng-class="{collapse: preview.show}">
+			<header class="header clearfix">
+				<div class="btn-group fr clearfix">
+					<button class="btn picture-select-btn fl">
+						<input 
+							id="picture-page-picture-upload-input-file"
+							type="file" 
+							multiple="multiple"
+							onchange="angular.element(this).scope().onPictureInputChanged(event)"
+						/>
 
-				<button 
-					class="btn"
-					ng-click="openCreateDirDialog()">
-					<span>New Directory</span>
-				</button>
-			</div>
+						<label
+							class="text" 
+							for="picture-page-picture-upload-input-file">
+							Upload
+						</label>
+					</button>
 
-			<div>
-				<span ng-show="path.length <= 0">All</span>
-				<ul ng-show="path.length > 0">
-					<li>
-						<a href="javascript:;" 
-							ng-click="backToParentDir()">
-							Back
-						</a>
+					<button 
+						class="btn create-dir-dialog-btn fl"
+						ng-click="openCreateDirDialog()">
+						<span>New Directory</span>
+					</button>
 
-						<span>|</span>
-					</li>
+					<button 
+						class="btn preview-btn fl"
+						ng-click="togglePreview()">
+						<span>Preview</span>
+					</button>
 
-					<li ng-show="path.length > 4">
-						<span>...</span>
-						<span>&gt;</span>
-					</li>
-					
-					<li ng-if="path.length > 4"
-						ng-repeat="dir in path | limitTo: 4 : path.length - 4">
-						<a href="javascript:;" 
-						   ng-click="changeToDir(dir)"
-						   ng-bind="dir.name">
-						</a>
+					<button 
+						class="btn batch-delete-btn fl">
+						Batch Delete
+					</button>
+				</div>
 
-						<span>&gt;</span>
-					</li>
+				<div class="path fl">
+					<span 
+						ng-show="path.length <= 0">
+						All
+					</span>
 
-					<li ng-if="path.length <= 4"
-						ng-repeat="dir in path">
-						<a href="javascript:;" 
-						   ng-click="changeToDir(dir)"
-						   ng-bind="dir.name">
-						</a>
+					<ul class="clearfix"
+						ng-show="path.length > 0">
+						<li class="fl">
+							<a class="path-dir"
+								href="javascript:;" 
+								ng-click="backToParentDir()">
+								Back
+							</a>
 
-						<span>&gt;</span>
-					</li>
-				</ul>
-			</div>
+							<span class="icon">|</span>
+						</li>
 
-			<div>
-				<ul>
-					<li ng-repeat="dirItem in dir.dirs">
-						<div ng-dblclick="enterToDir(dirItem)"
-							on-context-menu="contextMenu.dir.show($event, dirItem)">
-							<div>
-								<img ng-src="{{dirItem.thumbnail}}">
-							</div>
-							<span ng-bind="dirItem.name"></span>
-						</div>
-					</li>
+						<li class="fl"
+							ng-show="path.length > 3">
+							<a class="path-dir"
+								href="javascript:;">
+								...
+							</a>
 
-					<li ng-repeat="pic in picture.pictures"
-						on-context-menu="contextMenu.pic.show($event, pic)">
-						<div>
-							<img ng-src="{{pic.thumbnail}}"
-						</div>
-						<span ng-bind="pic.name"></span>
-					</li>
-				</ul>
+							<span class="icon">&gt;</span>
+						</li>
+						
+						<li class="fl"
+							ng-if="path.length > 3"
+							ng-repeat="dir in path | limitTo: 3 : path.length - 3">
+							
+							<a class="path-dir"
+								href="javascript:;" 
+								ng-click="changeToDir(dir)"
+								ng-bind="dir.name">
+							</a>
+
+							<span class="icon">&gt;</span>
+						</li>
+
+						<li class="fl"
+							ng-if="path.length <= 3"
+							ng-repeat="dir in path">
+							
+							<a class="path-dir"
+								href="javascript:;" 
+								ng-click="changeToDir(dir)"
+								ng-bind="dir.name">
+							</a>
+
+							<span class="icon">&gt;</span>
+						</li>
+					</ul>
+				</div>
+				
+			</header>
+
+			<div class="body">
+				<table>
+					<thead>
+						<tr>
+							<td>
+								<checkbox
+									default-value="{{isAllChecked}}"
+									on-change="toggleAllChecked()">
+								</checkbox>
+							</td>
+
+							<td>
+								<span>Index</span>
+							</td>
+
+							<td>
+								<span class="icon">Icon</span>
+							</td>
+
+							<td>
+								<span>Name</span>
+							</td>
+
+							<td>
+								<span>Date</span>
+							</td>
+								
+
+							<td>
+								<span>Operation</span>
+							</td>
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr ng-repeat="dirItem in dir.dirs"
+							ng-dblclick="enterToDir(dirItem)">
+							<td>
+								<checkbox
+									default-value="{{dirItem.isChecked}}"
+									on-change="toggleCategoryChecked(dirItem)">
+								</checkbox>
+							</td>
+
+							<td>
+								<span ng-bind="$index + 1"></span>
+							</td>
+
+							<td>
+								<span class="dir-icon"></span>
+							</td>
+
+							<td>
+								<span ng-bind="dirItem.name"></span>
+							</td>
+
+							<td>
+								<span ng-bind="Date.now() | date"></span>
+							</td>
+
+							<td>
+								<div class="operation-selector">
+									<button class="btn operation-selector-btn">
+										<span class="text">Operation<span>
+										<span class="icon caret"></span>
+									</button>
+
+									<ul class="operations">
+										<li class="operation-item">
+											<a class="btn edit-btn fl">
+												Edit
+											</a>
+										</li>
+
+										<li class="operation-item">
+											<a class="btn delete-btn fl">
+												Delete
+											</a>
+										</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+
+						<tr ng-repeat="pic in picture.pictures">
+							<td>
+								<checkbox
+									default-value="{{pic.isChecked}}"
+									on-change="togglePictureChecked(pic)">
+								</checkbox>
+							</td>
+
+							<td>
+								<span ng-bind="$index + dir.dirs.length + 1"></span>
+							</td>
+
+							<td>
+								<span class="pic-icon"></span>
+							</td>
+
+							<td>
+								<span ng-bind="pic.name"></span>
+							</td>
+
+							<td>
+								<span ng-bind="Date.now() | date"></span>
+							</td>
+
+							<td>
+								<div class="operation-selector">
+									<button class="btn operation-selector-btn">
+										<span class="text">Operation<span>
+										<span class="icon caret"></span>
+									</button>
+
+									<ul class="operations">
+										<li class="operation-item">
+											<a class="btn edit-btn fl">
+												Edit
+											</a>
+										</li>
+
+										<li class="operation-item">
+											<a class="btn delete-btn fl">
+												Delete
+											</a>
+										</li>
+
+										<li class="operation-item">
+											<a class="btn copy-link-btn fl">
+												Copy Link
+											</a>
+										</li>
+									</ul>
+								</div>
+								
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 
-		<div class="context-menu-pane">
+		<div class="preview-area"
+			ng-class="{extend: preview.show}">
+		</div>
+
+		<div class="context-menu-area">
 			<context-menu 
 				ng-show="contextMenu.dir._show"
 				on-blur="contextMenu.dir.hide()"
@@ -175,55 +336,56 @@
 				<p>Are you sure to delete this picture?</p>
 			</wl-dialog>
 		</div>
+
+		<div ng-show="uploadPicturesDialogConfig.show">
+			<div class="clearfix">
+				<h4 class="title fl">Upload Picture</h4>	
+				<button class="btn btn-close icon iconfont fr"
+						ng-click="closeUploadPicturesDialog()">
+						&#xe61c;
+				</button>
+			</div>
+
+			<div>
+				<table>
+					<tbody>
+						<tr ng-repeat="picture in uploadPicturesDialogConfig.pictures">
+							<td>
+								<i></i>
+								<span ng-bind="::picture.name"></span>
+							</td>
+
+							<td>
+								<span ng-bind="::picture.size | byteFormat"></span>
+							</td>
+
+							<td ng-show="picture.uploading">
+								<span ng-bind="picture.progress | percent"></span>
+							</td>
+
+							<td ng-show="picture.uploading">
+								<button 
+									class="btn"
+									ng-click="abortUploadPicture(picture)">
+									Abort
+								</button>
+							</td>
+
+							<td ng-show="picture.complete">
+								<span>success</span>
+							</td>
+
+							<td ng-show="picture.error">
+								<span>error</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 
-	<div ng-show="uploadPicturesDialogConfig.show"
-		style="position: absolute; right: 0; bottom: 0;">
-		<div class="clearfix">
-			<h4 class="title fl">Upload Picture</h4>	
-			<button class="btn btn-close icon iconfont fr"
-					ng-click="closeUploadPicturesDialog()">
-					&#xe61c;
-			</button>
-		</div>
-
-		<div>
-			<table>
-				<tbody>
-					<tr ng-repeat="picture in uploadPicturesDialogConfig.pictures">
-						<td>
-							<i></i>
-							<span ng-bind="::picture.name"></span>
-						</td>
-
-						<td>
-							<span ng-bind="::picture.size | byteFormat"></span>
-						</td>
-
-						<td ng-show="picture.uploading">
-							<span ng-bind="picture.progress | percent"></span>
-						</td>
-
-						<td ng-show="picture.uploading">
-							<button 
-								class="btn"
-								ng-click="abortUploadPicture(picture)">
-								Abort
-							</button>
-						</td>
-
-						<td ng-show="picture.complete">
-							<span>success</span>
-						</td>
-
-						<td ng-show="picture.error">
-							<span>error</span>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+	
 
 	
 

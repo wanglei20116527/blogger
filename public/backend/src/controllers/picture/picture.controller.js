@@ -30,100 +30,124 @@ angular.module("Backend").controller("pictureCtrl", [
 			name: 'All'
 		};
 
-		$scope.contextMenu = {
-			dir: {
-				dir: null,
+		// $scope.contextMenu = {
+		// 	dir: {
+		// 		dir: null,
 				
-				_show: false,
+		// 		_show: false,
 
-				position: {
-					top : 0, 
-					left: 0
-				},
+		// 		position: {
+		// 			top : 0, 
+		// 			left: 0
+		// 		},
 
-				show: function (event, dir) {
-					event.preventDefault();
+		// 		show: function (event, dir) {
+		// 			event.preventDefault();
 
-					showDirContextMenu(dir, {
-						top: 0,
-						left: 0
-					});
+		// 			showDirContextMenu(dir, {
+		// 				top: 0,
+		// 				left: 0
+		// 			});
 
-					hidePictureContextMenu();
-				},
+		// 			hidePictureContextMenu();
+		// 		},
 				
-				hide: function () {
-					hideDirContextMenu();
-				},
+		// 		hide: function () {
+		// 			hideDirContextMenu();
+		// 		},
 
-				update: function () {
-					openUpdateDirDialog(this.dir);
-					hideDirContextMenu();
-				},
+		// 		update: function () {
+		// 			openUpdateDirDialog(this.dir);
+		// 			hideDirContextMenu();
+		// 		},
 
-				delete: function () {
-					openDeleteDirDialog(this.dir);
-					hideDirContextMenu();
-				}
-			},
+		// 		delete: function () {
+		// 			openDeleteDirDialog(this.dir);
+		// 			hideDirContextMenu();
+		// 		}
+		// 	},
 
-			pic: {
-				_show: false,
+		// 	pic: {
+		// 		_show: false,
 
-				pic: null,
+		// 		pic: null,
 
-				position: {
-					top: 0,
-					left: 0	
-				},
+		// 		position: {
+		// 			top: 0,
+		// 			left: 0	
+		// 		},
 
-				isSupportCopyLink: Clipboard.isSupportCopy(),
+		// 		isSupportCopyLink: Clipboard.isSupportCopy(),
 
-				show: function (event, pic) {;
-					event.preventDefault();
+		// 		show: function (event, pic) {;
+		// 			event.preventDefault();
 
-					pic = angular.copy(pic);
+		// 			pic = angular.copy(pic);
 
-					showPictureContextMenu(pic, {
-						top: 0,
-						left: 0
-					});
+		// 			showPictureContextMenu(pic, {
+		// 				top: 0,
+		// 				left: 0
+		// 			});
 
-					hideDirContextMenu();
-				},
+		// 			hideDirContextMenu();
+		// 		},
 
-				hide: function () {
-					hidePictureContextMenu();
-				},
+		// 		hide: function () {
+		// 			hidePictureContextMenu();
+		// 		},
 
-				delete: function () {
-					var pic = $scope.contextMenu.pic.pic;
+		// 		delete: function () {
+		// 			var pic = $scope.contextMenu.pic.pic;
 
-					openDeletePictureDialog(pic);
+		// 			openDeletePictureDialog(pic);
 					
-					hidePictureContextMenu();
-				},
+		// 			hidePictureContextMenu();
+		// 		},
 
-				copyLink: function () {
-					var pic = $scope.contextMenu.pic.pic;
+		// 		copyLink: function () {
+		// 			var pic = $scope.contextMenu.pic.pic;
 					
-					copyPictureLinkToClipboard(pic);
+		// 			copyPictureLinkToClipboard(pic);
 
-					hidePictureContextMenu();
-				}
-			}
-		};
+		// 			hidePictureContextMenu();
+		// 		}
+		// 	}
+		// };
 
 		$scope.isLoading = true;
 
 		$scope.path = [];
 
 		$scope.dir = {
-			dirs: [],
+			dirs: []
 		};
 
 		$scope.picture = {
 			pictures: [],
+		};
+
+		$scope.preview = {
+			show: false
+		};
+
+		$scope.isAllChecked = false;
+
+		$scope.togglePreview = function () {
+			var preview = $scope.preview.show = !$scope.preview.show;
+
+			updateUrlPreviewMode(preview);
+		};
+
+		$scope.toggleAllChecked = function () {
+			toggleAllChecked();
+		};
+
+		$scope.toggleCategoryChecked = function (category) {
+			toggleChecked(category);
+		};
+
+		$scope.togglePictureChecked = function (pic) {
+			toggleChecked(pic);
 		};
 
 		$scope.createDirDialogConfig = {
@@ -387,10 +411,16 @@ angular.module("Backend").controller("pictureCtrl", [
 			event.target.value = null;
 		};
 
+		$scope.batchDelete = function () {
+				
+		};
+
 		init();	
 
 		function init () {
 			initPath().then(function () {
+				initPreviewMode();
+
 				let path = $scope.path;
 				
 				let pDir;
@@ -506,12 +536,23 @@ angular.module("Backend").controller("pictureCtrl", [
 				pathStr += pathItem.id;
 			}
 
-			$location.search("path", pathStr);
+			$location.search(path, pathStr);
+		}
+
+		function updateUrlPreviewMode (preview) {
+			$location.search("preview", !!preview ? "1" : "0");
 		}
 
 		function initDirs (pDir) {
+			return updateDirs(pDir);
+		}
+
+		function updateDirs (pDir) {
 			return new $q(function (resolve, reject) {
 				Directory.getDirectories(pDir).then(function (dirs) {
+					angular.forEach(dirs, function (dir) {
+						dir.isChecked = false;
+					});
 					$scope.dir.dirs = dirs;
 
 					resolve();
@@ -602,7 +643,7 @@ angular.module("Backend").controller("pictureCtrl", [
 
 			path.push(dir);
 
-			updataUrlPath(path);
+			updataUrlPath(path, !!$scope.preview.show);
 		}
 
 		function changeToDir (dir) {
@@ -616,7 +657,7 @@ angular.module("Backend").controller("pictureCtrl", [
 					var dirItem = path[i];
 					tPath.push(dirItem);
 
-					if (dirItem === dir) {
+					if (dirItem.id === dir.id) {
 						find = true;
 						break;
 					}
@@ -631,12 +672,17 @@ angular.module("Backend").controller("pictureCtrl", [
 		}
 
 		function initPictures (pDir) {
+			return updatePictures(pDir);
+		}
+
+		function updatePictures (pDir) {
 			return new $q(function (resolve, reject) {
 				Picture.getPictures(pDir).then(function (pictures) {
-					$scope.picture.pictures = pictures || [];
+					angular.forEach(pictures, function (pic) {
+						pic.isChecked = false;
+					});
 
-					console.log("init pictures success");
-					console.log(pictures);
+					$scope.picture.pictures = pictures || [];
 
 					resolve();
 				})
@@ -794,6 +840,53 @@ angular.module("Backend").controller("pictureCtrl", [
 			console.log("wanglei is cool and houna is cute");
 			console.log(pic);
 			console.log(Clipboard.copyText(pic.url));
+		}
+
+		function initPreviewMode () {
+			var preview = $location.search()['preview'];
+			$scope.preview.show = preview === "1";
+		}
+
+		function toggleAllChecked () {
+			var isChecked = $scope.isAllChecked = !$scope.isAllChecked;
+
+			var dirs = $scope.dir.dirs;
+			angular.forEach(dirs, function (dir) {
+				dir.isChecked = isChecked;
+			});
+
+			var pics = $scope.picture.pictures;
+			angular.forEach(pics, function (pic) {
+				pic.isChecked = isChecked;
+			});
+		}
+
+		function isAllChecked () {
+			var dirs = $scope.dir.dirs;
+			for (var i = 0, len = dirs.length; i < len; ++i) {
+				var dir = dirs[i];
+
+				if (!dir.isChecked) {
+					return false;
+				}
+			}
+
+			var pics = $scope.picture.pictures;
+			for (var i = 0, len = pics.length; i < len; ++i) {
+				var pic = pics[i];
+
+				if (!pic.isChecked) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		function toggleChecked (item) {
+			item.isChecked = !item.isChecked;
+
+			$scope.isAllChecked = isAllChecked();
 		}
 
 		function openCreateDirDialog () {
