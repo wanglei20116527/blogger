@@ -26,15 +26,30 @@ module.exports = {
 		});
 	},
 
-	getPicturesByUserAndDir: function (user, dir) {
+	getPicturesByUserAndDir: function (user, dir, start, number) {
 		return database.executeTemplate(conn=>{
 			let promise = null;
 
 			if (dir == null) {
-				promise = pictureModel.getPictruesByUserUnderRootDir(conn, user);
+				promise = pictureModel.getPictruesByUserUnderRootDir(conn, user, start, number);
 
 			} else {
-				promise = pictureModel.getPicturesByUserUnderDir(conn, user, dir);
+				promise = pictureModel.getPicturesByUserUnderDir(conn, user, dir, start, number);
+			}
+			
+			return promise;
+		});
+	},
+
+	getNumberOfPicutesByUserUnderDir: function (user, dir) {
+		return database.executeTemplate(conn=>{
+			let promise = null;
+
+			if (dir == null) {
+				promise = pictureModel.getNumberOfPictruesByUserUnderRootDir(conn, user);
+
+			} else {
+				promise = pictureModel.getNumberOfPicturesByUserUnderDir(conn, user, dir);
 			}
 			
 			return promise;
@@ -82,7 +97,8 @@ module.exports = {
 			path: picPath,
 			url : pathUrl,
 			thumbnail: thumbnailUrl,
-			thumbnailPath: thumbnailPath
+			thumbnailPath: thumbnailPath,
+			date: Date.now(),
 		};
 
 		if (dir != null) {

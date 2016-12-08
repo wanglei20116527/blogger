@@ -89,11 +89,18 @@
                         background-color: $blackishGreen;
                     }
                 }
+            }
+            
+            & > .body {                
+                box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
 
                 .path {
+                    padding: .5rem 2rem;
+                    margin-top: 2.5rem;
                     color: $grey;
                     font-size: 1.4rem;
                     line-height: 3.6rem;
+                    background-color: rgba(236, 239, 241, 0.56);;
 
                     ul {
 
@@ -126,16 +133,9 @@
                                 }
                             }
                         }
-                        
+                            
                     }
                 }
-                
-            }
-
-            & > .body {
-                margin-top: 2.5rem;
-                box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
-
                 table {
                     width: 100%;
                     color: $grey;

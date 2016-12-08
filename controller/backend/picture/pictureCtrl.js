@@ -10,6 +10,7 @@ const pictureService = require("../../../service/pictureService");
 
 const TMP_DIR   = path.join(process.cwd(), "tmp/picture");
 const MAX_SIZE  = 2 * 1024 * 1024;
+const NUMBER    = 10;
 
 let _pictures = {};
 
@@ -380,23 +381,37 @@ module.exports = {
 		} = req.session.user;
 
 		let {
+			start    = 0,
+			number   = NUMBER,
 			directory: dirId
 		} = req.query;
 
-		if (dirId != null) {
-			try {
-				dirId = parseInt(dirId, 10);
+		start = parseInt(start, 10);
+		if (!Number.isInteger(start)) {
+			res.json({
+				success: false,
+				error: {
+					code: 160000,
+					message: `start ${start} invalid`
+				}
+			});
+			return;
+		}
 
-			} catch (err) {
-				res.json({
-					success: false,
-					error: {
-						code: 160000,
-						message: `directory id ${dirId} invalid`
-					}
-				});
-				return;
-			}
+		number = parseInt(number, 10);
+		if (!Number.isInteger(number)) {
+			res.json({
+				success: false,
+				error: {
+					code: 160000,
+					message: `number ${number} invalid`
+				}
+			});
+			return;
+		}
+
+		if (dirId != null) {
+			dirId = parseInt(dirId, 10);
 		}
 
 		if (dirId != null && !Number.isInteger(dirId)) {
@@ -423,7 +438,7 @@ module.exports = {
 				throw err;	
 			}
 
-			return pictureService.getPicturesByUserAndDir(user, dir);
+			return pictureService.getPicturesByUserAndDir(user, dir, start, number);
 		})
 		.then(pics=>{
 			pics = pics || [];
@@ -457,83 +472,70 @@ module.exports = {
 		});
 	},
 
-	// getPicturesUnderDir: function (req, res) {
-	// 	let {
-	// 		user
-	// 	} = req.session.user;
+	getNumberOfPictures: function () {
+		let {
+			user
+		} = req.session.user;
 
-	// 	let {
-	// 		directory: dirId
-	// 	} = req.params;
+		let {
+			directory: dirId
+		} = req.query;
 
-	// 	try {
-	// 		dirId = parseInt(dirId, 10);
+		if (dirId != null) {
+			dirId = parseInt(dirId, 10);
+		}
 
-	// 	} catch (err) {
-	// 		res.json({
-	// 			success: false,
-	// 			error: {
-	// 				code: 160000,
-	// 				message: `directory id ${dirId} invalid`
-	// 			}
-	// 		});
-	// 		return;
-	// 	}
+		if (dirId != null && !Number.isInteger(dirId)) {
+			res.json({
+				success: false,
+				error: {
+					code: 160000,
+					message: `directory id ${dirId} invalid`
+				}
+			});
+			return;
+		}
 
-	// 	if (!Number.isInteger(dirId)) {
-	// 		res.json({
-	// 			success: false,
-	// 			error: {
-	// 				code: 160000,
-	// 				message: `directory id ${dirId} invalid`
-	// 			}
-	// 		});
-	// 		return;
-	// 	}
+		let promise = Promise.resolve(null);
 
-	// 	dirService.getDirByUserAndId(user, dirId).then(dir=>{
-	// 		if (!dir) {
-	// 			let err = new Error(`directory not exist`);
-	// 			err.code = 160000;
-	// 			throw err;
-	// 		}
+		if (dirId != null) {
+			promise = dirService.getDirByUserAndId(user, dirId);
+		}
 
-	// 		return pictureService.getPicturesByUserAndDir(user, dir);
-	// 	})
-	// 	.then(pics=>{
-	// 		pics = pics || [];
-			
-	// 		for (let pic of pics) {
-	// 			delete pic.path;
-	// 		}
+		promise.then(dir=>{
+			if (dirId != null && dir == null) {
+				let err = new Error(`directory not exist`);
+				err.code = 160000;
+				throw err;	
+			}
 
-	// 		res.json({
-	// 			success: true,
-	// 			data: {
-	// 				pictures: pics
-	// 			}
-	// 		});
-	// 	})
-	// 	.catch(err=>{
-	// 		console.error(err);
+			return pictureService.getNumberOfPicutesByUserUnderDir(user, dir);
+		})
+		.then(number=>{
+			res.json({
+				success: true,
+				data: {
+					number: number || 0
+				}
+			});
+		})
+		.catch(err=>{
+			console.error(err);
 
-	// 		if (err.statusCode) {
-	// 			res.sendStatus(err.statusCode);
-	// 			return;
-	// 		}
+			if (err.code) {
+				res.json({
+					success: false,
+					error: {
+						code: err.code,
+						message: err.message || err.stack	
+					}
+				});
+				return;
+			}
 
-	// 		if (err.code) {
-	// 			res.json({
-	// 				success: false,
-	// 				error: {
-	// 					code: err.code,
-	// 					message: err.message || err.stack	
-	// 				}
-	// 			});
-	// 			return;
-	// 		}
-	// 	});
-	// },
+			res.sendStatus(err.statusCode || 500);
+		});
+	},
 
 	updatePicture: function (req, res) {
 		let {
@@ -575,6 +577,7 @@ module.exports = {
 			}
 
 			picture = Object.assign({}, pic, picture);
+			picture.date = Date.now();
 
 			return pictureService.updatePicture(picture);
 		})

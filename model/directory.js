@@ -7,7 +7,8 @@ const FIELDS = [
 	"name", 
 	"parentDirectory",
 	"user",
-	"path"
+	"path",
+	"date"
 ];
 
 class Directory {
@@ -212,9 +213,11 @@ class Directory {
 		});
 	}
 
-	static getUserRootDirs (connection, user) {
+	static getUserRootDirs (connection, user, start, number) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(start, null, `start can not be ${start}`);
+		assert.notEqual(number, null, `number can not be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -224,9 +227,10 @@ class Directory {
 						where 
 							user=? 
 							and parentDirectory is null 
-							and deleteTime is null`;
+							and deleteTime is null
+						limit ?,?`;
 
-			let params = [user.id];
+			let params = [user.id, start, number];
 
 			database.executeSql(
 							connection, 
@@ -245,10 +249,40 @@ class Directory {
 		});
 	}
 
-	static getUserSubDirs (connection, user, directory) {
+	static getNumberOfUserRootDirs (connection, user) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							count(*) as number
+						from 
+							${TABLENAME}
+						where 
+							user=? 
+							and parentDirectory is null 
+							and deleteTime is null`;
+
+			let params = [user.id];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+							)
+					.then(ret=>{
+						resolve(ret[0].number);
+					})
+					.catch(reject);
+		});
+	}
+
+	static getUserSubDirs (connection, user, directory, start, number) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
 		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
+		assert.notEqual(start, null, `start can not be ${start}`);
+		assert.notEqual(number, null, `number can not be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -258,9 +292,10 @@ class Directory {
 						where 
 							user=? 
 							and parentDirectory=? 
-							and deleteTime is null`;
+							and deleteTime is null
+						limit ?,?`;
 
-			let params = [user.id, directory.id];
+			let params = [user.id, directory.id, start, number];
 
 			database.executeSql(
 							connection, 
@@ -279,7 +314,36 @@ class Directory {
 		});
 	}
 
-	static getSubDirs (connection, directory) {
+	static getNumberOfUserSubDirs (connection, user, directory) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can't be ${user.id}`);
+		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							count(*) as number 
+						from 
+							${TABLENAME}
+						where 
+							user=? 
+							and parentDirectory=? 
+							and deleteTime is null`;
+
+			let params = [user.id, directory.id];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(ret=>{
+						resolve(ret[0].number);
+					})
+					.catch(reject);
+		});
+	}
+
+	static getAllSubDirs (connection, directory) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(directory.id, null, `directory id can't be ${directory.id}`);
 		assert.notEqual(directory.user, null, `directory user can't be ${directory.user}`);

@@ -8,6 +8,7 @@ const FIELDS = [
 	"path",
 	"url",
 	"user",
+	"date",
 	"directory",
 	"thumbnail",
 	"thumbnailPath"
@@ -128,14 +129,53 @@ class Picture {
 		});
 	}
 
-	static getPicturesByUserUnderDir (connection, user, directory) {
+	static getPicturesByUserUnderDir (connection, user, directory, start, number) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
+		assert.notEqual(directory.id, null, `directory id can not be ${directory.id}`);
+		assert.notEqual(start, null, `start can not be ${start}`);
+		assert.notEqual(number, null, `number can not be ${number}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							* 
+						from 
+							${TABLENAME}
+						where 
+							user=? 
+							and directory=? 
+							and deleteTime is null
+						limit ?,?`;
+
+			let params = [user.id, directory.id, start, number];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(pictures=>{
+						let ret = [];
+
+						for (let picture of pictures) {
+							picture = new Picture(picture);
+							ret.push(picture);
+						}
+
+						resolve(ret);
+					})
+					.catch(reject);
+		});
+	}
+
+	static getNumberOfPicturesByUserUnderDir (connection, user, directory) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
 		assert.notEqual(directory.id, null, `directory id can not be ${directory.id}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
-							* 
+							count(*) as number  
 						from 
 							${TABLENAME}
 						where 
@@ -150,23 +190,19 @@ class Picture {
 							sql, 
 							params
 						)
-					.then(pictures=>{
-						let ret = [];
+					.then(ret=>{
 
-						for (let picture of pictures) {
-							picture = new Picture(picture);
-							ret.push(picture);
-						}
-
-						resolve(ret);
+						resolve(ret[0].number);
 					})
 					.catch(reject);
 		});
 	}
 
-	static getPictruesByUserUnderRootDir (connection, user) {
+	static getPictruesByUserUnderRootDir (connection, user, start, number) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
+		assert.notEqual(start, null, `start can not be ${start}`);
+		assert.notEqual(number, null, `number can not be ${number}`);
 
 		return new Promise((resolve, reject)=>{
 			let sql = 	`select 
@@ -176,9 +212,10 @@ class Picture {
 						where 
 							user=?
 							and directory is null 
-							and deleteTime is null`;
+							and deleteTime is null
+						limit ?,?`;
 
-			let params = [user.id];
+			let params = [user.id, start, number];
 
 			database.executeSql(
 							connection, 
@@ -199,7 +236,35 @@ class Picture {
 		});
 	}
 
-	static getPicturesUnderDir (connection, directory) {
+	static getNumberOfPictruesByUserUnderRootDir (connection, user) {
+		assert.notEqual(connection, null, `connection can't be ${connection}`);
+		assert.notEqual(user.id, null, `user id can not be ${user.id}`);
+
+		return new Promise((resolve, reject)=>{
+			let sql = 	`select 
+							count(*) as number 
+						from 
+							${TABLENAME}
+						where 
+							user=?
+							and directory is null 
+							and deleteTime is null`;
+
+			let params = [user.id];
+
+			database.executeSql(
+							connection, 
+							sql, 
+							params
+						)
+					.then(ret=>{
+						resolve(ret[0].number);
+					})
+					.catch(reject);
+		});
+	}
+
+	static getAllPicturesUnderDir (connection, directory) {
 		assert.notEqual(connection, null, `connection can't be ${connection}`);
 		assert.notEqual(directory.id, null, `directory id can not be ${directory.id}`);
 

@@ -21,6 +21,7 @@ let router = express.Router();
 // router.get("/directory/:directory", checkLoginFilter, pictureCtrl.getPicturesUnderDir)
 
 router.get("/", checkLoginFilter, pictureCtrl.getPictures);
+router.get("/number", checkLoginFilter, pictureCtrl.getNumberOfPictures);
 
 router.post("/upload/segment/start", checkLoginFilter, pictureCtrl.startUploadPictureSegment);
 router.post("/upload/segment", checkLoginFilter, uploadDelegate, pictureCtrl.uploadPictureSegment);

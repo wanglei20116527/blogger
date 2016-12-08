@@ -6,8 +6,8 @@
 	<div ng-show="!isLoading" class="picture-page-body">
 		<div class="content-area"
 			ng-class="{collapse: preview.show}">
-			<header class="header clearfix">
-				<div class="btn-group fr clearfix">
+			<header class="header">
+				<div class="btn-group clearfix">
 					<button class="btn picture-select-btn fl">
 						<input 
 							id="picture-page-picture-upload-input-file"
@@ -40,205 +40,200 @@
 						Batch Delete
 					</button>
 				</div>
-
-				<div class="path fl">
-					<span 
-						ng-show="path.length <= 0">
-						All
-					</span>
-
-					<ul class="clearfix"
-						ng-show="path.length > 0">
-						<li class="fl">
-							<a class="path-dir"
-								href="javascript:;" 
-								ng-click="backToParentDir()">
-								Back
-							</a>
-
-							<span class="icon">|</span>
-						</li>
-
-						<li class="fl"
-							ng-show="path.length > 3">
-							<a class="path-dir"
-								href="javascript:;">
-								...
-							</a>
-
-							<span class="icon">&gt;</span>
-						</li>
-						
-						<li class="fl"
-							ng-if="path.length > 3"
-							ng-repeat="dir in path | limitTo: 3 : path.length - 3">
-							
-							<a class="path-dir"
-								href="javascript:;" 
-								ng-click="changeToDir(dir)"
-								ng-bind="dir.name">
-							</a>
-
-							<span class="icon">&gt;</span>
-						</li>
-
-						<li class="fl"
-							ng-if="path.length <= 3"
-							ng-repeat="dir in path">
-							
-							<a class="path-dir"
-								href="javascript:;" 
-								ng-click="changeToDir(dir)"
-								ng-bind="dir.name">
-							</a>
-
-							<span class="icon">&gt;</span>
-						</li>
-					</ul>
-				</div>
-				
 			</header>
 
 			<div class="body">
-				<table>
-					<thead>
-						<tr>
-							<td>
-								<checkbox
-									default-value="{{isAllChecked}}"
-									on-change="toggleAllChecked()">
-								</checkbox>
-							</td>
+				<div class="">
+					<div class="path">
+						<span 
+							ng-show="path.length <= 0">
+							All
+						</span>
 
-							<td>
-								<span>Index</span>
-							</td>
+						<ul class="clearfix"
+							ng-show="path.length > 0">
+							<li class="fl">
+								<a class="path-dir"
+									href="javascript:;" 
+									ng-click="backToParentDir()">
+									Back
+								</a>
 
-							<td>
-								<span class="icon">Icon</span>
-							</td>
+								<span class="icon">|</span>
+							</li>
 
-							<td>
-								<span>Name</span>
-							</td>
+							<li class="fl"
+								ng-show="path.length > 3">
+								<a class="path-dir"
+									href="javascript:;">
+									...
+								</a>
 
-							<td>
-								<span>Date</span>
-							</td>
+								<span class="icon">&gt;</span>
+							</li>
 								
+							<li class="fl"
+								ng-if="path.length > 3"
+								ng-repeat="dir in path | limitTo: 3 : path.length - 3">
+									
+								<a class="path-dir"
+									href="javascript:;" 
+									ng-click="changeToDir(dir)"
+									ng-bind="dir.name">
+								</a>
 
-							<td>
-								<span>Operation</span>
-							</td>
-						</tr>
-					</thead>
+								<span class="icon">&gt;</span>
+							</li>
 
-					<tbody>
-						<tr ng-repeat="dirItem in dir.dirs"
-							ng-dblclick="enterToDir(dirItem)">
-							<td>
-								<checkbox
-									default-value="{{dirItem.isChecked}}"
-									on-change="toggleCategoryChecked(dirItem)">
-								</checkbox>
-							</td>
+							<li class="fl"
+								ng-if="path.length <= 3"
+								ng-repeat="dir in path">
+									
+								<a class="path-dir"
+									href="javascript:;" 
+									ng-click="changeToDir(dir)"
+									ng-bind="dir.name">
+								</a>
 
-							<td>
-								<span ng-bind="$index + 1"></span>
-							</td>
+								<span class="icon">&gt;</span>
+							</li>
+						</ul>
+					</div>
 
-							<td>
-								<span class="dir-icon"></span>
-							</td>
+					<table>
+						<thead>
+							<tr>
+								<td>
+									<checkbox
+										default-value="{{isAllChecked}}"
+										on-change="toggleAllChecked()">
+									</checkbox>
+								</td>
 
-							<td>
-								<span ng-bind="dirItem.name"></span>
-							</td>
+								<td>
+									<span>Index</span>
+								</td>
 
-							<td>
-								<span ng-bind="Date.now() | date"></span>
-							</td>
+								<td>
+									<span class="icon">Icon</span>
+								</td>
 
-							<td>
-								<div class="operation-selector">
-									<button class="btn operation-selector-btn">
-										<span class="text">Operation<span>
-										<span class="icon caret"></span>
-									</button>
+								<td>
+									<span>Name</span>
+								</td>
 
-									<ul class="operations">
-										<li class="operation-item">
-											<a class="btn edit-btn fl">
-												Edit
-											</a>
-										</li>
+								<td>
+									<span>Date</span>
+								</td>
+									
 
-										<li class="operation-item">
-											<a class="btn delete-btn fl">
-												Delete
-											</a>
-										</li>
-									</ul>
-								</div>
-							</td>
-						</tr>
+								<td>
+									<span>Operation</span>
+								</td>
+							</tr>
+						</thead>
 
-						<tr ng-repeat="pic in picture.pictures">
-							<td>
-								<checkbox
-									default-value="{{pic.isChecked}}"
-									on-change="togglePictureChecked(pic)">
-								</checkbox>
-							</td>
+						<tbody>
+							<tr ng-repeat="dirItem in dir.dirs"
+								ng-dblclick="enterToDir(dirItem)">
+								<td>
+									<checkbox
+										default-value="{{dirItem.isChecked}}"
+										on-change="toggleCategoryChecked(dirItem)">
+									</checkbox>
+								</td>
 
-							<td>
-								<span ng-bind="$index + dir.dirs.length + 1"></span>
-							</td>
+								<td>
+									<span ng-bind="$index + 1"></span>
+								</td>
 
-							<td>
-								<span class="pic-icon"></span>
-							</td>
+								<td>
+									<span class="dir-icon"></span>
+								</td>
 
-							<td>
-								<span ng-bind="pic.name"></span>
-							</td>
+								<td>
+									<span ng-bind="dirItem.name"></span>
+								</td>
 
-							<td>
-								<span ng-bind="Date.now() | date"></span>
-							</td>
+								<td>
+									<span ng-bind="dirItem.date | date"></span>
+								</td>
 
-							<td>
-								<div class="operation-selector">
-									<button class="btn operation-selector-btn">
-										<span class="text">Operation<span>
-										<span class="icon caret"></span>
-									</button>
+								<td>
+									<div class="operation-selector">
+										<button class="btn operation-selector-btn">
+											<span class="text">Operation<span>
+											<span class="icon caret"></span>
+										</button>
 
-									<ul class="operations">
-										<li class="operation-item">
-											<a class="btn edit-btn fl">
-												Edit
-											</a>
-										</li>
+										<ul class="operations">
+											<li class="operation-item">
+												<a class="btn edit-btn fl">
+													Edit
+												</a>
+											</li>
 
-										<li class="operation-item">
-											<a class="btn delete-btn fl">
-												Delete
-											</a>
-										</li>
+											<li class="operation-item">
+												<a class="btn delete-btn fl">
+													Delete
+												</a>
+											</li>
+										</ul>
+									</div>
+								</td>
+							</tr>
 
-										<li class="operation-item">
-											<a class="btn copy-link-btn fl">
-												Copy Link
-											</a>
-										</li>
-									</ul>
-								</div>
-								
-							</td>
-						</tr>
-					</tbody>
-				</table>
+							<tr ng-repeat="pic in picture.pictures">
+								<td>
+									<checkbox
+										default-value="{{pic.isChecked}}"
+										on-change="togglePictureChecked(pic)">
+									</checkbox>
+								</td>
+
+								<td>
+									<span ng-bind="$index + dir.dirs.length + 1"></span>
+								</td>
+
+								<td>
+									<span class="pic-icon"></span>
+								</td>
+
+								<td>
+									<span ng-bind="pic.name"></span>
+								</td>
+
+								<td>
+									<span ng-bind="pic.date | date"></span>
+								</td>
+
+								<td>
+									<div class="operation-selector">
+										<button class="btn operation-selector-btn">
+											<span class="text">Operation<span>
+											<span class="icon caret"></span>
+										</button>
+
+										<ul class="operations">
+											<li class="operation-item">
+												<a class="btn delete-btn fl">
+													Delete
+												</a>
+											</li>
+
+											<li class="operation-item">
+												<a class="btn copy-link-btn fl">
+													Copy Link
+												</a>
+											</li>
+										</ul>
+									</div>
+									
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 

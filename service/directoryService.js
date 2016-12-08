@@ -24,14 +24,28 @@ module.exports = {
 		}); 
 	},
 
-	getDirs: function (user, parentDir) {
+	getDirs: function (user, parentDir, start, number) {
 		return database.executeTemplate(conn=>{
 			let p = null;
 
 			if (parentDir == null) {
-				p = directoryModel.getUserRootDirs(conn, user);
+				p = directoryModel.getUserRootDirs(conn, user, start, number);
 			} else {
-				p = directoryModel.getUserSubDirs(conn, user, parentDir);
+				p = directoryModel.getUserSubDirs(conn, user, parentDir, start, number);
+			}
+
+			return p;
+		});
+	},
+
+	getNumberOfDirs: function (user, parentDir) {
+		return database.executeTemplate(conn=>{
+			let p = null;
+
+			if (parentDir == null) {
+				p = directoryModel.getNumberOfUserRootDirs(conn, user);
+			} else {
+				p = directoryModel.getNumberOfUserSubDirs(conn, user, parentDir);
 			}
 
 			return p;
@@ -75,7 +89,7 @@ module.exports = {
 
 		function deleteDir (conn, dir) {
 			return new Promise((resolve, reject)=>{
-				directoryModel.getSubDirs(conn, dir).then(dirs=>{
+				directoryModel.getAllSubDirs(conn, dir).then(dirs=>{
 					let promises = [];
 
 					if (dirs.length > 0) {
@@ -86,7 +100,7 @@ module.exports = {
 					}
 
 					Promise.all(promises).then(()=>{
-						return pictureModel.getPicturesUnderDir(conn, dir);
+						return pictureModel.getAllPicturesUnderDir(conn, dir);
 					})
 					.then(pictures=>{
 						return pictureModel.deletePictures(conn, pictures);

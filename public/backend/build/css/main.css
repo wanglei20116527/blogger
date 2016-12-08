@@ -1407,29 +1407,31 @@ a:focus {
         background-color: #8bc34a; }
       .picture-page .picture-page-body .content-area > .header .btn-group .batch-delete-btn {
         background-color: #009688; }
-      .picture-page .picture-page-body .content-area > .header .path {
-        color: #666;
-        font-size: 1.4rem;
-        line-height: 3.6rem; }
-        .picture-page .picture-page-body .content-area > .header .path ul li {
-          margin-right: .4rem; }
-          .picture-page .picture-page-body .content-area > .header .path ul li a {
-            color: #1976D2; }
-            .picture-page .picture-page-body .content-area > .header .path ul li a:hover {
-              opacity: .8; }
-          .picture-page .picture-page-body .content-area > .header .path ul li .icon {
-            margin-left: .4rem;
-            color: #666; }
-          .picture-page .picture-page-body .content-area > .header .path ul li:last-child {
-            margin-right: 0; }
-            .picture-page .picture-page-body .content-area > .header .path ul li:last-child a {
-              color: #666;
-              cursor: default; }
-            .picture-page .picture-page-body .content-area > .header .path ul li:last-child .icon {
-              display: none; }
       .picture-page .picture-page-body .content-area > .body {
-        margin-top: 2.5rem;
         box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.2); }
+        .picture-page .picture-page-body .content-area > .body .path {
+          padding: .5rem 2rem;
+          margin-top: 2.5rem;
+          color: #666;
+          font-size: 1.4rem;
+          line-height: 3.6rem;
+          background-color: rgba(236, 239, 241, 0.56); }
+          .picture-page .picture-page-body .content-area > .body .path ul li {
+            margin-right: .4rem; }
+            .picture-page .picture-page-body .content-area > .body .path ul li a {
+              color: #1976D2; }
+              .picture-page .picture-page-body .content-area > .body .path ul li a:hover {
+                opacity: .8; }
+            .picture-page .picture-page-body .content-area > .body .path ul li .icon {
+              margin-left: .4rem;
+              color: #666; }
+            .picture-page .picture-page-body .content-area > .body .path ul li:last-child {
+              margin-right: 0; }
+              .picture-page .picture-page-body .content-area > .body .path ul li:last-child a {
+                color: #666;
+                cursor: default; }
+              .picture-page .picture-page-body .content-area > .body .path ul li:last-child .icon {
+                display: none; }
         .picture-page .picture-page-body .content-area > .body table {
           width: 100%;
           color: #666;

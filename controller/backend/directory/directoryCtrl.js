@@ -5,10 +5,113 @@ const validation  = require("../../../utils/validation");
 const hashService = require("../../../service/hashService");
 const dirService  = require("../../../service/directoryService");
 
+const NUMBER      = 10;
 const BASE_PATH   = path.join(process.cwd(), "/public/picture");
 
 module.exports = {
-	getDirectoies: function (req, res) {
+	getDirectories: function (req, res) {
+		let {
+			user
+		} = req.session.user;
+
+		let {
+			start  = 0,
+			number = NUMBER,
+			parentDirectory: oPDirId
+		} = req.query;
+
+		start = parseInt(start, 10);
+		if (!Number.isInteger(start)) {
+			res.json({
+				success: false,
+				error: {
+					code: 190500,
+					message: `start ${start} invalid`
+				}
+			});
+			return;
+		}
+
+		number = parseInt(number, 10);
+		if (!Number.isInteger(number)) {
+			res.json({
+				success: false,
+				error: {
+					code: 190500,
+					message: `number ${number} invalid`
+				}
+			});
+			return;
+		}
+
+		let pDirId = null;
+
+		if (oPDirId != null) {
+			pDirId = parseInt(oPDirId, 10);
+		}
+
+		if (pDirId != null && !Number.isInteger(pDirId)) {
+			res.json({
+				success: false,
+				error: {
+					code: 190500,
+					message: `parent dir id ${oPDirId} invalid`
+				}
+			});
+			return;
+		}
+
+		let p = Promise.resolve(true);
+		if (pDirId != null) {
+			p = dirService.isDirExistByUserAndId(user, pDirId);
+		}
+
+		p.then(isExist=>{
+			if (!isExist) {
+				let err = new Error(`parent dir not exist`);
+				err.code = 190500;
+				throw err;
+			}
+
+			let pDir = pDirId == null ? null: {
+				id: pDirId
+			};
+
+			return dirService.getDirs(user, pDir, start, number);
+		})
+		.then(dirs=>{
+			dirs = dirs || [];
+
+			for (let dir of dirs) {
+				delete dir.path;
+			}
+
+			res.json({
+				success: true,
+				data: {
+					directories: dirs
+				}
+			});
+		})
+		.catch(err=>{
+			console.error(err);
+
+			if (err.code) {
+				res.json({
+					success: false,
+					error: {
+						code: err.code,
+						message: err.message || err.stack	
+					}
+				});
+				return;
+			}
+
+			res.sendStatus(err.statusCode || 500);
+		});
+	},
+
+	getNumberOfDirectories: function (req, res) {
 		let {
 			user
 		} = req.session.user;
@@ -50,19 +153,13 @@ module.exports = {
 				id: pDirId
 			};
 
-			return dirService.getDirs(user, pDir);
+			return dirService.getNumberOfDirs(user, pDir);
 		})
-		.then(dirs=>{
-			dirs = dirs || [];
-
-			for (let dir of dirs) {
-				delete dir.path;
-			}
-
+		.then(number=>{
 			res.json({
 				success: true,
 				data: {
-					directories: dirs
+					number: number || 0
 				}
 			});
 		})
@@ -198,8 +295,9 @@ module.exports = {
 		}
 
 		function addDir (dir, pDir) {
-			directory.user = user.id;
-			directory.name = directory.name.trim();
+			dir.user = user.id;
+			dir.date = Date.now();
+			dir.name = directory.name.trim();
 
 			let dirName = hashService.hash(dir.name + Date.now()) + uuid();
 			if (pDir) {
@@ -289,6 +387,7 @@ module.exports = {
 
 			directory.user = user.id;
 			directory.name = directory.name.trim();
+			directory.date = Date.now();
 			directory.path = dir.path;
 
 			dirService.isDirExistByUserAndName(user, directory.name).then(isExist=>{

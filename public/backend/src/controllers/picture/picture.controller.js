@@ -130,6 +130,7 @@ angular.module("Backend").controller("pictureCtrl", [
 			show: false
 		};
 
+		$scope.hasChecked   = false;
 		$scope.isAllChecked = false;
 
 		$scope.togglePreview = function () {
@@ -276,6 +277,9 @@ angular.module("Backend").controller("pictureCtrl", [
 						}
 
 						deleteDir(dir).then(function () {
+							$scope.hasChecked   = hasChecked();
+							$scope.isAllChecked = isAllChecked();
+
 							closeDeleteDirDialog();
 						})
 						.catch(function (err) {
@@ -325,6 +329,9 @@ angular.module("Backend").controller("pictureCtrl", [
 						var pic = $scope.deletePictureDialogConfig.pic;
 						
 						deletePicture(pic).then(function () {
+							$scope.hasChecked   = hasChecked();
+							$scope.isAllChecked = isAllChecked();
+
 							closeDeletePictureDialog();
 							console.warn("delete picture success");
 						})
@@ -353,7 +360,16 @@ angular.module("Backend").controller("pictureCtrl", [
 		};
 
 		$scope.enterToDir = function (dir) {
-			enterToDir(dir);
+			$scope.isLoading = true;
+
+			enterToDir(dir).then(function () {
+				console.log("enter to dirsuccess: ");
+				console.log(dir);
+				$scope.isLoading = false;
+			}).catch(function (err) {
+				console.error(err);
+				$scope.isLoading = false;
+			});
 		};
 
 		$scope.changeToDir = function (dir) {
@@ -364,7 +380,16 @@ angular.module("Backend").controller("pictureCtrl", [
 				return;
 			}
 
-			changeToDir(dir);
+			$scope.isLoading = true;
+
+			changeToDir(dir).then(function () {
+				console.log("change to dirsuccess: ");
+				console.log(dir);
+				$scope.isLoading = false;
+			}).catch(function (err) {
+				console.error(err);
+				$scope.isLoading = false;
+			});
 		};
 
 		$scope.backToParentDir = function () {
@@ -375,9 +400,18 @@ angular.module("Backend").controller("pictureCtrl", [
 				return;
 			}
 			
-			var pDir = path[path.length - 2];
+			var dir = path[path.length - 2];
 			
-			changeToDir(pDir);
+			$scope.isLoading = true;
+
+			changeToDir(dir).then(function () {
+				console.log("change to dirsuccess: ");
+				console.log(dir);
+				$scope.isLoading = false;
+			}).catch(function (err) {
+				console.error(err);
+				$scope.isLoading = false;
+			});
 		};
 
 		$scope.closeUploadPicturesDialog = function () {
@@ -454,6 +488,26 @@ angular.module("Backend").controller("pictureCtrl", [
 			});
 		}
 
+		function loadDirsAndPictures (pDir) {
+			return new $q(function (resolve, reject) {
+				var promises = [];
+				var p = null;
+
+				p = loadDirs(pDir);
+				promises.push(p);
+
+				p = loadPictures(pDir);
+				promises.push(p);
+
+				$q.all(promises).then(function () {
+					$scope.hasChecked   = false;
+					$scope.isAllChecked = false;
+					
+					resolve();
+				}).catch(reject);
+			});
+		}
+
 		function initPath () {
 			return new $q(function (resolve, reject) {
 				var pathStr = $location.search()['path'];
@@ -519,7 +573,7 @@ angular.module("Backend").controller("pictureCtrl", [
 			});
 		}
 
-		function updataUrlPath (path) {
+		function updateUrlPath (path) {
 			if (path.length <= 1) {
 				$location.search("path", "");
 				return;
@@ -536,7 +590,7 @@ angular.module("Backend").controller("pictureCtrl", [
 				pathStr += pathItem.id;
 			}
 
-			$location.search(path, pathStr);
+			$location.search("path", pathStr);
 		}
 
 		function updateUrlPreviewMode (preview) {
@@ -544,10 +598,10 @@ angular.module("Backend").controller("pictureCtrl", [
 		}
 
 		function initDirs (pDir) {
-			return updateDirs(pDir);
+			return loadDirs(pDir);
 		}
 
-		function updateDirs (pDir) {
+		function loadDirs (pDir) {
 			return new $q(function (resolve, reject) {
 				Directory.getDirectories(pDir).then(function (dirs) {
 					angular.forEach(dirs, function (dir) {
@@ -635,7 +689,7 @@ angular.module("Backend").controller("pictureCtrl", [
 		}
 
 		function enterToDir (dir) {
-			var path = angular.copy($scope.path);
+			var path = $scope.path;
 
 			if (path.length <= 0) {
 				path.push(DEFAULT_PATH_DIR);
@@ -643,11 +697,15 @@ angular.module("Backend").controller("pictureCtrl", [
 
 			path.push(dir);
 
-			updataUrlPath(path, !!$scope.preview.show);
+			$scope.path = path;
+
+			updateUrlPath(path);
+
+			return loadDirsAndPictures(dir);
 		}
 
 		function changeToDir (dir) {
-			var path  = angular.copy($scope.path);
+			var path  = $scope.path;
 			var tPath = [];
 
 			if (dir !== DEFAULT_PATH_DIR) {
@@ -665,17 +723,24 @@ angular.module("Backend").controller("pictureCtrl", [
 
 				if (!find) {
 					tPath = [];
+					dir = undefined;
 				}
+			} else {
+				dir = undefined;
 			}
+			
+			$scope.path = tPath;
 
-			updataUrlPath(tPath);
+			updateUrlPath(tPath);
+
+			return loadDirsAndPictures(dir);
 		}
 
 		function initPictures (pDir) {
-			return updatePictures(pDir);
+			return loadPictures(pDir);
 		}
 
-		function updatePictures (pDir) {
+		function loadPictures (pDir) {
 			return new $q(function (resolve, reject) {
 				Picture.getPictures(pDir).then(function (pictures) {
 					angular.forEach(pictures, function (pic) {
@@ -859,6 +924,8 @@ angular.module("Backend").controller("pictureCtrl", [
 			angular.forEach(pics, function (pic) {
 				pic.isChecked = isChecked;
 			});
+
+			$scope.hasChecked = isChecked;
 		}
 
 		function isAllChecked () {
@@ -883,9 +950,32 @@ angular.module("Backend").controller("pictureCtrl", [
 			return true;
 		}
 
+		function hasChecked () {
+			var dirs = $scope.dir.dirs;
+			for (var i = 0, len = dirs.length; i < len; ++i) {
+				var dir = dirs[i];
+
+				if (dir.isChecked) {
+					return true;
+				}
+			}
+
+			var pics = $scope.picture.pictures;
+			for (var i = 0, len = pics.length; i < len; ++i) {
+				var pic = pics[i];
+
+				if (pic.isChecked) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		function toggleChecked (item) {
 			item.isChecked = !item.isChecked;
 
+			$scope.hasChecked   = hasChecked();
 			$scope.isAllChecked = isAllChecked();
 		}
 
