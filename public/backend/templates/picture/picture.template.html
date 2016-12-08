@@ -43,7 +43,7 @@
 			</header>
 
 			<div class="body">
-				<div class="">
+				<div class="picture-directory-list">
 					<div class="path">
 						<span 
 							ng-show="path.length <= 0">
@@ -144,7 +144,7 @@
 								</td>
 
 								<td>
-									<span ng-bind="$index + 1"></span>
+									<span ng-bind="dirItem.index + 1"></span>
 								</td>
 
 								<td>
@@ -160,30 +160,23 @@
 								</td>
 
 								<td>
-									<div class="operation-selector">
-										<button class="btn operation-selector-btn">
-											<span class="text">Operation<span>
-											<span class="icon caret"></span>
+									<div class="operation-btn-group">
+										<button 
+											class="btn edit-btn"
+											ng-click="openUpdateDirDialog(dirItem)">
+											Edit
 										</button>
-
-										<ul class="operations">
-											<li class="operation-item">
-												<a class="btn edit-btn fl">
-													Edit
-												</a>
-											</li>
-
-											<li class="operation-item">
-												<a class="btn delete-btn fl">
-													Delete
-												</a>
-											</li>
-										</ul>
+										
+										<button 
+											class="btn delete-btn"
+											ng-click="openDeleteDirDialog(dirItem)">
+											Delete
+										</button>
 									</div>
 								</td>
 							</tr>
 
-							<tr ng-repeat="pic in picture.pictures">
+							<tr ng-repeat="pic in pic.pics">
 								<td>
 									<checkbox
 										default-value="{{pic.isChecked}}"
@@ -192,7 +185,7 @@
 								</td>
 
 								<td>
-									<span ng-bind="$index + dir.dirs.length + 1"></span>
+									<span ng-bind="pic.index + 1"></span>
 								</td>
 
 								<td>
@@ -208,31 +201,33 @@
 								</td>
 
 								<td>
-									<div class="operation-selector">
-										<button class="btn operation-selector-btn">
-											<span class="text">Operation<span>
-											<span class="icon caret"></span>
+									<div class="operation-btn-group">
+										<button 
+											class="btn copy-link-btn">
+											Copy Link
 										</button>
-
-										<ul class="operations">
-											<li class="operation-item">
-												<a class="btn delete-btn fl">
-													Delete
-												</a>
-											</li>
-
-											<li class="operation-item">
-												<a class="btn copy-link-btn fl">
-													Copy Link
-												</a>
-											</li>
-										</ul>
+										
+										<button 
+											class="btn delete-btn">
+											Delete
+										</button>
 									</div>
 									
 								</td>
 							</tr>
 						</tbody>
 					</table>
+				</div>
+
+				<div class="pagination-wrapper clearfix">
+					<ul class="fl clearfix"
+						uib-pagination
+						boundary-links="true"
+						items-per-page="pagination.numPerPage"
+						total-items="pagination.total" 
+						ng-model="pagination.curtPage" 
+						ng-change="onPageChanged()">	
+					</ul>
 				</div>
 			</div>
 		</div>

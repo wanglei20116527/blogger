@@ -257,7 +257,6 @@ angular.module("Backend").service("PictureUploader", [
 			var id = item.uploadId;
 			
 			Picture.finishUploadPictureSegment(id).then(function (pic) {
-				debugger;
 				handleComplete(item, pic);
 				removeItemFromUploadingQueue(item);
 				startUploadNextPicture();

@@ -3,6 +3,7 @@ angular.module("Backend").service("Picture", [
 	"$q",
 	"$timeout",
 	function ($http, $q, $timeout) {
+		var NUMBER   = 10;
 		var BASE_URL = "/backend/picture";
 
 		this.startUploadPictureSegment = function (picture, directory) {
@@ -166,14 +167,17 @@ angular.module("Backend").service("Picture", [
 			});
 		};
 
-		this.getPictures = function (dir) {
+		this.getPictures = function (dir, start, number) {
+			start  = start  || 0;
+			number = number || NUMBER;
+			
 			return new $q(function (resolve, reject) {
-				var url = BASE_URL;
+				var url = BASE_URL + "?start=" + start + "&number=" + number;
 
 				if (angular.isObject(dir) 
 					&& angular.isNumber(dir.id)
 					&& parseInt(dir.id) === dir.id) {
-					url += "?directory=" + dir.id;
+					url += "&directory=" + dir.id;
 				}
 
 				$http.get(url).then(function (ret) {
@@ -193,6 +197,35 @@ angular.module("Backend").service("Picture", [
 					reject(new Error("server error"));
 				});
 			});	
+		};
+
+		this.getNumberOfPictures = function (dir) {
+			return new $q(function (resolve, reject) {
+				var url = BASE_URL + "/number";
+
+				if (angular.isObject(dir) 
+					&& angular.isNumber(dir.id)
+					&& parseInt(dir.id) === dir.id) {
+					url += "?directory=" + dir.id;
+				}
+
+				$http.get(url).then(function (ret) {
+					ret = ret.data;
+					
+					if (!ret.success) {
+						var errMsg = ret.error.message;
+						console.error(errMsg);
+						reject(new Error(errMsg)); 
+						return;
+					}
+					
+					resolve(ret.data.number);
+
+				}).catch(function(err){
+					console.error(err);
+					reject(new Error("server error"));
+				});
+			});
 		};
 
 		this.updatePicture = function (picture) {

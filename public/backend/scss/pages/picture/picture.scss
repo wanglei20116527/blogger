@@ -2,6 +2,7 @@
     position: relative;
     width: 100%;
     height: 100%;
+    overflow: auto;
 
     .picture-page-body {
         position: relative;
@@ -92,157 +93,191 @@
             }
             
             & > .body {                
-                box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+            
+                .picture-directory-list {
+                    
+                    .path {
+                        padding: .5rem 2rem;
+                        margin-top: 2rem;
+                        color: $grey;
+                        font-size: 1.4rem;
+                        line-height: 3.6rem;
+                        background-color: rgba(236, 239, 241, 0.56);
+                        box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
 
-                .path {
-                    padding: .5rem 2rem;
-                    margin-top: 2.5rem;
-                    color: $grey;
-                    font-size: 1.4rem;
-                    line-height: 3.6rem;
-                    background-color: rgba(236, 239, 241, 0.56);;
+                        ul {
 
-                    ul {
-
-                        li {
-                            margin-right: .4rem;
-
-                            a {
-                                color: $blue;
-
-                                &:hover {
-                                    opacity: .8;
-                                }
-                            }
-
-                            .icon {
-                                margin-left: .4rem;
-                                color: $grey;
-                            }
-
-                            &:last-child {
-                                margin-right: 0;
+                            li {
+                                margin-right: .4rem;
 
                                 a {
-                                    color: $grey;
-                                    cursor: default;
+                                    color: $blue;
+
+                                    &:hover {
+                                        opacity: .8;
+                                    }
                                 }
 
                                 .icon {
-                                    display: none;
+                                    margin-left: .4rem;
+                                    color: $grey;
+                                }
+
+                                &:last-child {
+                                    margin-right: 0;
+
+                                    a {
+                                        color: $grey;
+                                        cursor: default;
+                                    }
+
+                                    .icon {
+                                        display: none;
+                                    }
                                 }
                             }
-                        }
-                            
-                    }
-                }
-                table {
-                    width: 100%;
-                    color: $grey;
-                    font-size: 1.5rem;
-                    text-align: center;
-                    vertical-align: middle;
-                    border-collapse: collapse;
-
-                    tr {
-                        border-top: 1px solid #f3efef;
-
-                        &:first-child {
-                            border: none;
-                        }
-
-                        td {
-                            padding: 1.3rem 0;
+                                
                         }
                     }
 
-                    thead {
-                        color: $white;
-                        font-weight: 600;
-                        background-color: $blue;
-
-                        .wl-checkbox {
-                            vertical-align: middle;
-                            border-color: $white;
-
-                            .icon {
-                                border-color: $white;
-                            }
-                        }
-                    }
-
-                    tbody {
-                        background-color: $white;
+                    table {
+                        width: 100%;
+                        margin-top: 2rem;
+                        color: $grey;
+                        font-size: 1.5rem;
+                        text-align: center;
+                        vertical-align: middle;
+                        border-collapse: collapse;
+                        box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
 
                         tr {
-                            cursor: pointer;
-                        }
+                            border-top: 1px solid #f3efef;
 
-                        .wl-checkbox {
-                            vertical-align: middle;
-                        }
-
-                        .dir-icon {
-                            display: inline-block;
-                            width: 30px;
-                            height: 25px;
-                            background-repeat: no-repeat;
-                            background-position: -594px -416px;
-                            background-image: url("/backend/static/image/icon.png");
-                        }
-
-                        .pic-icon {
-                            display: inline-block;
-                            width: 26px;
-                            height: 26px;
-                            background-repeat: no-repeat;
-                            background-image: url("/backend/static/image/picture.icon.png");
-                        }
-
-                        
-                        .operation-selector {
-                            position: relative;
-                            display: inline-block;
-
-                            .operation-selector-btn {
-                                position: relative;
-                                display: inline-block;
-                                padding-left: 2rem;
-                                padding-right: 2rem;
-                                line-height: 3.6rem;
-                                text-align: center;
-                                color: $grey;
-                                font-size: 1.4rem;
-                                opacity: 1;
-                                box-shadow: 0 0 2px rgba(0,0,0,.12);
-
-                                .icon {
-                                    margin-left: .5rem;
-                                }
+                            &:first-child {
+                                border: none;
                             }
 
-                            .operations {
-                                position: absolute;
-                                display: none;
-                                width: 100%;
-                                top: 4rem;
-                                text-align: left;
-                                background-color: $white;
-                                box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2); 
+                            td {
+                                padding: 1.3rem 0;
 
-                                .operation-item {
-                                    a {
-                                        display: inline-block;
-                                        width: 100%;
-                                        padding: 1rem 2rem;
-                                        color: $grey;
-                                        font-size: 1.4rem;
-                                        cursor: pointer;
+                                &:first-child {
+                                    min-width: 4rem;
+                                }
+                            }
+                        }
+
+                        thead {
+                            color: $white;
+                            font-weight: 600;
+                            background-color: $blue;
+
+                            .wl-checkbox {
+                                vertical-align: middle;
+                                border-color: $white;
+
+                                .icon {
+                                    border-color: $white;
+                                }
+                            }
+                        }
+
+                        tbody {
+                            background-color: $white;
+
+                            tr {
+                                cursor: pointer;
+                            }
+
+                            .wl-checkbox {
+                                vertical-align: middle;
+                            }
+
+                            .dir-icon {
+                                display: inline-block;
+                                width: 30px;
+                                height: 25px;
+                                background-repeat: no-repeat;
+                                background-position: -594px -416px;
+                                background-image: url("/backend/static/image/icon.png");
+                            }
+
+                            .pic-icon {
+                                display: inline-block;
+                                width: 26px;
+                                height: 26px;
+                                background-repeat: no-repeat;
+                                background-image: url("/backend/static/image/picture.icon.png");
+                            }
+
+                            .operation-btn-group {
+                                .btn {
+                                    display: inline-block;
+                                    display: inline-block;
+                                    line-height: 2.4rem;
+                                    color: $black;
+                                    opacity: 1;
+                                    text-decoration: underline;
+                                    
+                                    &:hover {
+                                        opacity: .8;
+                                    }
+                                    
+                                    &.edit-btn,
+                                    &.copy-link-btn {
+                                        color: $green;
+                                        margin-right: 1rem;
                                         
-                                        &:hover {
-                                            background-color: rgba(222, 216, 216, 0.24);
-                                        }
-                                    } 
+                                    }
+
+                                    &.delete-btn {
+                                        color: $red;
+                                    }
+                                }
+                            }                            
+                        }
+                    }
+                }
+
+                
+
+                .pagination-wrapper {
+                    margin-top: 2rem;
+                    padding-left: 1rem;
+                    background-color: $white;
+                    box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+
+                    li {
+                        float: left;
+                        margin-left: .5rem;
+                        padding: 1.3rem 0;
+
+                        a {
+                            display: inline-block;
+                            padding-left: 1rem;
+                            padding-right: 1rem;
+                            line-height: 2.4rem;
+                            font-size: 1.4rem;
+                            color: $black;
+                            opacity: 1;
+
+                            &:hover {
+                                opacity: 0.8;
+                            }
+                        }
+
+                        &.active {
+                            a {
+                                font-weight: 600;
+                                color: $blue;
+                            }
+                        }
+
+                        &.disabled {
+                            a {
+                                color: $grey;
+
+                                &:hover {
+                                    opacity: 1;
                                 }
                             }
                         }

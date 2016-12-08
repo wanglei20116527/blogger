@@ -472,7 +472,7 @@ module.exports = {
 		});
 	},
 
-	getNumberOfPictures: function () {
+	getNumberOfPictures: function (req, res) {
 		let {
 			user
 		} = req.session.user;

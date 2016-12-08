@@ -3,14 +3,18 @@ angular.module("Backend").service("Directory", [
 	"$q",
 
 	function ($http, $q) {
+		var NUMBER   = 10;
 		var BASE_URL = "/backend/directory";
 
-		this.getDirectories = function (pDir) {
+		this.getDirectories = function (pDir, start, number) {
+			start  = start  || 0;
+			number = number || NUMBER;
+
 			return new $q(function (resolve, reject) {
-				var url = BASE_URL;
+				var url = BASE_URL + "?start=" + start + "&number=" + number;
 
 				if (pDir) {
-					url += "?parentDirectory=" + pDir.id;
+					url += "&parentDirectory=" + pDir.id;
 				}
 
 				$http.get(url).then(function (ret) {
@@ -30,6 +34,33 @@ angular.module("Backend").service("Directory", [
 					});
 
 					resolve(dirs);
+
+				}).catch(function(err){
+					console.error(err);
+					reject(new Error("server error"));
+				});
+			});
+		};
+
+		this.getNumberOfDirectories = function (pDir) {
+			return new $q(function (resolve, reject) {
+				var url = BASE_URL + "/number";
+
+				if (pDir) {
+					url += "?parentDirectory=" + pDir.id;
+				}
+
+				$http.get(url).then(function (ret) {
+					ret = ret.data;
+
+					if (!ret.success) {
+						var errMsg = ret.error.message;
+						console.error(errMsg);
+						reject(new Error(errMsg)); 
+						return;
+					}
+
+					resolve(ret.data.number);
 
 				}).catch(function(err){
 					console.error(err);
