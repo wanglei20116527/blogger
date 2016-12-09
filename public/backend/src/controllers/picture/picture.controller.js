@@ -75,15 +75,10 @@ angular.module("Backend").controller("pictureCtrl", [
 
 		$scope.onPageChanged = function () {
 			startLoading();
-
-			$q.all([loadDirs(), loadPics()]).then(function () {
-				$scope.hasChecked   = false;
-				$scope.isAllChecked = false;
-
-				updateUrlPage($scope.pagination.curtPage);
-
+			
+			var curtPage = $scope.pagination.curtPage;
+			changeToPage(curtPage).then(function () {
 				stopLoading();
-
 			}).catch(function (err) {
 				console.error(err);
 				stopLoading();
@@ -369,10 +364,9 @@ angular.module("Backend").controller("pictureCtrl", [
 		};
 
 		$scope.changeToDir = function (dir) {
-			var path = $scope.path, 
-				len  = path.length;
+			var path = $scope.path;
 
-			if (dir === path[len - 1]) {
+			if (dir === path[path.length - 1].dir) {
 				return;
 			}
 
@@ -388,14 +382,9 @@ angular.module("Backend").controller("pictureCtrl", [
 
 		$scope.backToParentDir = function () {
 			var path = $scope.path;
-			
-			if (path.length < 2) {
-				console.error("curt path length less then 2");
-				return;
-			}
-			
-			var dir = path[path.length - 2];
-			
+			var item = path[path.length - 2];
+			var dir  = item.dir;
+
 			startLoading();
 
 			changeToDir(dir).then(function () {
@@ -491,12 +480,29 @@ angular.module("Backend").controller("pictureCtrl", [
 
 			initPath()
 				.then(initPreviewMode)
-				.then(initDirsNumber)
-				.then(initPicsNumber)
+				.then(function () {
+					var dir = getCurtDir();
+
+					return $q.all([
+						loadDirsNumber(dir),
+						loadPicsNumber(dir)
+					]);
+				})
 				.then(initPagination)
-				.then(initCurtPage)
-				.then(initDirs)
-				.then(initPics)
+				.then(function () {
+					var numOfDirs  = $scope.dir.number;
+					var numOfPics  = $scope.pic.number;
+					var pagination = $scope.pagination;
+
+					var dir = getCurtDir();
+					var curtPage = pagination.curtPage;
+					var numPerPage = pagination.numPerPage;
+					
+					return $q.all([
+						loadDirs(dir, curtPage, numOfDirs, numPerPage),
+						loadPics(dir, curtPage, numOfDirs, numOfPics, numPerPage)
+					]);
+				})
 				.then(function () {
 					initPictureUploadEvents();
 					stopLoading();
@@ -514,49 +520,25 @@ angular.module("Backend").controller("pictureCtrl", [
 			return new $q(function (resolve, reject) {
 
 				$q.all([
-					Directory.getNumberOfDirectories(), 
-					Picture.getNumberOfPictures()
+					loadDirsNumber(),
+					loadPicsNumber()
 				])
 				.then(function (args) {
+					var numOfDirs = args[0];
+					var numOfPics = args[1];
+
+					var ids      = parseUrlDirIds();
+					var curtPage = parseUrlPage();
+
 					// init root dir pagination
 					var path = [{
 						dir: DEFAULT_PATH_DIR,
 						pagination: {
-							total: args[0] + args[1],
-							curtPage: 0,
+							total: numOfDirs + numOfPics,
+							curtPage: ids.length > 0 ? 1: curtPage,
 							numPerPage: NUMBER_PRE_PAGE
 						}
 					}];
-
-					var pathStr = $location.search()['path'];
-
-					if (!angular.isString(pathStr)) {
-						$scope.path = path;
-						resolve();
-						return;
-					}
-
-					var ids = pathStr.split(" ");;
-
-					for (var i = 0, len = ids.length; i < len; ++i) {
-						var idStr = ids[i].trim();
-						
-						if (idStr == "") {
-							--i;
-							--len;
-							ids.splice(i, 1);
-							continue;
-						}
-
-						var idInt = parseInt(idStr);
-
-						if (!(angular.isNumber(idInt) && idInt === idInt) || idInt != idStr) {
-							reject(new Error("url path invalid"))
-							return;
-						}
-
-						ids[i] = idInt;
-					}
 
 					if (ids.length <= 0) {
 						$scope.path = path;
@@ -574,7 +556,9 @@ angular.module("Backend").controller("pictureCtrl", [
 						var numsOfDirs = args[1];
 						var numsOfPics = args[2];
 
-						if (dirs.length <= 0 || dirs[0] == null) {
+						if (dirs.length <= 0 
+							|| dirs[0] == null 
+							|| dirs[0].parentDirectory != null) {
 							reject(new Error("url path dir not exist"));
 							return;
 						}
@@ -583,7 +567,7 @@ angular.module("Backend").controller("pictureCtrl", [
 							dir: dirs[0],
 							pagination: {
 								total: numsOfDirs[0] + numsOfPics[0],
-								curtPage: 0,
+								curtPage: dirs.length === 1 ? curtPage : 1,
 								numPerPage: NUMBER_PRE_PAGE
 							}
 						});
@@ -602,11 +586,11 @@ angular.module("Backend").controller("pictureCtrl", [
 								dir: dirs[i],
 								pagination: {
 									total: numsOfDirs[i] + numsOfPics[i],
-									curtPage: 1,
+									curtPage: i === len - 1 ? curtPage : 1,
 									numPerPage: NUMBER_PRE_PAGE 
 								}
 							});
-						}	
+						}
 
 						$scope.path = path;
 						resolve();
@@ -624,15 +608,15 @@ angular.module("Backend").controller("pictureCtrl", [
 			$scope.preview.show = preview === "1";
 		}
 
-		function initCurtPage () {
-			var page = parseInt($location.search()['page']);
+		// function initCurtPage () {
+		// 	var page = parseInt($location.search()['page']);
 			
-			if (!(angular.isNumber(page) && page === page)|| page < 1) {
-				page = 1;
-			}
+		// 	if (!(angular.isNumber(page) && page === page)|| page < 1) {
+		// 		page = 1;
+		// 	}
 
-			$scope.pagination.curtPage = page;
-		}
+		// 	$scope.pagination.curtPage = page;
+		// }
 
 		function initDirsNumber () {
 			return loadDirsNumber();
@@ -643,14 +627,9 @@ angular.module("Backend").controller("pictureCtrl", [
 		}
 
 		function initPagination () {
-			var pic = $scope.pic;
-			var dir = $scope.dir;
-
-			$scope.pagination = {
-				total      : pic.number + dir.number,
-				curtPage   : 1,
-				numPerPage : NUMBER_PRE_PAGE
-			};
+			var path = $scope.path;
+			var item = path[path.length - 1];
+			var pagination = $scope.pagination = item.pagination;
 		}
 
 		function initDirs() {
@@ -686,21 +665,14 @@ angular.module("Backend").controller("pictureCtrl", [
 			$location.search("page", page);
 		}
 
-		function loadDirs () {
+		function loadDirs (pDir, curtPage, numberOfDir, numPerPage) {
 			return new $q(function (resolve, reject) {
-				var pDir = getCurtDir();
-
-				var dir = $scope.dir;
-				var numberOfDir = dir.number; 
-
-				var pagination = $scope.pagination;
-				var curtPage   = pagination.curtPage - 1;
-				var numPerPage = pagination.numPerPage;
+				curtPage -= 1;
 				
 				var start  = curtPage * numPerPage;
 				if (start >= numberOfDir) {
-					$scope.dir.dirs = [];
-					resolve();
+					var dirs = $scope.dir.dirs = [];
+					resolve(dirs);
 					return;
 				}
 
@@ -718,19 +690,18 @@ angular.module("Backend").controller("pictureCtrl", [
 					});
 					$scope.dir.dirs = dirs;
 
-					resolve();
+					resolve(dirs);
 				}).catch(reject);
 			});
 		}
 
-		function loadDirsNumber () {
+		function loadDirsNumber (pDir) {
 			return new $q(function (resolve, reject) {
-				var pDir   = getCurtDir();
 				var pDirId = pDir == null ? null : pDir.id;
 				
 				Directory.getNumberOfDirectories(pDirId).then(function (number) {
 					$scope.dir.number = number;
-					resolve();
+					resolve(number);
 				}).catch(reject);
 			});
 		}
@@ -741,7 +712,7 @@ angular.module("Backend").controller("pictureCtrl", [
 			var dir;
 			if (path.length > 1) {
 				var pathItem = path[path.length - 1];
-				dir = item.dir;
+				dir = pathItem.dir;
 			}
 
 			return dir;
@@ -826,81 +797,96 @@ angular.module("Backend").controller("pictureCtrl", [
 		}
 
 		function enterToDir (dir) {
-			var path = $scope.path;
-			var pagination = $scope.pagination;
-
-			if (path.length <= 0) {
-				path.push({
-					dir: DEFAULT_PATH_DIR,
-					pagination: pagination
-				});
-			}
-
-			path.push({
-				dir: dir,
-				pagination: pagination
-			});
-
-			$scope.path = path;
-
-			updateUrlPath(path);
-
 			return new $q(function (resolve, reject) {
-				initDirsNumber()
-					.then(initPicsNumber)
-					.then(initPagination)
-					.then(initDirs)
-					.then(initPics)
-					.then(function () {
-						$scope.hasChecked   = false;
-						$scope.isAllChecked = false;
-						resolve();
-					})
-					.catch(reject);
+				$q.all([
+					loadDirsNumber(dir),
+					loadPicsNumber(dir)
+				])
+				.then(function (args) {
+					var numOfDirs  = args[0];
+					var numOfPics  = args[1];
+					var curtPage   = 1;
+					var numPerPage = NUMBER_PRE_PAGE;
+
+					var pagination = $scope.pagination = {
+						total: numOfDirs + numOfPics,
+						curtPage: curtPage,
+						numPerPage: numPerPage
+					};
+
+					var path = $scope.path;
+					
+					path.push({
+						dir: dir,
+						pagination: pagination
+					});
+
+					updateUrlPage(curtPage);
+					updateUrlPath(path);
+
+					return $q.all([
+						loadDirs(dir, curtPage, numOfDirs, numPerPage),
+						loadPics(dir, curtPage, numOfDirs, numOfPics, numPerPage)
+					]);
+				})
+				.then(function () {
+					$scope.hasChecked   = false;
+					$scope.isAllChecked = false;
+
+					resolve();
+				})
+				.catch(reject);
 			});
 		}
 
 		function changeToDir (dir) {
-			var path  = $scope.path;
-			var tPath = [];
+			return new $q(function (resolve, reject) {
+				var path  = $scope.path;
 
-			if (dir !== DEFAULT_PATH_DIR) {
-				var find = false;
-				
-				for (var i = 0, len = path.length; i < len; ++i) {
-					var dirItem = path[i];
-					tPath.push(dirItem);
-
-					if (dirItem.id === dir.id) {
-						find = true;
+				for (var i = path.length - 1; i > 0; --i) {
+					var item = path[i];
+					
+					if (item.dir === dir) {
 						break;
 					}
+
+					path.pop();
 				}
 
-				if (!find) {
-					tPath = [];
-					dir = undefined;
+				if (path.length <= 0) {
+					reject(new Error("change to dir: " + dir.id + " not found in path"));
+					return;
 				}
-			} else {
-				dir = undefined;
-			}
-			
-			$scope.path = tPath;
 
-			updateUrlPath(tPath);
+				var item = path[path.length - 1];
+				var pagination = item.pagination;
+				var curtPage = pagination.curtPage;
+				var numPerPage = pagination.numPerPage;
 
-			return new $q(function (resolve, reject) {
-				initDirsNumber()
-					.then(initPicsNumber)
-					.then(initPagination)
-					.then(initDirs)
-					.then(initPics)
-					.then(function () {
-						$scope.hasChecked   = false;
-						$scope.isAllChecked = false;
-						resolve();
-					})
-					.catch(reject);
+				$q.all([
+					loadDirsNumber(dir),
+					loadPicsNumber(dir)
+				])
+				.then(function (args) {
+					var numOfDirs = args[0];
+					var numOfPics = args[1];
+
+					return $q.all([
+						loadDirs(dir, curtPage, numOfDirs, numPerPage),
+						loadPics(dir, curtPage, numOfDirs, numOfPics, numPerPage)
+					]);
+				})
+				.then(function () {
+					$scope.hasChecked   = false;
+					$scope.isAllChecked = false;
+					$scope.pagination   = pagination;
+
+					updateUrlPage(curtPage);
+					updateUrlPath(path);
+
+					resolve();
+				})
+				.catch(reject);
 			});
 		}
 
@@ -908,22 +894,15 @@ angular.module("Backend").controller("pictureCtrl", [
 			return loadPics();
 		}
 
-		function loadPics () {
+		function loadPics (pDir, curtPage, numberOfDirs, numberOfPics, numPerPage) {
 			return new $q(function (resolve, reject) {
-				var pDir = getCurtDir();
-				var numberOfDirs = $scope.dir.number;
-
-				var pagination = $scope.pagination;
-				var curtPage   = pagination.curtPage - 1;
-				var numPerPage = pagination.numPerPage;
+				curtPage -= 1;
 
 				if ((curtPage + 1) * numPerPage <= numberOfDirs) {
-					$scope.pic.pics = [];
-					resolve();
+					var pics = $scope.pic.pics = [];
+					resolve(pics);
 					return;
 				}
-
-				var numberOfPics = $scope.pic.number;
 
 				var tmpCurtPage = curtPage - Math.floor(numberOfDirs / numPerPage);
 				var numberRemainedDirs = numberOfDirs % numPerPage;
@@ -939,8 +918,8 @@ angular.module("Backend").controller("pictureCtrl", [
 				}
 
 				if (number == 0) {
-					$scope.pic.pics = [];
-					resolve();
+					var pics = $scope.pic.pics = [];
+					resolve(pics);
 					return;
 				}
 
@@ -953,7 +932,45 @@ angular.module("Backend").controller("pictureCtrl", [
 						pic.isActive  = false;
 					});
 
-					$scope.pic.pics = pics || [];
+					pics = $scope.pic.pics = pics || [];
+
+					resolve(pics);
+				})
+				.catch(reject);
+			});
+		}
+
+		function loadPicsNumber (pDir) {
+			return new $q(function (resolve, reject) {
+				var pDirId = pDir == null ? null : pDir.id;
+
+				Picture.getNumberOfPictures(pDirId).then(function (number) {
+					$scope.pic.number = number;
+
+					resolve(number);
+				})
+				.catch(reject);
+			});
+		}
+		
+		function changeToPage (page) {
+			return new $q(function (resolve, reject) {
+				var numOfDirs  = $scope.dir.number;
+				var numOfPics  = $scope.pic.number;
+				var pagination = $scope.pagination;
+				var curtPage   = pagination.curtPage;
+				var numPerPage = pagination.numPerPage;
+				var curtDir    = getCurtDir();
+
+				return $q.all([
+					loadDirs(curtDir, curtPage, numOfDirs, numPerPage),
+					loadPics(curtDir, curtPage, numOfDirs, numOfPics, numPerPage)
+				])
+				.then(function () {
+					$scope.hasChecked   = false;
+					$scope.isAllChecked = false;
+
+					updateUrlPage(curtPage);
 
 					resolve();
 				})
@@ -961,18 +978,45 @@ angular.module("Backend").controller("pictureCtrl", [
 			});
 		}
 
-		function loadPicsNumber () {
-			return new $q(function (resolve, reject) {
-				var pDir   = getCurtDir();
-				var pDirId = pDir == null ? null : pDir.id;
+		function parseUrlDirIds () {
+			var pathStr = $location.search()['path'];
 
-				Picture.getNumberOfPictures(pDirId).then(function (number) {
-					$scope.pic.number = number;
+			if (!angular.isString(pathStr)) {
+				return [];
+			}
 
-					resolve();
-				})
-				.catch(reject);
-			});
+			var ids = pathStr.split(" ");;
+
+			for (var i = 0, len = ids.length; i < len; ++i) {
+				var idStr = ids[i].trim();
+						
+				if (idStr == "") {
+					--i;
+					--len;
+					ids.splice(i, 1);
+					continue;
+				}
+
+				var idInt = parseInt(idStr);
+
+				if (!(angular.isNumber(idInt) && idInt === idInt) || idInt != idStr) {
+					throw new Error("url path invalid");
+				}
+
+				ids[i] = idInt;
+			}
+
+			return ids;
+		}
+
+		function parseUrlPage () {
+			var page = parseInt($location.search()['page']);
+			
+			if (!(angular.isNumber(page) && page === page) || page < 1) {
+				page = 1;
+			}
+
+			return page;
 		}
 
 		function initPictureUploadEvents () {

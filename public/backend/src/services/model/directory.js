@@ -13,8 +13,8 @@ angular.module("Backend").service("Directory", [
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "?start=" + start + "&number=" + number;
 
-				if (pDirId) {
-					url += "&parentDirectory=" + pDirId.id;
+				if (pDirId != null) {
+					url += "&parentDirectory=" + pDirId;
 				}
 
 				$http.get(url).then(function (ret) {
@@ -46,7 +46,7 @@ angular.module("Backend").service("Directory", [
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "/number";
 
-				if (pDirId) {
+				if (pDirId != null) {
 					url += "?parentDirectory=" + pDirId;
 				}
 

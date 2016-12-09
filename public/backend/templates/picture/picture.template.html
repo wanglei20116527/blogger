@@ -48,12 +48,12 @@
 				<div class="picture-directory-list">
 					<div class="path">
 						<span 
-							ng-show="path.length <= 0">
+							ng-show="path.length <= 1">
 							All
 						</span>
 
 						<ul class="clearfix"
-							ng-show="path.length > 0">
+							ng-show="path.length > 1">
 							<li class="fl">
 								<a class="path-dir"
 									href="javascript:;" 
@@ -65,7 +65,7 @@
 							</li>
 
 							<li class="fl"
-								ng-show="path.length > 3">
+								ng-show="path.length > 4">
 								<a class="path-dir"
 									href="javascript:;">
 									...
@@ -75,26 +75,26 @@
 							</li>
 								
 							<li class="fl"
-								ng-if="path.length > 3"
-								ng-repeat="dir in path | limitTo: 3 : path.length - 3">
+								ng-if="path.length > 4"
+								ng-repeat="item in path | limitTo: 4 : path.length - 4">
 									
 								<a class="path-dir"
 									href="javascript:;" 
-									ng-click="changeToDir(dir)"
-									ng-bind="dir.name">
+									ng-click="changeToDir(item.dir)"
+									ng-bind="item.dir.name">
 								</a>
 
 								<span class="icon">&gt;</span>
 							</li>
 
 							<li class="fl"
-								ng-if="path.length <= 3"
-								ng-repeat="dir in path">
+								ng-if="path.length <= 4"
+								ng-repeat="item in path">
 									
 								<a class="path-dir"
 									href="javascript:;" 
-									ng-click="changeToDir(dir)"
-									ng-bind="dir.name">
+									ng-click="changeToDir(item.dir)"
+									ng-bind="item.dir.name">
 								</a>
 
 								<span class="icon">&gt;</span>
