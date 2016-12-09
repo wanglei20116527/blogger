@@ -6,15 +6,15 @@ angular.module("Backend").service("Directory", [
 		var NUMBER   = 10;
 		var BASE_URL = "/backend/directory";
 
-		this.getDirectories = function (pDir, start, number) {
+		this.getDirectories = function (pDirId, start, number) {
 			start  = start  || 0;
 			number = number || NUMBER;
 
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "?start=" + start + "&number=" + number;
 
-				if (pDir) {
-					url += "&parentDirectory=" + pDir.id;
+				if (pDirId) {
+					url += "&parentDirectory=" + pDirId.id;
 				}
 
 				$http.get(url).then(function (ret) {
@@ -42,12 +42,12 @@ angular.module("Backend").service("Directory", [
 			});
 		};
 
-		this.getNumberOfDirectories = function (pDir) {
+		this.getNumberOfDirectories = function (pDirId) {
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "/number";
 
-				if (pDir) {
-					url += "?parentDirectory=" + pDir.id;
+				if (pDirId) {
+					url += "?parentDirectory=" + pDirId;
 				}
 
 				$http.get(url).then(function (ret) {
@@ -67,6 +67,18 @@ angular.module("Backend").service("Directory", [
 					reject(new Error("server error"));
 				});
 			});
+		};
+
+		this.getNumbersOfDirectories = function (ids) {
+			var promises = [];
+
+			angular.forEach(ids, function (id) {
+				var p = this.getNumberOfDirectories(id);
+				promises.push(p); 
+
+			}.bind(this));
+
+			return $q.all(promises);
 		};
 
 		this.getDirectoriesByIds = function (ids) {

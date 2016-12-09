@@ -39,16 +39,29 @@
                         opacity: 1;
                         box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
 
+                        -webkit-transition: all 0.2s ease-in-out;
+                        -moz-transition: all 0.2s ease-in-out;
+                        -ms-transition: all 0.2s ease-in-out;
+                        -o-transition: all 0.2s ease-in-out;
+                        transition: all 0.2s ease-in-out;
+
                         &:first-child {
                             margin-left: 0;
                         }
 
-                        &:hover {
-                            opacity: .8;
+                        &:not(.disabled) {
+                            &:hover {
+                                opacity: .8;
+                            }
+
+                            &:active {
+                                box-shadow: 0 0 4px rgba(0,0,0,.32),0 2px 4px rgba(0,0,0,.3);
+                            }
                         }
 
-                        &:active {
-                            box-shadow: 0 0 4px rgba(0,0,0,.32),0 2px 4px rgba(0,0,0,.3);
+                        &.disabled {
+                            background-color: $grey;
+                            opacity: .4;
                         }
                     }
 
@@ -161,7 +174,7 @@
                                 padding: 1.3rem 0;
 
                                 &:first-child {
-                                    min-width: 4rem;
+                                    width: 6rem;
                                 }
                             }
                         }
@@ -186,6 +199,10 @@
 
                             tr {
                                 cursor: pointer;
+
+                                &.active {
+                                    background-color: rgba(158,158,158,.1);
+                                }
                             }
 
                             .wl-checkbox {
@@ -308,5 +325,92 @@
                 box-shadow: -0.2rem 0 0.4rem 0 rgba(0, 0, 0, 0.4);
             }
         }
+
+        
+    }
+
+    .picture-upload-pane {
+        position: fixed;
+        width: 500px;
+        right: 3rem;
+        bottom: 0;
+        background-color: $white;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, .2), 0 0 4px 0 rgba(0, 0, 0, .5);
+
+        & > .header {
+            padding: 1.3rem 2rem;
+            border-bottom: 1px solid #f3efef;
+            color: $black;
+                background: $white;
+
+            .title,
+            .btn {
+                color: $black;
+                font-size: 1.4rem;
+                font-weight: 500;
+            }
+        }
+
+        & > .body {
+            height: 250px;
+            overflow: auto;
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                color: $grey;
+                font-size: 1.2rem;
+                text-align: center;
+
+                td {
+                    padding: 1rem 0;
+                }
+
+                tr {
+                    td:first-child {
+                        padding-left: 1.2rem;
+                    }
+                }
+
+                thead {
+                    color: $black;
+                }
+
+                tbody {
+                    tr {
+                        border-top: 1px solid #f3efef;
+                    }
+
+                    .pic-icon {
+                        display: inline-block;
+                        width: 26px;
+                        height: 26px;
+                        vertical-align: middle;
+                        background-repeat: no-repeat;
+                        background-image: url(/backend/static/image/picture.icon.png);
+                    }
+
+                    .state {
+                        &.success {
+                            color: $green;
+                        }
+
+                        &.error {
+                            color: $red;
+                        }
+
+                        &.aborted {
+                            color: $orange;
+                        }
+                    }
+
+                    .abort-upload-picture-btn {
+                        color: $red;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+            
     }
 }

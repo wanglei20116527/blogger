@@ -36,7 +36,9 @@
 					</button>
 
 					<button 
-						class="btn batch-delete-btn fl">
+						class="btn batch-delete-btn fl"
+						ng-class="{disabled: !hasChecked}"
+						ng-click="batchDelete()">
 						Batch Delete
 					</button>
 				</div>
@@ -135,7 +137,9 @@
 
 						<tbody>
 							<tr ng-repeat="dirItem in dir.dirs"
-								ng-dblclick="enterToDir(dirItem)">
+								ng-dblclick="enterToDir(dirItem)"
+								ng-click="activeDir(dirItem)"
+								ng-class="{active: dirItem.isActive}">
 								<td>
 									<checkbox
 										default-value="{{dirItem.isChecked}}"
@@ -176,7 +180,9 @@
 								</td>
 							</tr>
 
-							<tr ng-repeat="pic in pic.pics">
+							<tr ng-repeat="pic in pic.pics"
+								ng-click="activeDir(pic)"
+								ng-class="{active: pic.isActive}">
 								<td>
 									<checkbox
 										default-value="{{pic.isChecked}}"
@@ -202,13 +208,15 @@
 
 								<td>
 									<div class="operation-btn-group">
-										<button 
-											class="btn copy-link-btn">
+										<button
+											class="btn copy-link-btn"
+											ng-click="copyPictureLink(pic)">
 											Copy Link
 										</button>
 										
 										<button 
-											class="btn delete-btn">
+											class="btn delete-btn"
+											ng-click="openDeletePictureDialog(pic)">
 											Delete
 										</button>
 									</div>
@@ -234,53 +242,6 @@
 
 		<div class="preview-area"
 			ng-class="{extend: preview.show}">
-		</div>
-
-		<div class="context-menu-area">
-			<context-menu 
-				ng-show="contextMenu.dir._show"
-				on-blur="contextMenu.dir.hide()"
-				style="position: fixed; left: 500px; top: 300px; z-index: 99999;">
-				
-				<ul>
-					<li>
-						<a href="javascript:;"
-							ng-click="contextMenu.dir.delete()">
-							Delete
-						</a>
-					</li>
-
-					<li>
-						<a href="javascript:;"
-							ng-click="contextMenu.dir.update()">
-							Rename
-						</a>
-					</li>
-				</ul>
-			</context-menu>
-
-			<context-menu 
-				ng-show="contextMenu.pic._show"
-				on-blur="contextMenu.pic.hide()"
-				style="position: fixed; left: 500px; top: 300px; z-index: 99999;">
-				
-				<ul>
-					<li>
-						<a href="javascript:;"
-							ng-click="contextMenu.pic.delete()">
-							Delete
-						</a>
-					</li>
-
-					<li>
-						<a href="javascript:;"
-							ng-show="::contextMenu.pic.isSupportCopyLink"
-							ng-click="contextMenu.pic.copyLink()">
-							Copy Link
-						</a>
-					</li>
-				</ul>
-			</context-menu>
 		</div>
 
 		<div>
@@ -325,64 +286,128 @@
 				
 				<p>Are you sure to delete this picture?</p>
 			</wl-dialog>
-		</div>
 
-		<div ng-show="uploadPicturesDialogConfig.show">
-			<div class="clearfix">
-				<h4 class="title fl">Upload Picture</h4>	
-				<button class="btn btn-close icon iconfont fr"
-						ng-click="closeUploadPicturesDialog()">
-						&#xe61c;
-				</button>
-			</div>
-
-			<div>
-				<table>
-					<tbody>
-						<tr ng-repeat="picture in uploadPicturesDialogConfig.pictures">
-							<td>
-								<i></i>
-								<span ng-bind="::picture.name"></span>
-							</td>
-
-							<td>
-								<span ng-bind="::picture.size | byteFormat"></span>
-							</td>
-
-							<td ng-show="picture.uploading">
-								<span ng-bind="picture.progress | percent"></span>
-							</td>
-
-							<td ng-show="picture.uploading">
-								<button 
-									class="btn"
-									ng-click="abortUploadPicture(picture)">
-									Abort
-								</button>
-							</td>
-
-							<td ng-show="picture.complete">
-								<span>success</span>
-							</td>
-
-							<td ng-show="picture.error">
-								<span>error</span>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+			<wl-dialog
+				ng-show="copyPictureLinkDialogConfig.show"
+				title="{{copyPictureLinkDialogConfig.title}}"
+				buttons="copyPictureLinkDialogConfig.buttons"
+				on-close="copyPictureLinkDialogConfig.onClose()">
+				
+				<input 
+					autofocus
+					type="text" 
+					ng-model="copyPictureLinkDialogConfig.link"
+				/>
+			</wl-dialog>
 		</div>
 	</div>
 
-	
+	<div class="picture-upload-pane" ng-show="uploadPicturesDialogConfig.show">
+		<div class="clearfix header">
+			<h4 class="title fl">Upload Picture</h4>	
+			<button class="btn btn-close icon iconfont fr"
+					ng-click="closeUploadPicturesDialog()">
+					&#xe61c;
+			</button>
+		</div>
 
-	
+		<div class="body">
+			<table>
+				<thead>
+					<tr>
+						<td>
+							<span>Index</span>
+						</td>
+							
+						<td>
+							<span>Icon</span>
+						</td>
 
-	<!-- <image-upload-dialog
-		ng-if="imageUploadDialog.show"
-		on-close="imageUploadDialog.onClose()"
-		on-cancel="imageUploadDialog.onCancel()"
-		on-confirm="imageUploadDialog.onConfirm()">
-	</image-upload-dialog> -->
+						<td>
+							<span>Name</span>
+						</td>
+
+						<td>
+							<span>Size</span>
+						</td>
+
+						<td>
+							<span>State</span>
+						</td>
+
+						<td>
+							<span>Operation</span>
+						</td>					
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr ng-repeat="picture in uploadPicturesDialogConfig.pictures">
+						<td>
+							<span 
+								class="index"
+								ng-bind="$index + 1">
+							</span>
+						</td>
+
+						<td>
+							<span class="pic-icon"></span>
+						</td>
+
+						<td>
+							<span 
+								class="name"
+								ng-bind="::picture.name">
+							</span>
+						</td>
+
+						<td>
+							<span
+								class="size" 
+								ng-bind="::picture.size | byteFormat">
+							</span>
+						</td>
+
+						<td ng-show="picture.uploading">
+							<span
+								class="progress" 
+								ng-bind="picture.progress | percent">
+							</span>
+						</td>
+
+						<td ng-show="picture.complete">
+							<span
+								class="state success">
+								Success
+							</span>
+						</td>
+
+						<td ng-show="picture.error">
+							<span 
+								class="state error">
+								Error
+							</span>
+						</td>
+
+						<td ng-show="picture.abort">
+							<span 
+								class="state aborted">
+								Aborted
+							</span>
+						</td>
+
+						<td>
+							<button 
+								class="btn abort-upload-picture-btn"
+								ng-show="picture.uploading"
+								ng-click="abortUploadPicture(picture)">
+								Abort
+							</button>
+						</td>
+		
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>

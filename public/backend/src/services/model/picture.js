@@ -167,17 +167,15 @@ angular.module("Backend").service("Picture", [
 			});
 		};
 
-		this.getPictures = function (dir, start, number) {
+		this.getPictures = function (dirId, start, number) {
 			start  = start  || 0;
 			number = number || NUMBER;
 			
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "?start=" + start + "&number=" + number;
 
-				if (angular.isObject(dir) 
-					&& angular.isNumber(dir.id)
-					&& parseInt(dir.id) === dir.id) {
-					url += "&directory=" + dir.id;
+				if (angular.isNumber(dirId) && parseInt(dirId) === dirId) {
+					url += "&directory=" + dirId;
 				}
 
 				$http.get(url).then(function (ret) {
@@ -199,14 +197,12 @@ angular.module("Backend").service("Picture", [
 			});	
 		};
 
-		this.getNumberOfPictures = function (dir) {
+		this.getNumberOfPictures = function (dirId) {
 			return new $q(function (resolve, reject) {
 				var url = BASE_URL + "/number";
 
-				if (angular.isObject(dir) 
-					&& angular.isNumber(dir.id)
-					&& parseInt(dir.id) === dir.id) {
-					url += "?directory=" + dir.id;
+				if (angular.isNumber(dirId) && parseInt(dirId) === dirId) {
+					url += "?directory=" + dirId;
 				}
 
 				$http.get(url).then(function (ret) {
@@ -226,6 +222,17 @@ angular.module("Backend").service("Picture", [
 					reject(new Error("server error"));
 				});
 			});
+		};
+
+		this.getNumbersOfPictures = function (ids) {
+			var promises = [];
+
+			angular.forEach(ids, function (id) {
+				var p = this.getNumberOfPictures(id);
+				promises.push(p);
+			}.bind(this));
+
+			return $q.all(promises);
 		};
 
 		this.updatePicture = function (picture) {

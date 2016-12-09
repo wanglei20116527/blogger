@@ -28,90 +28,6 @@ angular.module("Backend").controller("pictureCtrl", [
 		
 		var NUMBER_PRE_PAGE = 10;
 
-		// $scope.contextMenu = {
-		// 	dir: {
-		// 		dir: null,
-				
-		// 		_show: false,
-
-		// 		position: {
-		// 			top : 0, 
-		// 			left: 0
-		// 		},
-
-		// 		show: function (event, dir) {
-		// 			event.preventDefault();
-
-		// 			showDirContextMenu(dir, {
-		// 				top: 0,
-		// 				left: 0
-		// 			});
-
-		// 			hidePictureContextMenu();
-		// 		},
-				
-		// 		hide: function () {
-		// 			hideDirContextMenu();
-		// 		},
-
-		// 		update: function () {
-		// 			openUpdateDirDialog(this.dir);
-		// 			hideDirContextMenu();
-		// 		},
-
-		// 		delete: function () {
-		// 			openDeleteDirDialog(this.dir);
-		// 			hideDirContextMenu();
-		// 		}
-		// 	},
-
-		// 	pic: {
-		// 		_show: false,
-
-		// 		pic: null,
-
-		// 		position: {
-		// 			top: 0,
-		// 			left: 0	
-		// 		},
-
-		// 		isSupportCopyLink: Clipboard.isSupportCopy(),
-
-		// 		show: function (event, pic) {;
-		// 			event.preventDefault();
-
-		// 			pic = angular.copy(pic);
-
-		// 			showPictureContextMenu(pic, {
-		// 				top: 0,
-		// 				left: 0
-		// 			});
-
-		// 			hideDirContextMenu();
-		// 		},
-
-		// 		hide: function () {
-		// 			hidePictureContextMenu();
-		// 		},
-
-		// 		delete: function () {
-		// 			var pic = $scope.contextMenu.pic.pic;
-
-		// 			openDeletePictureDialog(pic);
-					
-		// 			hidePictureContextMenu();
-		// 		},
-
-		// 		copyLink: function () {
-		// 			var pic = $scope.contextMenu.pic.pic;
-					
-		// 			copyPictureLinkToClipboard(pic);
-
-		// 			hidePictureContextMenu();
-		// 		}
-		// 	}
-		// };
-
 		$scope.isLoading = true;
 
 		$scope.path = [];
@@ -163,6 +79,8 @@ angular.module("Backend").controller("pictureCtrl", [
 			$q.all([loadDirs(), loadPics()]).then(function () {
 				$scope.hasChecked   = false;
 				$scope.isAllChecked = false;
+
+				updateUrlPage($scope.pagination.curtPage);
 
 				stopLoading();
 
@@ -341,6 +259,8 @@ angular.module("Backend").controller("pictureCtrl", [
 			show: false,
 
 			pictures: [],
+
+			finishedPictures: []
 		};
 
 		$scope.deletePictureDialogConfig = {
@@ -372,11 +292,19 @@ angular.module("Backend").controller("pictureCtrl", [
 						var pic = $scope.deletePictureDialogConfig.pic;
 						
 						deletePicture(pic).then(function () {
-							$scope.hasChecked   = hasChecked();
-							$scope.isAllChecked = isAllChecked();
-
 							closeDeletePictureDialog();
-							console.warn("delete picture success");
+							startLoading();
+
+							initDirsNumber()
+								.then(initPicsNumber)
+								.then(initPagination)
+								.then(initDirs)
+								.then(initPics)
+								.then(function () {
+									$scope.hasChecked   = false;
+									$scope.isAllChecked = false;
+									stopLoading();
+								});
 						})
 						.catch(function (err) {
 							console.error(err);
@@ -387,6 +315,31 @@ angular.module("Backend").controller("pictureCtrl", [
 
 			onClose: function () {
 				closeDeletePictureDialog();
+			}
+		};
+
+		$scope.copyPictureLinkDialogConfig = {
+			show: false,
+
+			link: "",
+
+			title: "Copy Link",
+
+			buttons: [
+				{
+					text: "Cancel",
+					style: {
+						color: "#fff",
+						backgroundColor: "#666"
+					},
+					onClick: function () {
+						closeCopyPictureLinkDialog();
+					}
+				}
+			],
+
+			onClose: function () {
+				closeCopyPictureLinkDialog();
 			}
 		};
 
@@ -453,6 +406,10 @@ angular.module("Backend").controller("pictureCtrl", [
 			});
 		};
 
+		$scope.openDeletePictureDialog = function (pic) {
+			openDeletePictureDialog(pic);
+		};
+
 		$scope.closeUploadPicturesDialog = function () {
 			closeUploadPicturesDialog();
 		};
@@ -484,7 +441,47 @@ angular.module("Backend").controller("pictureCtrl", [
 			event.target.value = null;
 		};
 
-		$scope.batchDelete = function () {	
+		$scope.copyPictureLink = function (pic) {
+			var link =  $location.protocol() + "://";
+				link += $location.host();
+				link += ":" + $location.port();;
+				link += pic.url;
+
+			if (Clipboard.isSupportCopy()) {
+				Clipboard.copyText(link);
+			} else {
+				openCopyPictureLinkDialog(link);
+			}
+		};
+
+		$scope.activeDir = function (dir) {
+			activeItem(dir);
+		};
+
+		$scope.activePic = function (pic) {
+			activeItem(pic);
+		};
+
+		$scope.batchDelete = function () {
+			if (!$scope.hasChecked) {
+				return;
+			}
+
+			startLoading();
+
+			batchDelete()
+				.then(loadDirsNumber)
+				.then(loadPicsNumber)
+				.then(initPagination)
+				.then(loadDirs)
+				.then(loadPics)
+				.then(function () {
+					stopLoading();
+					$scope.hasChecked   = false;
+					$scope.isAllChecked = false;
+				}).catch(function (err) {
+					console.error(err);
+				});
 		};
 
 		init();	
@@ -497,6 +494,7 @@ angular.module("Backend").controller("pictureCtrl", [
 				.then(initDirsNumber)
 				.then(initPicsNumber)
 				.then(initPagination)
+				.then(initCurtPage)
 				.then(initDirs)
 				.then(initPics)
 				.then(function () {
@@ -514,72 +512,126 @@ angular.module("Backend").controller("pictureCtrl", [
 
 		function initPath () {
 			return new $q(function (resolve, reject) {
-				var pathStr = $location.search()['path'];
 
-				if (!angular.isString(pathStr)) {
-					resolve();
-					return;
-				}
-				
-				var ids = pathStr.split(" ");
+				$q.all([
+					Directory.getNumberOfDirectories(), 
+					Picture.getNumberOfPictures()
+				])
+				.then(function (args) {
+					// init root dir pagination
+					var path = [{
+						dir: DEFAULT_PATH_DIR,
+						pagination: {
+							total: args[0] + args[1],
+							curtPage: 0,
+							numPerPage: NUMBER_PRE_PAGE
+						}
+					}];
 
-				for (var i = 0, len = ids.length; i < len; ++i) {
-					var idStr = ids[i].trim();
-					
-					if (idStr == "") {
-						--len;
-						--i;
-						ids.splice(i, 1);
-						continue;
-					}
+					var pathStr = $location.search()['path'];
 
-					var idInt = parseInt(idStr);
-
-					if (!angular.isNumber(idInt) || idInt != idStr) {
-						reject(new Error("url path invalid"))
+					if (!angular.isString(pathStr)) {
+						$scope.path = path;
+						resolve();
 						return;
 					}
 
-					ids[i] = idInt;
-				}
+					var ids = pathStr.split(" ");;
 
-				if (ids.length <= 0) {
-					resolve();
-					return;
-				}
-
-				Directory.getDirectoriesByIds(ids).then(function (dirs) {
-					if (dirs.length <= 0 || dirs[0] == null) {
-						throw new Error("url path dir not exist");
-					}
-
-					for (var i = 1, len = dirs.length; i < len; ++i) {
-						var curtDir = dirs[i];
-						var prevDir = dirs[i - 1];
-
-						if (curtDir == null 
-							|| curtDir.parentDirectory != prevDir.id) {
-							throw new Error("url path dir not exist");
+					for (var i = 0, len = ids.length; i < len; ++i) {
+						var idStr = ids[i].trim();
+						
+						if (idStr == "") {
+							--i;
+							--len;
+							ids.splice(i, 1);
+							continue;
 						}
+
+						var idInt = parseInt(idStr);
+
+						if (!(angular.isNumber(idInt) && idInt === idInt) || idInt != idStr) {
+							reject(new Error("url path invalid"))
+							return;
+						}
+
+						ids[i] = idInt;
 					}
 
-					var path = $scope.path;
-					path.push(DEFAULT_PATH_DIR);
+					if (ids.length <= 0) {
+						$scope.path = path;
+						resolve();
+						return;
+					}
 
-					$scope.path = path.concat(dirs);
+					$q.all([
+						Directory.getDirectoriesByIds(ids),
+						Directory.getNumbersOfDirectories(ids),
+						Picture.getNumbersOfPictures(ids)
+					])
+					.then(function (args) {
+						var dirs       = args[0];
+						var numsOfDirs = args[1];
+						var numsOfPics = args[2];
 
-					resolve();
+						if (dirs.length <= 0 || dirs[0] == null) {
+							reject(new Error("url path dir not exist"));
+							return;
+						}
+
+						path.push({
+							dir: dirs[0],
+							pagination: {
+								total: numsOfDirs[0] + numsOfPics[0],
+								curtPage: 0,
+								numPerPage: NUMBER_PRE_PAGE
+							}
+						});
+
+						for (var i = 1, len = dirs.length; i < len; ++i) {
+							var curtDir = dirs[i];
+							var prevDir = dirs[i - 1];
+
+							if (curtDir == null 
+								|| curtDir.parentDirectory != prevDir.id) {
+								reject(new Error("url path dir not exist"));
+								return;
+							}
+
+							path.push({
+								dir: dirs[i],
+								pagination: {
+									total: numsOfDirs[i] + numsOfPics[i],
+									curtPage: 1,
+									numPerPage: NUMBER_PRE_PAGE 
+								}
+							});
+						}	
+
+						$scope.path = path;
+						resolve();
+
+					})
+					.catch(reject);
+
 				})
-				.catch(function (err) {
-					console.error(err);
-					reject(err);
-				});
+				.catch(reject);
 			});
 		}
 
 		function initPreviewMode () {
 			var preview = $location.search()['preview'];
 			$scope.preview.show = preview === "1";
+		}
+
+		function initCurtPage () {
+			var page = parseInt($location.search()['page']);
+			
+			if (!(angular.isNumber(page) && page === page)|| page < 1) {
+				page = 1;
+			}
+
+			$scope.pagination.curtPage = page;
 		}
 
 		function initDirsNumber () {
@@ -614,12 +666,13 @@ angular.module("Backend").controller("pictureCtrl", [
 			var pathStr = "";
 			for (var i = 1, len = path.length; i < len; ++i) {
 				var pathItem = path[i];
+				var dir = pathItem.dir;
 				
 				if (i > 1) {
 					pathStr += " ";
 				}
 				
-				pathStr += pathItem.id;
+				pathStr += dir.id;
 			}
 
 			$location.search("path", pathStr);
@@ -627,6 +680,10 @@ angular.module("Backend").controller("pictureCtrl", [
 
 		function updateUrlPreviewMode (preview) {
 			$location.search("preview", !!preview ? "1" : "0");
+		}
+
+		function updateUrlPage (page) {
+			$location.search("page", page);
 		}
 
 		function loadDirs () {
@@ -652,7 +709,8 @@ angular.module("Backend").controller("pictureCtrl", [
 					number = numberOfDir - start;
 				}
 
-				Directory.getDirectories(pDir, start, number).then(function (dirs) {
+				var pDirId = pDir == null ? null : pDir.id;
+				Directory.getDirectories(pDirId, start, number).then(function (dirs) {
 					angular.forEach(dirs, function (dir, index) {
 						dir.index = start + index;
 						dir.isChecked = false;
@@ -667,9 +725,10 @@ angular.module("Backend").controller("pictureCtrl", [
 
 		function loadDirsNumber () {
 			return new $q(function (resolve, reject) {
-				var pDir = getCurtDir();
-
-				Directory.getNumberOfDirectories(pDir).then(function (number) {
+				var pDir   = getCurtDir();
+				var pDirId = pDir == null ? null : pDir.id;
+				
+				Directory.getNumberOfDirectories(pDirId).then(function (number) {
 					$scope.dir.number = number;
 					resolve();
 				}).catch(reject);
@@ -681,7 +740,8 @@ angular.module("Backend").controller("pictureCtrl", [
 				
 			var dir;
 			if (path.length > 1) {
-				dir = path[path.length - 1];
+				var pathItem = path[path.length - 1];
+				dir = item.dir;
 			}
 
 			return dir;
@@ -767,12 +827,19 @@ angular.module("Backend").controller("pictureCtrl", [
 
 		function enterToDir (dir) {
 			var path = $scope.path;
+			var pagination = $scope.pagination;
 
 			if (path.length <= 0) {
-				path.push(DEFAULT_PATH_DIR);
+				path.push({
+					dir: DEFAULT_PATH_DIR,
+					pagination: pagination
+				});
 			}
 
-			path.push(dir);
+			path.push({
+				dir: dir,
+				pagination: pagination
+			});
 
 			$scope.path = path;
 
@@ -877,7 +944,9 @@ angular.module("Backend").controller("pictureCtrl", [
 					return;
 				}
 
-				Picture.getPictures(pDir, start, number).then(function (pics) {
+				var pDirId = pDir == null ? null : pDir.id;
+
+				Picture.getPictures(pDirId, start, number).then(function (pics) {
 					angular.forEach(pics, function (pic, index) {
 						pic.index = numberOfDirs + start + index;
 						pic.isChecked = false;
@@ -894,9 +963,10 @@ angular.module("Backend").controller("pictureCtrl", [
 
 		function loadPicsNumber () {
 			return new $q(function (resolve, reject) {
-				var pDir = getCurtDir();
+				var pDir   = getCurtDir();
+				var pDirId = pDir == null ? null : pDir.id;
 
-				Picture.getNumberOfPictures(pDir).then(function (number) {
+				Picture.getNumberOfPictures(pDirId).then(function (number) {
 					$scope.pic.number = number;
 
 					resolve();
@@ -943,31 +1013,29 @@ angular.module("Backend").controller("pictureCtrl", [
 				if (tmpPic.uploadId === uploadId) {
 					tmpPic.complete  = true;
 					tmpPic.uploading = false;
-
-					startLoading();
-
-					loadDirsNumber()
-						.then(loadPicsNumber)
-						.then(initPagination)
-						.then(loadDirs)
-						.then(loadPics)
-						.then(function () {
-							$scope.hasChecked   = false;
-							$scope.isAllChecked = false;
-							
-							stopLoading();
-						}) 
-						.catch(function (err) {
-							console.error(err);
-							stopLoading();
-						});
 					break;
 				}
 			}
-				
-			
-			
-			// todo add picture to display
+
+			if (checkUploadPictureEnd()) {
+				startLoading();
+
+				loadDirsNumber()
+					.then(loadPicsNumber)
+					.then(initPagination)
+					.then(loadDirs)
+					.then(loadPics)
+					.then(function () {
+						$scope.hasChecked   = false;
+						$scope.isAllChecked = false;
+							
+						stopLoading();
+					}) 
+					.catch(function (err) {
+						console.error(err);
+						stopLoading();
+					});
+			}
 		}
 
 		function onErrorUploadPicture (err, uploadId) {
@@ -982,6 +1050,26 @@ angular.module("Backend").controller("pictureCtrl", [
 					pic.uploading = false;
 					break;
 				}
+			}
+
+			if (checkUploadPictureEnd()) {
+				startLoading();
+
+				loadDirsNumber()
+					.then(loadPicsNumber)
+					.then(initPagination)
+					.then(loadDirs)
+					.then(loadPics)
+					.then(function () {
+						$scope.hasChecked   = false;
+						$scope.isAllChecked = false;
+							
+						stopLoading();
+					}) 
+					.catch(function (err) {
+						console.error(err);
+						stopLoading();
+					});
 			}
 
 			console.error(err);
@@ -999,6 +1087,26 @@ angular.module("Backend").controller("pictureCtrl", [
 					pic.uploading = false;
 					break;
 				}
+			}
+
+			if (checkUploadPictureEnd()) {
+				startLoading();
+
+				loadDirsNumber()
+					.then(loadPicsNumber)
+					.then(initPagination)
+					.then(loadDirs)
+					.then(loadPics)
+					.then(function () {
+						$scope.hasChecked   = false;
+						$scope.isAllChecked = false;
+							
+						stopLoading();
+					}) 
+					.catch(function (err) {
+						console.error(err);
+						stopLoading();
+					});
 			}
 		}
 
@@ -1045,6 +1153,21 @@ angular.module("Backend").controller("pictureCtrl", [
 
 				tmpPic.uploadId = tmpId;
 			}
+		}
+
+		function checkUploadPictureEnd () {
+			var config = $scope.uploadPicturesDialogConfig;
+			var pics   = config.pictures;
+
+			for (var i = 0, len = pics.length; i < len; ++i) {
+				var tmpPic = pics[i];
+
+				if (tmpPic.uploading) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		function abortUploadPicture (picture) {
@@ -1135,6 +1258,68 @@ angular.module("Backend").controller("pictureCtrl", [
 			return false;
 		}
 
+		function getCheckedPics () {
+			var tPics = [];
+
+			var pics = $scope.pic.pics;
+			for (var i = 0, len = pics.length; i < len; ++i) {
+				var pic = pics[i];
+
+				if (pic.isChecked) {
+					tPics.push(pic);
+				}
+			}
+
+			return tPics;
+		}
+
+		function getCheckedDirs () {
+			var tDirs = [];
+
+			var dirs = $scope.dir.dirs;
+			for (var i = 0, len = dirs.length; i < len; ++i) {
+				var dir = dirs[i];
+
+				if (dir.isChecked) {
+					tDirs.push(dir);
+				}
+			}
+
+			return tDirs;
+		}
+
+		function activeItem (item) {
+			var dirs = $scope.dir.dirs;
+			angular.forEach(dirs, function (dir) {
+				dir.isActive = false;
+			})
+			
+			var pics = $scope.pic.pics;
+			angular.forEach(pics, function (pic) {
+				pic.isActive = false;
+			});
+
+			item.isActive = true;
+		}
+
+		function batchDelete () {
+			var promises = [];
+
+			var pics = getCheckedPics();
+			angular.forEach(pics, function (pic) {
+				var p = deletePicture(pic);
+				promises.push(p);
+			});
+
+			var dirs = getCheckedDirs();
+			angular.forEach(dirs, function (dir) {
+				var p = deleteDir(dir);
+				promises.push(p);
+			});
+
+			return $q.all(promises);
+		}
+
 		function startLoading () {
 			$scope.isLoading = true;
 		}
@@ -1200,48 +1385,14 @@ angular.module("Backend").controller("pictureCtrl", [
 			$scope.deletePictureDialogConfig.pic  = null;
 		}
 
-		function showDirContextMenu (dir, position) {
-			var dirContextMenu = $scope.contextMenu.dir;
-
-			dirContextMenu.dir = angular.copy(dir);
-			dirContextMenu._show = true;
-			dirContextMenu.position = {
-				top: position.top || 0,
-				left: position.left || 0
-			};
+		function openCopyPictureLinkDialog (link) {
+			$scope.copyPictureLinkDialogConfig.show = true;
+			$scope.copyPictureLinkDialogConfig.link = link;
 		}
 
-		function hideDirContextMenu () {
-			var dirContextMenu = $scope.contextMenu.dir;
-
-			dirContextMenu.dir = null;
-			dirContextMenu._show = false;
-			dirContextMenu.position = {
-				top: 0,
-				left: 0
-			};
-		}
-
-		function showPictureContextMenu (picture, position) {
-			var picContextMenu = $scope.contextMenu.pic;
-			
-			picContextMenu.pic = angular.copy(picture);
-			picContextMenu._show = true;
-			picContextMenu.position = {
-				top : position.top  || 0,
-				left: position.left || 0
-			};
-		}
-
-		function hidePictureContextMenu () {
-			var picContextMenu = $scope.contextMenu.pic;
-			
-			picContextMenu.pic = null;
-			picContextMenu._show = false;
-			picContextMenu.position = {
-				top : 0,
-				left: 0
-			};
+		function closeCopyPictureLinkDialog () {
+			$scope.copyPictureLinkDialogConfig.show = false;
+			$scope.copyPictureLinkDialogConfig.link = "";
 		}
 	}
 ]);

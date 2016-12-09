@@ -28,6 +28,11 @@
                 margin-right: 0;
             }
 
+            &.disabled {
+                background-color: $grey;
+                opacity: .4;
+            }
+
             &:not(.disabled) {
                 &:hover {
                     opacity: 0.8;
@@ -40,11 +45,6 @@
                 &.batch-delete-btn {
                     background-color: $green;
                 }
-            }
-
-            &.disabled {
-                background-color: $grey;
-                opacity: .4;
             }
         }
     }
