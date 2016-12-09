@@ -282,5 +282,17 @@ angular.module("Backend").service("Picture", [
 				});
 			});
 		};
+
+		this.deletePictures = function (pictures) {
+			var promises = [];
+			
+			angular.forEach(pictures, function (pic) {
+				var p = this.deletePicture(pic);
+
+				promises.push(p);
+			}.bind(this));
+
+			return $q.all(promises);
+		};
 	}
 ]);

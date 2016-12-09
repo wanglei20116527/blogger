@@ -195,5 +195,17 @@ angular.module("Backend").service("Directory", [
 				});
 			});		
 		};
+
+		this.deleteDirectories = function (dirs) {
+			var promises = [];
+
+			angular.forEach(dirs, function (dir) {
+				var p = this.deleteDirectory(dir);
+
+				promises.push(p);
+			}.bind(this));
+
+			return $q.all(promises);
+		};
 	}
 ]);
