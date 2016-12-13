@@ -18,16 +18,18 @@
 				/>
 			</div>
 
-			<div class="category-selector fl">
+			<div 
+				class="category-selector fl"
+				uib-dropdown>
 				<button 
-					class="btn category-selector-btn"
-					ng-click="toggleCtgySelector()">
+					uib-dropdown-toggle
+					class="btn category-selector-btn">
 					<span ng-bind="curtCategory.name"></span>
 					<span class="icon caret"></span>
 				</button>
 
-				<ul class="categoires"
-					ng-show="isCtgySelectorShow">
+				<ul uib-dropdown-menu
+					class="categoires dropdown-menu">
 					<li class="category-item"
 						ng-repeat="category in categoires">
 						<a ng-bind="category.name"
@@ -67,5 +69,38 @@
 			</wl-editor>
 		</div>
 
+	</div>
+
+	<div class="picture-select-pane">
+		<header class="picture-select-pane-header">
+			<div class="btn-group">
+				<button 
+					class="btn picture-select-pane-close-btn">
+					X
+				</button>
+			</div>
+		</header>
+
+		<div class="picture-select-pane-body">
+			<iframe
+				scrolling="yes"
+				frameborder="0"
+				src="/backend/static/templates/picture/picture.select.pane.template.html">
+			</iframe>
+		</div>
+
+		<footer class="picture-select-pane-footer">
+			<div class="btn-group clearfix">
+				<button 
+					class="btn cancel-btn">
+					<span class="text">Cancel</span>
+				</button>
+
+				<button
+					class="btn confirm-btn">
+					<span class="text">Confirm</span>
+				</button>
+			</div>
+		</footer>
 	</div>
 </div>

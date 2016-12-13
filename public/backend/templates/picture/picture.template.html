@@ -168,13 +168,19 @@
 										<button 
 											class="btn edit-btn"
 											ng-click="openUpdateDirDialog(dirItem)">
-											Edit
+											<span 
+												class="text">
+												Edit
+											</span>
 										</button>
 										
 										<button 
 											class="btn delete-btn"
 											ng-click="openDeleteDirDialog(dirItem)">
-											Delete
+											<span 
+												class="text">
+												Delete
+											</span>
 										</button>
 									</div>
 								</td>
@@ -182,6 +188,7 @@
 
 							<tr ng-repeat="pic in pic.pics"
 								ng-click="activeDir(pic)"
+								ng-dblclick="openImageGallery(pic)"
 								ng-class="{active: pic.isActive}">
 								<td>
 									<checkbox
@@ -209,15 +216,24 @@
 								<td>
 									<div class="operation-btn-group">
 										<button
+											aria-label="{{pic.tooltip.text}}"
 											class="btn copy-link-btn"
-											ng-click="copyPictureLink(pic)">
-											Copy Link
+											ng-click="copyPictureLink(pic)"
+											ng-mouseleave="resetPictureTooltip(pic)">
+
+											<span 
+												class="text">
+												Copy Link
+											</span>
 										</button>
 										
 										<button 
 											class="btn delete-btn"
 											ng-click="openDeletePictureDialog(pic)">
-											Delete
+											<span 
+												class="text">
+												Delete
+											</span>
 										</button>
 									</div>
 									
@@ -242,6 +258,68 @@
 
 		<div class="preview-area"
 			ng-class="{extend: preview.show}">
+
+			<div
+				class="inner-wrapper" 
+				ng-if="activeItem != null">
+				<div 
+					class="name" 
+					title="{{activeItem.name}}">
+					<span ng-bind="activeItem.name"></span>
+				</div>
+
+				<div 
+					class="modify-date"
+					title="{{activeItem.date | date}}">
+					<span>Modify Date: </span>
+					<span ng-bind="activeItem.date | date"></span>
+				</div>
+
+				<div class="thumbnail-wrapper">
+					<img ng-src={{activeItem.thumbnail}}>
+				</div>
+			</div>
+			
+		</div>
+
+		<div class="image-gallery"
+			ng-if="imageGallery.show">
+
+			<button 
+				class="btn image-gallery-close-btn"
+				ng-click="closeImageGallery()">
+				X
+			</button>
+
+			<div class="image-wrapper">
+				<div class="inner-wrapper1">
+					<div class="inner-wrapper2">
+						<img
+							class="image" 
+							ng-src="{{imageGallery.image.url}}"
+						/>
+					</div>
+				</div>
+			</div>
+
+			<div class="sidebar">
+				<div 
+					class="name" 
+					title="{{imageGallery.image.name}}">
+					<span ng-bind="imageGallery.image.name"></span>
+				</div>
+
+				<div 
+					class="modify-date"
+					title="{{imageGallery.image.date | date}}">
+					<span>Modify Date: </span>
+					<span ng-bind="imageGallery.image.date | date"></span>
+				</div>
+
+				<div class="thumbnail-wrapper">
+					<img ng-src={{imageGallery.image.thumbnail}}>
+				</div>
+			</div>
 		</div>
 
 		<div>

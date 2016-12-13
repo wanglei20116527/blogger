@@ -33,17 +33,8 @@ angular.module("Backend").controller("articleWriteCtrl", [
 
 		$scope.isCtgySelectorShow = false;
 
-		$scope.showCtgySelector = function (show) {
-			showCtgySelector(!!show);
-		};
-
-		$scope.toggleCtgySelector = function () {
-			toggleCtgySelector();
-		};
-
 		$scope.changeCategory = function (category) {
 			changeCategory(category);
-			showCtgySelector(false);
 		};
 
 		$scope.togglePublishState = function () {
@@ -136,16 +127,5 @@ angular.module("Backend").controller("articleWriteCtrl", [
 			$scope.curtCategory     = category;
 			$scope.article.category = category.id;
 		}
-
-		function showCtgySelector (show) {
-			$scope.isCtgySelectorShow = !!show;
-		}
-
-		function toggleCtgySelector () {
-			$scope.isCtgySelectorShow = !$scope.isCtgySelectorShow;
-		}
-
-		angular.element()
-
 	}
 ]);

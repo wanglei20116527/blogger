@@ -41,3 +41,11 @@
     border-right: 4px solid transparent;
     border-left: 4px solid transparent;
 }
+
+.dropdown {
+	&:not(.open) {
+		.dropdown-menu {
+			display: none;
+		}
+	}
+}

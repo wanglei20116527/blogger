@@ -507,6 +507,9 @@ a:focus {
   border-right: 4px solid transparent;
   border-left: 4px solid transparent; }
 
+.dropdown:not(.open) .dropdown-menu {
+  display: none; }
+
 .animation-rotate {
   -webkit-animation: animateRotate 1s linear infinite;
   -mozanimation: animateRotate 1s linear infinite;
@@ -1264,6 +1267,32 @@ a:focus {
     .article-write .article-write-body .editormd {
       z-index: 100;
       border: none; }
+  .article-write .picture-select-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000; }
+    .article-write .picture-select-pane .picture-select-pane-header {
+      position: absolute;
+      top: 0;
+      left: 0; }
+    .article-write .picture-select-pane .picture-select-pane-body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      overflow: hidden;
+      background-color: #eceff1; }
+      .article-write .picture-select-pane .picture-select-pane-body iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        padding: 0; }
+    .article-write .picture-select-pane .picture-select-pane-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0; }
 
 .article-category {
   padding: 0 3rem; }
@@ -1362,7 +1391,7 @@ a:focus {
       -o-transition: all 0.3s ease-in-out;
       transition: all 0.3s ease-in-out; }
       .picture-page .picture-page-body .content-area.collapse {
-        padding-right: 20rem; }
+        padding-right: 22.5rem; }
       .picture-page .picture-page-body .content-area > .header .btn-group .btn {
         position: relative;
         display: inline-block;
@@ -1488,19 +1517,44 @@ a:focus {
             background-repeat: no-repeat;
             background-image: url("/backend/static/image/picture.icon.png"); }
           .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .btn {
+            position: relative;
             display: inline-block;
             display: inline-block;
             line-height: 2.4rem;
             color: #000;
             opacity: 1;
             text-decoration: underline; }
-            .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .btn:hover {
+            .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .btn:hover .text {
               opacity: .8; }
-            .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .btn.edit-btn, .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .btn.copy-link-btn {
-              color: #52A954;
-              margin-right: 1rem; }
-            .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .btn.delete-btn {
-              color: #F44336; }
+          .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .edit-btn,
+          .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .copy-link-btn {
+            color: #52A954;
+            margin-right: 1rem; }
+          .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .copy-link-btn:hover:before {
+            content: " ";
+            position: absolute;
+            bottom: -.5rem;
+            left: 50%;
+            border: .5rem solid transparent;
+            border-bottom-color: #000;
+            transform: translateX(-50%); }
+          .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .copy-link-btn:hover:after {
+            content: attr(aria-label);
+            position: absolute;
+            left: 50%;
+            top: 100%;
+            margin-top: .5rem;
+            padding: .3rem .8rem;
+            text-decoration: none;
+            color: #fff;
+            background: #000;
+            font-size: 1.2rem;
+            border-radius: .3rem;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.2); }
+          .picture-page .picture-page-body .content-area > .body .picture-directory-list table tbody .operation-btn-group .delete-btn {
+            color: #F44336; }
       .picture-page .picture-page-body .content-area > .body .pagination-wrapper {
         margin-top: 2rem;
         padding-left: 1rem;
@@ -1533,16 +1587,119 @@ a:focus {
       top: 0;
       width: 0;
       height: 100%;
-      padding-top: 6.4rem;
-      background-color: #fff;
-      -webkit-transition: width 0.3s ease-in-out;
-      -moz-transition: width 0.3s ease-in-out;
-      -ms-transition: width 0.3s ease-in-out;
-      -o-transition: width 0.3s ease-in-out;
-      transition: width 0.3s ease-in-out; }
+      color: #000;
+      font-size: 1.4rem;
+      padding-top: 8.5rem;
+      text-align: center;
+      overflow: hidden;
+      background-color: rgba(236, 239, 241, 0.56);
+      -webkit-transition: all 0.3s ease-in-out;
+      -moz-transition: all 0.3s ease-in-out;
+      -ms-transition: all 0.3s ease-in-out;
+      -o-transition: all 0.3s ease-in-out;
+      transition: all 0.3s ease-in-out; }
       .picture-page .picture-page-body .preview-area.extend {
-        width: 20rem;
+        width: 22.5rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
         box-shadow: -0.2rem 0 0.4rem 0 rgba(0, 0, 0, 0.4); }
+      .picture-page .picture-page-body .preview-area .inner-wrapper {
+        width: 18.5rem; }
+        .picture-page .picture-page-body .preview-area .inner-wrapper .name,
+        .picture-page .picture-page-body .preview-area .inner-wrapper .modify-date {
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          -webkit-text-overflow: ellipsis;
+          -moz-text-overflow: ellipsis;
+          -ms-text-overflow: ellipsis;
+          -o-text-overflow: ellipsis;
+          text-overflow: ellipsis; }
+        .picture-page .picture-page-body .preview-area .inner-wrapper .name {
+          margin-bottom: .5rem; }
+        .picture-page .picture-page-body .preview-area .inner-wrapper .modify-date {
+          margin-bottom: 1rem; }
+        .picture-page .picture-page-body .preview-area .inner-wrapper .thumbnail-wrapper {
+          position: relative;
+          width: 100%;
+          overflow: hidden; }
+          .picture-page .picture-page-body .preview-area .inner-wrapper .thumbnail-wrapper img {
+            max-width: 100%; }
+    .picture-page .picture-page-body .image-gallery {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      text-align: center;
+      background-color: #000; }
+      .picture-page .picture-page-body .image-gallery .image-gallery-close-btn {
+        position: absolute;
+        width: 4rem;
+        height: 4rem;
+        line-height: 4rem;
+        text-align: center;
+        right: 0;
+        top: 0;
+        z-index: 3;
+        font-size: 3rem;
+        color: #fff;
+        background-color: rgba(102, 102, 102, 0.3); }
+      .picture-page .picture-page-body .image-gallery .image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding-right: 22.5rem;
+        overflow: auto; }
+        .picture-page .picture-page-body .image-gallery .image-wrapper .inner-wrapper1 {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          padding: 4rem;
+          background-color: rgba(102, 102, 102, 0.3); }
+          .picture-page .picture-page-body .image-gallery .image-wrapper .inner-wrapper1 .inner-wrapper2 {
+            position: relative;
+            width: 100%;
+            height: 100%; }
+            .picture-page .picture-page-body .image-gallery .image-wrapper .inner-wrapper1 .inner-wrapper2 .image {
+              position: absolute;
+              max-width: 100%;
+              max-height: 100%;
+              margin: auto;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0; }
+      .picture-page .picture-page-body .image-gallery .sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 22.5rem;
+        height: 100%;
+        padding: 4rem 2rem 0;
+        font-size: 1.4rem;
+        color: #fff; }
+        .picture-page .picture-page-body .image-gallery .sidebar .name,
+        .picture-page .picture-page-body .image-gallery .sidebar .modify-date {
+          white-space: nowrap;
+          overflow: hidden;
+          -webkit-text-overflow: ellipsis;
+          -moz-text-overflow: ellipsis;
+          -ms-text-overflow: ellipsis;
+          -o-text-overflow: ellipsis;
+          text-overflow: ellipsis;
+          width: 100%; }
+        .picture-page .picture-page-body .image-gallery .sidebar .name {
+          margin-bottom: .5rem; }
+        .picture-page .picture-page-body .image-gallery .sidebar .modify-date {
+          margin-bottom: 1rem; }
+        .picture-page .picture-page-body .image-gallery .sidebar .thumbnail-wrapper {
+          position: relative;
+          width: 100%;
+          overflow: hidden; }
+          .picture-page .picture-page-body .image-gallery .sidebar .thumbnail-wrapper img {
+            max-width: 100%; }
   .picture-page .picture-upload-pane {
     position: fixed;
     width: 500px;
@@ -1596,6 +1753,7 @@ a:focus {
 
 .app > .header {
   position: fixed;
+  z-index: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -1666,6 +1824,7 @@ a:focus {
     .app > .header .header-profile .logout-btn .icon:hover {
       color: #fff; }
 .app > .menu-bar, .app > .body {
+  z-index: 1;
   height: 100%;
   padding-top: 6.4rem;
   background-color: rgba(236, 239, 241, 0.56); }
@@ -1767,6 +1926,7 @@ a:focus {
         font-size: 1.6rem; }
 .app > .body {
   position: relative;
+  z-index: 1;
   width: 100%;
   min-width: 110rem;
   height: 100%; }

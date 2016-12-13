@@ -20,7 +20,7 @@
                     transition: all 0.3s ease-in-out;
 
             &.collapse {
-                padding-right: 20rem;
+                padding-right: 22.5rem;
             }
 
             & > .header {
@@ -162,6 +162,7 @@
                         vertical-align: middle;
                         border-collapse: collapse;
                         box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+                        
 
                         tr {
                             border-top: 1px solid #f3efef;
@@ -228,6 +229,7 @@
 
                             .operation-btn-group {
                                 .btn {
+                                    position: relative;
                                     display: inline-block;
                                     display: inline-block;
                                     line-height: 2.4rem;
@@ -236,20 +238,51 @@
                                     text-decoration: underline;
                                     
                                     &:hover {
-                                        opacity: .8;
-                                    }
-                                    
-                                    &.edit-btn,
-                                    &.copy-link-btn {
-                                        color: $green;
-                                        margin-right: 1rem;
-                                        
-                                    }
-
-                                    &.delete-btn {
-                                        color: $red;
+                                        .text {
+                                            opacity: .8;
+                                        }
                                     }
                                 }
+
+                                .edit-btn,
+                                .copy-link-btn {
+                                    color: $green;
+                                    margin-right: 1rem;
+                                }
+
+                                .copy-link-btn {
+                                    &:hover:before {
+                                        content: " ";
+                                        position: absolute;                               
+                                        bottom: -.5rem;
+                                        left: 50%;
+                                        border: .5rem solid transparent;
+                                        border-bottom-color: $black;
+                                        transform: translateX(-50%);
+                                    }
+
+                                    &:hover:after {
+                                        content: attr(aria-label);
+                                        position: absolute;
+                                        left: 50%;
+                                        top: 100%;
+                                        margin-top: .5rem;
+                                        padding: .3rem .8rem;
+                                        text-decoration: none;
+                                        color: $white;
+                                        background: $black;
+                                        font-size: 1.2rem;
+                                        border-radius: .3rem;
+                                        transform: translateX(-50%);
+                                        white-space: nowrap;
+                                        box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);
+                                    }
+                                }
+
+                                .delete-btn {
+                                    color: $red;
+                                }
+
                             }                            
                         }
                     }
@@ -309,23 +342,150 @@
             top: 0;
             width: 0;
             height: 100%;
-            padding-top: 6.4rem;
-            // background-color: rgba(236, 239, 241, 0.56);
-            background-color: $white;
+            color: $black;
+            font-size: 1.4rem;
+            padding-top: 8.5rem;
+            text-align: center;
+            overflow: hidden;
+            
+            background-color: rgba(236, 239, 241, 0.56);
 
-            -webkit-transition: width 0.3s ease-in-out;
-            -moz-transition: width 0.3s ease-in-out;
-                -ms-transition: width 0.3s ease-in-out;
-                -o-transition: width 0.3s ease-in-out;
-                    transition: width 0.3s ease-in-out;
+            -webkit-transition: all 0.3s ease-in-out;
+            -moz-transition: all 0.3s ease-in-out;
+                -ms-transition: all 0.3s ease-in-out;
+                -o-transition: all 0.3s ease-in-out;
+                    transition: all 0.3s ease-in-out;
             
 
             &.extend {
-                width: 20rem;
+                width: 22.5rem;
+                padding-left: 2rem;
+                padding-right: 2rem;
                 box-shadow: -0.2rem 0 0.4rem 0 rgba(0, 0, 0, 0.4);
+            }
+
+            .inner-wrapper {
+                width: 18.5rem;
+                
+                .name,
+                .modify-date {
+                    width: 100%;
+                    @include textOverflowEllipsis(); 
+                }
+
+                .name {
+                    margin-bottom: .5rem;
+                }
+
+                .modify-date {
+                    margin-bottom: 1rem;
+                }
+
+                .thumbnail-wrapper {
+                    position: relative;
+                    width: 100%;
+                    overflow: hidden;
+
+                    img {
+                        max-width: 100%;    
+                    }
+                }
             }
         }
 
+        .image-gallery {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            text-align: center;
+            background-color: $black;
+
+            .image-gallery-close-btn {
+                position: absolute;
+                width: 4rem;
+                height: 4rem;
+                line-height: 4rem;
+                text-align: center;
+                right: 0;
+                top: 0;
+                z-index: 3;
+                font-size: 3rem;
+                color: $white;
+                background-color: transparentize($grey, 0.7);
+            }
+
+            .image-wrapper {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                padding-right: 22.5rem;
+                overflow: auto;
+
+                .inner-wrapper1 {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    padding: 4rem;
+                    background-color: transparentize($grey, 0.7);
+
+                    .inner-wrapper2 {
+                        position: relative;
+                        width: 100%;
+                        height: 100%;
+
+                        .image {
+                            position: absolute;
+                            max-width: 100%;
+                            max-height: 100%;
+                            margin: auto;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                        }
+
+                    }
+                }
+            }
+
+            .sidebar {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 22.5rem;
+                height: 100%;
+                padding: 4rem 2rem 0;
+                font-size: 1.4rem;
+                color: $white;
+
+                .name,
+                .modify-date {
+                    @include textOverflowEllipsis();
+                    width: 100%;
+                }
+                
+                .name {
+                    margin-bottom: .5rem;
+                }
+
+                .modify-date {
+                    margin-bottom: 1rem;
+                }
+
+                .thumbnail-wrapper {
+                    position: relative;
+                    width: 100%;
+                    overflow: hidden;
+
+                    img {
+                        max-width: 100%;    
+                    }
+                }
+            }
+        }
         
     }
 

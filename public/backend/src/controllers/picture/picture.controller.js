@@ -43,7 +43,8 @@ angular.module("Backend").controller("pictureCtrl", [
 		};
 
 		$scope.preview = {
-			show: false
+			show: false,
+			item: null
 		};
 
 		$scope.pagination = {
@@ -51,6 +52,13 @@ angular.module("Backend").controller("pictureCtrl", [
 			curtPage: 1,
 			numPerPage: NUMBER_PRE_PAGE,
 		};
+
+		$scope.imageGallery = {
+			show: false,
+			image: null
+		};
+
+		$scope.activeItem = null;
 
 		$scope.hasChecked   = false;
 		$scope.isAllChecked = false;
@@ -408,9 +416,14 @@ angular.module("Backend").controller("pictureCtrl", [
 
 			if (Clipboard.isSupportCopy()) {
 				Clipboard.copyText(link);
+				pic.tooltip.text = "Copied!";
 			} else {
 				openCopyPictureLinkDialog(link);
 			}
+		};
+
+		$scope.resetPictureTooltip = function (pic) {
+			pic.tooltip.text = "Copy to clipboard";
 		};
 
 		$scope.activeDir = function (dir) {
@@ -431,6 +444,14 @@ angular.module("Backend").controller("pictureCtrl", [
 			}).catch(function (err) {
 				console.error(err);
 			});
+		};
+
+		$scope.openImageGallery = function (image) {
+			openImageGallery(image);
+		};
+
+		$scope.closeImageGallery = function () {
+			closeImageGallery();
 		};
 
 		init();	
@@ -902,6 +923,9 @@ angular.module("Backend").controller("pictureCtrl", [
 						pic.index = numberOfDirs + start + index;
 						pic.isChecked = false;
 						pic.isActive  = false;
+						pic.tooltip = {
+							text: "Copy to clipboard"
+						};
 					});
 
 					pics = $scope.pic.pics = pics || [];
@@ -941,6 +965,8 @@ angular.module("Backend").controller("pictureCtrl", [
 				.then(function () {
 					$scope.hasChecked   = false;
 					$scope.isAllChecked = false;
+
+					$scope.activeItem = null;
 
 					updateUrlPage(curtPage);
 
@@ -989,6 +1015,14 @@ angular.module("Backend").controller("pictureCtrl", [
 			}
 
 			return page;
+		}
+
+		function previewPicture (pic) {
+			$scope.preview.item = pic;
+		}
+
+		function previewDir (dir) {
+			$scope.preview.item = dir;
 		}
 
 		function initPictureUploadEvents () {
@@ -1304,6 +1338,8 @@ angular.module("Backend").controller("pictureCtrl", [
 			});
 
 			item.isActive = true;
+
+			$scope.activeItem = item;
 		}
 
 		function batchDelete () {
@@ -1384,6 +1420,16 @@ angular.module("Backend").controller("pictureCtrl", [
 		function closeDeletePictureDialog () {
 			$scope.deletePictureDialogConfig.show = false;
 			$scope.deletePictureDialogConfig.pic  = null;
+		}
+
+		function openImageGallery (image) {
+			$scope.imageGallery.show  = true;
+			$scope.imageGallery.image = image; 
+		}
+
+		function closeImageGallery () {
+			$scope.imageGallery.show  = false;
+			$scope.imageGallery.image = null;
 		}
 
 		function openCopyPictureLinkDialog (link) {

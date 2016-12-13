@@ -13,14 +13,13 @@ angular.module("Backend").directive("wlEditor", [
 		Uuid, 
 		Directory, 
 		Picture) {
-
+			
 		return {
 			restrict: 'E',
 			scope: {
 				content: "@?",
 				onCtrlS: "&?",
-				onChange: "&?",
-				
+				onChange: "&?",	
 			},
 
 			templateUrl: "/backend/static/src/directives/editor/editor.html",
@@ -53,8 +52,8 @@ angular.module("Backend").directive("wlEditor", [
 							"hr", "|",
 							"link", 
 							"reference-link", 
-							"image", 
-							// "picture", 
+							// "image", 
+							"picture", 
 							"code", 
 							"code-block", 
 							"table", 
@@ -88,9 +87,10 @@ angular.module("Backend").directive("wlEditor", [
 
 					toolbarHandlers: {
 						picture: function (cm, icon, cursor, selection) {
-							scope.$apply(function () {
-								showPictureDialog(true);
-							});
+							debugger;
+							// scope.$apply(function () {
+							// 	showPictureDialog(true);
+							// });
 						}
 					},
 

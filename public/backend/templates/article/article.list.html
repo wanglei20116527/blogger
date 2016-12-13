@@ -19,48 +19,54 @@
 				</li>
 
 				<li class="fl btn-wrapper">
-					<button 
-						class="btn category-selector-btn"
-						ng-click="articleList.toggleCategorySelector()">
-						<span
-							ng-bind="articleList.categorySelector.curtCategory.name">
-						</span>
-						<span class="icon caret"></span>
-					</button>
+					 <div uib-dropdown>
+						<button 
+							uib-dropdown-toggle
+							class="btn category-selector-btn">
+							<span
+								ng-bind="articleList.categorySelector.curtCategory.name">
+							</span>
+							<span class="icon caret"></span>
+						</button>
 
-					<ul class="category-selector"
-						ng-show="articleList.categorySelector.show">
-						<li class="item"
-							ng-click="articleList.updateCategory(defaultCategory)">
-							<a ng-bind="defaultCategory.name"></a>
-						</li>
+						<ul class="category-selector dropdown-menu"
+							uib-dropdown-menu 
+							aria-labelledby="simple-dropdown">
+							<li class="item"
+								ng-click="articleList.updateCategory(defaultCategory)">
+								<a ng-bind="defaultCategory.name"></a>
+							</li>
 
-						<li class="item"
-							ng-repeat="category in categories"
-							ng-click="articleList.updateCategory(category)">
-							<a ng-bind="category.name"></a>
-						</li>
-					</ul>
+							<li class="item"
+								ng-repeat="category in categories"
+								ng-click="articleList.updateCategory(category)">
+								<a ng-bind="category.name"></a>
+							</li>
+						</ul>
+					 </div>	
 				</li>
 
 				<li class="fl btn-wrapper">
-					<button 
-						class="btn publish-selector-btn"
-						ng-click="articleList.togglePublishSelector()">
-						<span
-							ng-bind="articleList.publishSelector.curtItem.name">
-						</span>
-						<span class="icon caret"></span>
-					</button>
-
-					<ul class="publish-selector"
-						ng-show="articleList.publishSelector.show">
-						<li class="item"
-							ng-repeat="publishItem in publishList"
-							ng-click="articleList.updatePublishSelecorItem(publishItem)">
-							<a ng-bind="publishItem.name"></a>
-						</li>
-					</ul>
+					<div uib-dropdown>
+						<button
+							uib-dropdown-toggle
+							class="btn publish-selector-btn">
+							<span
+								ng-bind="articleList.publishSelector.curtItem.name">
+							</span>
+							<span class="icon caret"></span>
+						</button>
+					
+						<ul class="publish-selector dropdown-menu"
+							uib-dropdown-menu 
+							aria-labelledby="simple-dropdown">
+							<li class="item"
+								ng-repeat="publishItem in publishList"
+								ng-click="articleList.updatePublishSelecorItem(publishItem)">
+								<a ng-bind="publishItem.name"></a>
+							</li>
+						</ul>
+					</div>
 				</li>
 
 				<li class="fl btn-wrapper">
@@ -183,18 +189,21 @@
 					/>
 				</div>
 
-				<div class="category-selector fl">
+				<div 
+					class="category-selector fl" 
+					uib-dropdown>
+
 					<button 
-						class="btn category-selector-btn"
-						ng-click="articleEdit.toggleCategorySelector()">
+						uib-dropdown-toggle
+						class="btn category-selector-btn">
 						<span 
 							ng-bind="articleEdit.categorySelector.curtCategory.name">
 						</span>
 						<span class="icon caret"></span>
 					</button>
 
-					<ul class="categoires"
-						ng-show="articleEdit.categorySelector.show">
+					<ul uib-dropdown-menu
+						class="categoires dropdown-menu">
 						<li class="category-item"
 							ng-repeat="category in categories">
 							<a ng-bind="category.name"

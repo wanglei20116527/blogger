@@ -102,12 +102,10 @@ angular.module("Backend").controller("articleListCtrl", [
 			numPerPage: NUMBER_PER_PAGE,
 
 			categorySelector: {
-				show: false,
 				curtCategory: DEFAULT_CATEGORY,
 			},
 
 			publishSelector: {
-				show: false,
 				curtItem: PUBLISH_LIST[0]
 			},
 
@@ -144,29 +142,11 @@ angular.module("Backend").controller("articleListCtrl", [
 				});
 			},
 
-			showCategorySelector: function (show) {
-				this.categorySelector.show = !!show;
-			},
-
-			toggleCategorySelector: function () {
-				this.categorySelector.show = !this.categorySelector.show;
-			},
-
 			updateCategory: function (category) {
-				this.categorySelector.show = false;
 				this.categorySelector.curtCategory = category;
 			},
 
-			showPublishSelector: function (show) {
-				this.publishSelector.show = !!show;
-			},
-
-			togglePublishSelector: function () {
-				this.publishSelector.show = !this.publishSelector.show;
-			},
-
 			updatePublishSelecorItem: function (item) {
-				this.publishSelector.show = false;
 				this.publishSelector.curtItem = item;
 			},
 
@@ -226,7 +206,6 @@ angular.module("Backend").controller("articleListCtrl", [
 			article: null,
 
 			categorySelector: {
-				show: false,
 				curtCategory: null,
 			},
 
@@ -237,14 +216,6 @@ angular.module("Backend").controller("articleListCtrl", [
 				$scope.articleList.show = true;
 			},
 
-			showCategorySelector: function (show) {
-				this.categorySelector.show = !!show;
-			},
-
-			toggleCategorySelector: function () {
-				this.categorySelector.show = !this.categorySelector.show;
-			},
-
 			togglePublishState: function () {
 				this.article.isPublish = !this.article.isPublish;
 			},
@@ -252,7 +223,6 @@ angular.module("Backend").controller("articleListCtrl", [
 			changeCategory: function (category) {
 				this.article.category = category;
 
-				this.categorySelector.show = false;
 				this.categorySelector.curtCategory = category;
 			},
 
@@ -266,7 +236,6 @@ angular.module("Backend").controller("articleListCtrl", [
 			},
 
 			updateArticle: function () {
-				debugger;
 				updateArticle(this.article).then(function () {
 					console.log("update article success");
 				}).catch(function (err) {
