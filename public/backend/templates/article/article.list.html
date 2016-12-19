@@ -170,7 +170,8 @@
 	</div>
 
 	<div ng-if="!isLoading && statistic.total > 0 && articleEdit.show" 
-		class="article-edit-area">
+		class="article-edit-area"
+		ng-show="!articleEdit.pictureSelectPaneOption.show">
 		<header class="article-edit-header">
 			<div class="back-btn-wrapper clearfix">
 				<button
@@ -241,8 +242,39 @@
 			<wl-editor
 				content="{{articleEdit.article.markdown}}"
 				on-ctrl-s="articleEdit.updateArticle()"
-				on-change="articleEdit.onContentChange(html, markdown)">		
+				on-change="articleEdit.onContentChange(html, markdown)"
+				on-picture-select="articleEdit.onPictureSelect(isFullScreen)">		
 			</wl-editor>
 		</div>
+	</div>
+
+	<div 
+		class="picture-select-pane" 
+		ng-show="articleEdit.pictureSelectPaneOption.show"
+		ng-class="{'full-screen': articleEdit.pictureSelectPaneOption.isFullScreen}">
+		<div class="picture-select-pane-body">
+			<iframe
+				id="picture-select-iframe"
+				scrolling="yes"
+				frameborder="0"
+				src="/backend/static/templates/picture/picture.select.pane.template.html">
+			</iframe>
+		</div>
+
+		<footer class="picture-select-pane-footer clearfix">
+			<div class="btn-group clearfix fr">
+				<button 
+					class="btn cancel-btn fl"
+					ng-click="articleEdit.onPictureSelectCancel()">
+					<span class="text">Cancel</span>
+				</button>
+
+				<button
+					class="btn confirm-btn fl"
+					ng-click="articleEdit.onPictureSelectConfirm()">
+					<span class="text">Confirm</span>
+				</button>
+			</div>
+		</footer>
 	</div>
 </div>

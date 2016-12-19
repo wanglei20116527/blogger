@@ -7,7 +7,8 @@
 		<h1> no category, please add a category first</h1>
 	</div>
 	
-	<div ng-if="categoires.length > 0 && !isLoading">
+	<div ng-if="categoires.length > 0 && !isLoading"
+		ng-show="!pictureSelectPaneOption.show">
 		<header class="article-write-header clearfix">
 			<div class="article-title fl">
 				<span>Title</span>
@@ -65,39 +66,36 @@
 		<div class="article-write-body">
 			<wl-editor
 				on-ctrl-s="saveArticle()"
-				on-change="onContentChange(html, markdown)">
+				on-change="onContentChange(html, markdown)"
+				on-picture-select="onPictureSelect(isFullScreen)">
 			</wl-editor>
 		</div>
-
 	</div>
 
-	<div class="picture-select-pane">
-		<header class="picture-select-pane-header">
-			<div class="btn-group">
-				<button 
-					class="btn picture-select-pane-close-btn">
-					X
-				</button>
-			</div>
-		</header>
-
+	<div 
+		class="picture-select-pane" 
+		ng-show="pictureSelectPaneOption.show"
+		ng-class="{'full-screen': pictureSelectPaneOption.isFullScreen}">
 		<div class="picture-select-pane-body">
 			<iframe
+				id="picture-select-iframe"
 				scrolling="yes"
 				frameborder="0"
 				src="/backend/static/templates/picture/picture.select.pane.template.html">
 			</iframe>
 		</div>
 
-		<footer class="picture-select-pane-footer">
-			<div class="btn-group clearfix">
+		<footer class="picture-select-pane-footer clearfix">
+			<div class="btn-group clearfix fr">
 				<button 
-					class="btn cancel-btn">
+					class="btn cancel-btn fl"
+					ng-click="onPictureSelectCancel()">
 					<span class="text">Cancel</span>
 				</button>
 
 				<button
-					class="btn confirm-btn">
+					class="btn confirm-btn fl"
+					ng-click="onPictureSelectConfirm()">
 					<span class="text">Confirm</span>
 				</button>
 			</div>

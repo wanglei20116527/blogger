@@ -2,4 +2,70 @@
 	<div class="editormd">
     	<textarea style="display:none;"></textarea>
 	</div>
+
+	<wl-dialog
+				ng-show="deleteArticleDialogOption.show"
+				title="{{deleteArticleDialogOption.title}}"
+				buttons="deleteArticleDialogOption.buttons"
+				on-close="deleteArticleDialogOption.onClose()">
+				<p>Are you sure to delete this article ?</p>
+			</wl-dialog>
+
+	<wl-dialog
+		ng-if="picSelectDialogOption.show"
+		title="{{picSelectDialogOption.title}}"
+		buttons="picSelectDialogOption.buttons"
+		on-close="picSelectDialogOption.onClose()">
+		
+		<div>
+			<table>
+				<tr>
+					<td>
+						<span>Picture Address:</span>
+					</td>
+					
+					<td>
+						<input 
+							type="text" 
+							ng-model="picSelectDialogOption.picUrl"
+						/>
+					</td>
+
+					<td>
+						<button 
+							class="btn pic-select-btn"
+							ng-click="selectPic()">
+							Select Picture
+						</button>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<span>Description: </span>
+					</td>
+					
+					<td>
+						<input 
+							type="text" 
+							ng-model="picSelectDialogOption.desc"
+						/>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<span>Picture Link: </span>
+					</td>
+					
+					<td>
+						<input 
+							type="text" 
+							ng-model="picSelectDialogOption.linkUrl"
+						/>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</wl-dialog>
 </div>

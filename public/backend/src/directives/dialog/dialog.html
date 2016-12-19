@@ -1,5 +1,5 @@
-<div class="dialog">
-	<div class="wrapper">
+<div class="dialog" ng-click="close()">
+	<div class="wrapper" ng-click="preventDefault($event)">
 		<div class="dialog-header clearfix">
 			<h4 class="title fl" ng-bind="title"></h4>	
 			<button class="btn btn-close icon iconfont fr"

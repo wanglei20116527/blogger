@@ -415,8 +415,12 @@ angular.module("Backend").controller("pictureCtrl", [
 				link += pic.url;
 
 			if (Clipboard.isSupportCopy()) {
-				Clipboard.copyText(link);
-				pic.tooltip.text = "Copied!";
+				if (Clipboard.copyText(link)) {
+					pic.tooltip.text = "Copied!";
+				} else {
+					pic.tooltip.text = "Copy Failed!";
+				}
+			
 			} else {
 				openCopyPictureLinkDialog(link);
 			}

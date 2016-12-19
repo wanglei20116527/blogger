@@ -3,9 +3,15 @@ angular.module("Backend").service("Clipboard", [
     "$timeout",
 
 	function ($document, $timeout) {
+        var textareaId = [
+            "wl",
+            "clipboard",
+            "textarea"
+        ].join("-");
+
         this.isSupportCopy = function () {
             var document = $document[0];
-            var textarea = document.createElement("textarea");
+            var textarea = getTextarea();
 
             if (!("select" in textarea)) {
                 return false;
@@ -28,22 +34,13 @@ angular.module("Backend").service("Clipboard", [
             try {
 
                 var document = $document[0];
-                var textarea = document.createElement("textarea");
-                
-                textarea.value = text;
-                textarea.style.position = "fixed";
-                textarea.style.left = "-1000px";
-                textarea.style.top  = "-1000px";
-                
-                document.body.appendChild(textarea);
-                
+                var textarea = getTextarea();
 
+                textarea.value = text;
+                
                 textarea.select();
                 
                 isSuccess = document.execCommand("copy");
-                
-                document.body.removeChild(textarea);
-
             } catch (err) {
                 console.error(err);
                 isSuccess = false;
@@ -51,5 +48,27 @@ angular.module("Backend").service("Clipboard", [
 
             return isSuccess;
         };
+
+        this.getText = function () {
+            return getTextarea().value;
+        };
+        
+
+        function getTextarea () {
+            var document = $document[0];
+            var textarea = document.getElementById(textareaId);
+
+            if (textarea == null) {
+                textarea    = document.createElement("textarea");
+                textarea.id = textareaId;
+                textarea.style.position = "fixed";
+                textarea.style.top  = "-10000000px";
+                textarea.style.left = "-10000000px";
+
+                document.body.appendChild(textarea);
+            }
+
+            return textarea;
+        }
 	}
 ]);

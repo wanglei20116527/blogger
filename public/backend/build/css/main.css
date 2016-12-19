@@ -776,13 +776,14 @@ a:focus {
   font-size: 1.6rem; }
 
 .dialog {
-  position: absolute;
-  z-index: 100;
+  position: fixed;
+  z-index: 100000;
   top: 0;
   left: 0;
   width: 100%;
-  height: 0;
+  height: 100%;
   text-align: center;
+  background-color: rgba(0, 0, 0, 0.6);
   -webkit-user-select: none;
   user-select: none; }
   .dialog.model-dialog {
@@ -790,11 +791,14 @@ a:focus {
     background-color: rgba(0, 0, 0, 0.4); }
   .dialog > .wrapper {
     display: inline-block;
-    margin-top: 10rem;
+    position: absolute;
+    left: 0;
+    top: 0;
     border-radius: 2px;
     background-color: #fff;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4); }
     .dialog > .wrapper .dialog-header {
+      cursor: move;
       padding: 1.4rem 2.5rem;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
       .dialog > .wrapper .dialog-header > .title {
@@ -1175,6 +1179,64 @@ a:focus {
       .article-list .article-edit-area .article-edit-body .editormd {
         z-index: 100;
         border: none; }
+  .article-list .picture-select-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 6rem; }
+    .article-list .picture-select-pane.full-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000; }
+      .article-list .picture-select-pane.full-screen .picture-select-pane-footer {
+        position: fixed;
+        z-index: 10000; }
+    .article-list .picture-select-pane .picture-select-pane-body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      overflow: hidden;
+      background-color: #eceff1; }
+      .article-list .picture-select-pane .picture-select-pane-body iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        padding: 0; }
+    .article-list .picture-select-pane .picture-select-pane-footer {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      padding: 1rem 3rem;
+      box-shadow: 0 -0.2rem 0.4rem rgba(0, 0, 0, 0.5);
+      background-color: #eceff1; }
+      .article-list .picture-select-pane .picture-select-pane-footer .btn {
+        position: relative;
+        display: inline-block;
+        height: 3.6rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+        line-height: 3.6rem;
+        text-align: center;
+        color: #fff;
+        font-size: 1.4rem;
+        opacity: 1;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.2);
+        -webkit-transition: all 0.2s ease-in-out;
+        -moz-transition: all 0.2s ease-in-out;
+        -ms-transition: all 0.2s ease-in-out;
+        -o-transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out; }
+        .article-list .picture-select-pane .picture-select-pane-footer .btn:hover {
+          opacity: 0.8; }
+      .article-list .picture-select-pane .picture-select-pane-footer .cancel-btn {
+        margin-right: 1.5rem;
+        background-color: rgba(102, 102, 102, 0.6); }
+      .article-list .picture-select-pane .picture-select-pane-footer .confirm-btn {
+        background-color: #1976D2; }
 
 .article-write {
   position: relative;
@@ -1273,11 +1335,15 @@ a:focus {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1000; }
-    .article-write .picture-select-pane .picture-select-pane-header {
-      position: absolute;
+    padding-bottom: 6rem; }
+    .article-write .picture-select-pane.full-screen {
+      position: fixed;
       top: 0;
-      left: 0; }
+      left: 0;
+      z-index: 1000; }
+      .article-write .picture-select-pane.full-screen .picture-select-pane-footer {
+        position: fixed;
+        z-index: 10000; }
     .article-write .picture-select-pane .picture-select-pane-body {
       width: 100%;
       height: 100%;
@@ -1291,8 +1357,36 @@ a:focus {
         padding: 0; }
     .article-write .picture-select-pane .picture-select-pane-footer {
       position: absolute;
+      width: 100%;
       bottom: 0;
-      left: 0; }
+      left: 0;
+      padding: 1rem 3rem;
+      box-shadow: 0 -0.2rem 0.4rem rgba(0, 0, 0, 0.5);
+      background-color: #eceff1; }
+      .article-write .picture-select-pane .picture-select-pane-footer .btn {
+        position: relative;
+        display: inline-block;
+        height: 3.6rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+        line-height: 3.6rem;
+        text-align: center;
+        color: #fff;
+        font-size: 1.4rem;
+        opacity: 1;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.2);
+        -webkit-transition: all 0.2s ease-in-out;
+        -moz-transition: all 0.2s ease-in-out;
+        -ms-transition: all 0.2s ease-in-out;
+        -o-transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out; }
+        .article-write .picture-select-pane .picture-select-pane-footer .btn:hover {
+          opacity: 0.8; }
+      .article-write .picture-select-pane .picture-select-pane-footer .cancel-btn {
+        margin-right: 1.5rem;
+        background-color: rgba(102, 102, 102, 0.6); }
+      .article-write .picture-select-pane .picture-select-pane-footer .confirm-btn {
+        background-color: #1976D2; }
 
 .article-category {
   padding: 0 3rem; }
@@ -1753,7 +1847,6 @@ a:focus {
 
 .app > .header {
   position: fixed;
-  z-index: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -1824,7 +1917,6 @@ a:focus {
     .app > .header .header-profile .logout-btn .icon:hover {
       color: #fff; }
 .app > .menu-bar, .app > .body {
-  z-index: 1;
   height: 100%;
   padding-top: 6.4rem;
   background-color: rgba(236, 239, 241, 0.56); }
@@ -1834,12 +1926,7 @@ a:focus {
   left: 0;
   width: 22.5rem;
   overflow: hidden;
-  box-shadow: 0.2rem 0 0.4rem 0 rgba(0, 0, 0, 0.4);
-  -webkit-transition: width 0.3s ease-in-out;
-  -moz-transition: width 0.3s ease-in-out;
-  -ms-transition: width 0.3s ease-in-out;
-  -o-transition: width 0.3s ease-in-out;
-  transition: width 0.3s ease-in-out; }
+  box-shadow: 0.2rem 0 0.4rem 0 rgba(0, 0, 0, 0.4); }
   .app > .menu-bar.collapse {
     width: 0; }
   .app > .menu-bar nav {
@@ -1863,12 +1950,7 @@ a:focus {
         height: auto;
         max-height: 0;
         background-color: rgba(207, 216, 220, 0.56);
-        overflow: hidden;
-        -webkit-transition: max-height .3s ease-in-out;
-        -moz-transition: max-height .3s ease-in-out;
-        -ms-transition: max-height .3s ease-in-out;
-        -o-transition: max-height .3s ease-in-out;
-        transition: max-height .3s ease-in-out; }
+        overflow: hidden; }
         .app > .menu-bar nav .main-menu > li ul li:hover a {
           background-color: rgba(255, 255, 255, 0.24); }
       .app > .menu-bar nav .main-menu > li.active > a {
@@ -1926,7 +2008,6 @@ a:focus {
         font-size: 1.6rem; }
 .app > .body {
   position: relative;
-  z-index: 1;
   width: 100%;
   min-width: 110rem;
   height: 100%; }
@@ -1934,12 +2015,7 @@ a:focus {
     position: relative;
     width: 100%;
     height: 100%;
-    padding-left: 22.5rem;
-    -webkit-transition: padding 0.3s ease-in-out;
-    -moz-transition: padding 0.3s ease-in-out;
-    -ms-transition: padding 0.3s ease-in-out;
-    -o-transition: padding 0.3s ease-in-out;
-    transition: padding 0.3s ease-in-out; }
+    padding-left: 22.5rem; }
     .app > .body .view .page {
       position: relative;
       width: 100%;

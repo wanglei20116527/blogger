@@ -1,6 +1,7 @@
 angular.module("Backend").controller("articleListCtrl", [
 	"$scope",
 	"$q",
+	"$window",
 	"User",
 	"Category",
 	"Article",
@@ -8,6 +9,7 @@ angular.module("Backend").controller("articleListCtrl", [
 	function (
 			$scope,
 			$q,
+			$window,
 			User,
 			Category,
 			Article
@@ -209,6 +211,13 @@ angular.module("Backend").controller("articleListCtrl", [
 				curtCategory: null,
 			},
 
+			pictureSelectPaneOption: {
+				show: false,
+				resolveFunc: null,
+				rejectFunc: null,
+				isFullScreen: false,
+			},
+
 			backToArticleList: function () {
 				this.show = false;
 				this.article = null;
@@ -242,6 +251,35 @@ angular.module("Backend").controller("articleListCtrl", [
 					console.error(err);
 				});
 			},
+
+			onPictureSelectCancel: function () {
+				var resolveFunc = this.pictureSelectPaneOption.resolveFunc;
+
+				resolveFunc({
+					selected: false
+				});
+
+				hidePictureSelectPane();
+			},
+
+			onPictureSelectConfirm: function () {
+				var resolveFunc = this.pictureSelectPaneOption.resolveFunc;
+
+				var url = getCopyedImageUrl();
+				
+				resolveFunc({
+					selected: true,
+					url: url
+				});
+
+				hidePictureSelectPane();
+			},
+
+			onPictureSelect: function (isFullScreen) {
+				return $q(function (resolve, reject) {
+					showPictureSelectPane(isFullScreen, resolve, reject);
+				});
+			}
 		};
 
 		$scope.defaultCategory = DEFAULT_CATEGORY;
@@ -474,6 +512,35 @@ angular.module("Backend").controller("articleListCtrl", [
 		function closeDeleteArticleDialog () {
 			$scope.deleteArticleDialogOption.show = false;
 			$scope.deleteArticleDialogOption.article = null;
+		}
+
+		function showPictureSelectPane (isFullScreen, resolveFunc, rejectFunc) {
+			var articleEdit = $scope.articleEdit;
+
+			articleEdit.pictureSelectPaneOption.show = true;
+			articleEdit.pictureSelectPaneOption.isFullScreen = !!isFullScreen;
+			articleEdit.pictureSelectPaneOption.resolveFunc = resolveFunc;
+			articleEdit.pictureSelectPaneOption.rejectFunc  = rejectFunc;
+		}
+
+		function hidePictureSelectPane () {
+			var articleEdit = $scope.articleEdit;
+
+			articleEdit.pictureSelectPaneOption.show = false;
+			articleEdit.pictureSelectPaneOption.isFullScreen = false;
+			articleEdit.pictureSelectPaneOption.resolveFunc = null;
+			articleEdit.pictureSelectPaneOption.rejectFunc  = null;
+		}
+
+		function getCopyedImageUrl () {
+			var iframe   = $window.document.getElementById("picture-select-iframe");
+			var textarea = iframe.contentWindow.document.getElementById("wl-clipboard-textarea");
+
+			if (textarea == null) {
+				return "";
+			}
+
+			return textarea.value;
 		}
 	}
 ]);

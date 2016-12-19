@@ -3,6 +3,7 @@ angular.module("Backend").controller("articleWriteCtrl", [
 	"$scope",
 	"$q",
 	"Validation",
+	"Clipboard",
 	"Category",
 	"Article",
 
@@ -11,6 +12,7 @@ angular.module("Backend").controller("articleWriteCtrl", [
 			$scope,
 			$q,
 			Validation,
+			Clipboard,
 			Category,
 			Article
 		) {
@@ -27,6 +29,13 @@ angular.module("Backend").controller("articleWriteCtrl", [
 			isPublish: false
 		};
 
+		$scope.pictureSelectPaneOption = {
+			show: false,
+			resolveFunc: null,
+			rejectFunc: null,
+			isFullScreen: false
+		};
+
 		$scope.onContentChange = function (html, markdown) {
 			updateContent(html, markdown);
 		};
@@ -40,7 +49,7 @@ angular.module("Backend").controller("articleWriteCtrl", [
 		$scope.togglePublishState = function () {
 			updatePublishState(!$scope.article.isPublish);
 		};
-
+		
 		$scope.saveArticle = function () {
 			var article   = $scope.article;
 			article.title = article.title.trim();
@@ -56,6 +65,35 @@ angular.module("Backend").controller("articleWriteCtrl", [
 			.catch(function (err) {
 				console.error(err);
 			});
+		};
+
+		$scope.onPictureSelect = function (isFullScreen) {
+			return $q(function (resolve, reject) {
+				showPictureSelectPane(isFullScreen, resolve, reject);
+			});
+		};
+
+		$scope.onPictureSelectCancel = function () {
+			var resolveFunc = $scope.pictureSelectPaneOption.resolveFunc;
+
+			resolveFunc({
+				selected: false
+			});
+
+			hidePictureSelectPane();
+		};
+
+		$scope.onPictureSelectConfirm = function () {
+			var resolveFunc = $scope.pictureSelectPaneOption.resolveFunc;
+
+			var url = getCopyedImageUrl();
+			
+			resolveFunc({
+				selected: true,
+				url: url
+			});
+
+			hidePictureSelectPane();
 		};
 
 		init();
@@ -126,6 +164,31 @@ angular.module("Backend").controller("articleWriteCtrl", [
 		function changeCategory (category) {
 			$scope.curtCategory     = category;
 			$scope.article.category = category.id;
+		}
+
+		function showPictureSelectPane (isFullScreen, resolveFunc, rejectFunc) {
+			$scope.pictureSelectPaneOption.show = true;
+			$scope.pictureSelectPaneOption.isFullScreen = isFullScreen;
+			$scope.pictureSelectPaneOption.resolveFunc = resolveFunc;
+			$scope.pictureSelectPaneOption.rejectFunc  = rejectFunc;
+		}
+
+		function hidePictureSelectPane () {
+			$scope.pictureSelectPaneOption.show = false;
+			$scope.pictureSelectPaneOption.isFullScreen = false;
+			$scope.pictureSelectPaneOption.resolveFunc = null;
+			$scope.pictureSelectPaneOption.rejectFunc  = null;
+		}
+
+		function getCopyedImageUrl () {
+			var iframe   = $window.document.getElementById("picture-select-iframe");
+			var textarea = iframe.contentWindow.document.getElementById("wl-clipboard-textarea");
+
+			if (textarea == null) {
+				return "";
+			}
+
+			return textarea.value;
 		}
 	}
 ]);

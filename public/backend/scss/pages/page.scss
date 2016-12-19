@@ -6,7 +6,6 @@
 .app {
 	& > .header {
 		position: fixed;
-		z-index: 1;
 		top: 0;
 		left: 0;
 		width: 100%;
@@ -107,7 +106,6 @@
 
 	& > .menu-bar,
 	& > .body {
-		z-index: 1;
 		height: 100%;
 		padding-top: 6.4rem;
 		background-color: rgba(236,239,241,0.56);
@@ -121,11 +119,11 @@
 		overflow: hidden;
 		box-shadow: .2rem 0 .4rem 0 rgba(0, 0, 0, 0.4);
 		
-		-webkit-transition: width 0.3s ease-in-out;
-		-moz-transition: width 0.3s ease-in-out;
-			-ms-transition: width 0.3s ease-in-out;
-			-o-transition: width 0.3s ease-in-out;
-				transition: width 0.3s ease-in-out;
+		// -webkit-transition: width 0.3s ease-in-out;
+		// -moz-transition: width 0.3s ease-in-out;
+		// 	-ms-transition: width 0.3s ease-in-out;
+		// 	-o-transition: width 0.3s ease-in-out;
+		// 		transition: width 0.3s ease-in-out;
 
 		&.collapse {
 			width: 0;
@@ -161,11 +159,11 @@
 						background-color: rgba(207,216,220,0.56);
 						overflow: hidden;
 
-						-webkit-transition: max-height .3s ease-in-out;
-						-moz-transition: max-height .3s ease-in-out;
-							-ms-transition: max-height .3s ease-in-out;
-							-o-transition: max-height .3s ease-in-out;
-								transition: max-height .3s ease-in-out;
+						// -webkit-transition: max-height .3s ease-in-out;
+						// -moz-transition: max-height .3s ease-in-out;
+						// 	-ms-transition: max-height .3s ease-in-out;
+						// 	-o-transition: max-height .3s ease-in-out;
+						// 		transition: max-height .3s ease-in-out;
 
 						li:hover {
 							a {
@@ -266,7 +264,6 @@
 
 	& > .body {
 		position: relative;
-		z-index: 1;
 		width: 100%;
 		min-width: 110rem;
 		height: 100%;
@@ -277,11 +274,11 @@
 			height: 100%;
 			padding-left: 22.5rem;
 
-			-webkit-transition: padding 0.3s ease-in-out;
-			-moz-transition: padding 0.3s ease-in-out;
-				-ms-transition: padding 0.3s ease-in-out;
-				-o-transition: padding 0.3s ease-in-out;
-					transition: padding 0.3s ease-in-out;
+			// -webkit-transition: padding 0.3s ease-in-out;
+			// -moz-transition: padding 0.3s ease-in-out;
+			// 	-ms-transition: padding 0.3s ease-in-out;
+			// 	-o-transition: padding 0.3s ease-in-out;
+			// 		transition: padding 0.3s ease-in-out;
 			
 			.page {
 				position: relative;

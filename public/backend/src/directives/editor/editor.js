@@ -19,7 +19,8 @@ angular.module("Backend").directive("wlEditor", [
 			scope: {
 				content: "@?",
 				onCtrlS: "&?",
-				onChange: "&?",	
+				onChange: "&?",
+				onPictureSelect: "&?"
 			},
 
 			templateUrl: "/backend/static/src/directives/editor/editor.html",
@@ -33,6 +34,7 @@ angular.module("Backend").directive("wlEditor", [
 					path: "/backend/static/editormd/lib/",
 					htmlDecode : "style,script,iframe|on*",
 					placeholder: "Enjoy writing article now ...",
+					crossDomainUpload : true,
 					toolbarIcons: function () {
 						return  [
 							"bold", 
@@ -87,10 +89,9 @@ angular.module("Backend").directive("wlEditor", [
 
 					toolbarHandlers: {
 						picture: function (cm, icon, cursor, selection) {
-							debugger;
-							// scope.$apply(function () {
-							// 	showPictureDialog(true);
-							// });
+							scope.$apply(function () {
+								openPicSelectDialog();
+							});
 						}
 					},
 
@@ -104,13 +105,33 @@ angular.module("Backend").directive("wlEditor", [
 						this.addKeyMap(keyMap);
 						
 						detectResizeEvent();
-                    }
+                    },
+
+					onfullscreen : function() {
+						isFullScreen = true;
+					},
+
+					onfullscreenExit : function() {
+						isFullScreen = false;
+					}
 
 				};
 				
-				var PICTURE_DIALOG_CONFIG = {
-					title: "Select Picture",
-					
+				var editor    = null;
+				var timeoutId = null;
+				var size      = {
+					width: angular.element(elements).width(),
+					height: 450
+				};
+
+				var isFullScreen = false;
+
+				var picSelectDialogOption = scope.picSelectDialogOption = {
+					show: false,
+					picUrl: "",
+					linkUrl: "http://",
+					desc: "",
+					title: "Add Picture",
 					buttons: [
 						{
 							text: "Cancel",
@@ -119,7 +140,7 @@ angular.module("Backend").directive("wlEditor", [
 								backgroundColor: "#666"
 							},
 							onClick: function () {
-								showPictureDialog(false);
+								closePicSelectDialog();
 							}
 						},
 
@@ -130,29 +151,41 @@ angular.module("Backend").directive("wlEditor", [
 								backgroundColor: "#2196F3"
 							},
 							onClick: function () {
-								console.log("wanglei is cool and houna is cute");
-								showPictureDialog(false);
+								var url  = picSelectDialogOption.picUrl;
+								var link = picSelectDialogOption.linkUrl;
+								var desc = picSelectDialogOption.desc;
+
+								insertPicture(url, link, desc);
+
+								closePicSelectDialog();
 							}
-						},
+						}
 					],
-					
+
 					onClose: function () {
-						showPictureDialog(false);
+						closePicSelectDialog();
 					}
 				};
-				
-				var editor    = null;
-				var timeoutId = null;
-				var size      = {
-					width: angular.element(elements).width(),
-					height: 450
-				};
-				
 
-				scope.pictureDialog = {
-					show: false,
-					config: PICTURE_DIALOG_CONFIG
-				};
+				scope.selectPic = function () {
+					if (!scope.onPictureSelect) {
+						return;
+					}
+					
+					scope.onPictureSelect({
+						isFullScreen: isFullScreen
+					})
+					.then(function (ret) {
+						if (!ret.selected) {
+							return;
+						}
+
+						scope.picSelectDialogOption.picUrl = ret.url;
+					})
+					.catch(function (err) {
+						console.error(err);
+					});
+				}				
 
 				scope.$on("$destroy", function () {
 					offDetectResizeEvent();
@@ -207,8 +240,41 @@ angular.module("Backend").directive("wlEditor", [
 					}
 				}
 
-				function showPictureDialog (show) {
-					scope.pictureDialog.show = !!show;
+				function openPicSelectDialog () {
+					scope.picSelectDialogOption.show = true;
+				}
+
+				function closePicSelectDialog () {
+					scope.picSelectDialogOption.show = false;
+					scope.picSelectDialogOption.picUrl = "";
+					scope.picSelectDialogOption.linkUrl = "http://";
+					scope.picSelectDialogOption.desc = "";
+				}
+
+				function insertPicture (url, link, desc) {
+					var str = "";
+
+					if (desc) {
+						str = "![" + desc + "](" + url + " '" + desc + "')";
+					} else {	
+						str = "![](" + url + ")";
+					}
+
+					if (!!link 
+						&& (link.indexOf("http://") === 0 && link !== "http://"
+							||
+							link.indexOf("https://") === 0 && link !== "https://"
+							)
+						) {
+
+						if (desc) {
+							str = "[" + str + "]" + "(" + url + " '" + desc + "')"
+						} else {
+							str = "[" + str + "]" + "(" + url + ")"
+						}	
+					}
+
+					editor.insertValue(str);
 				}
 			}
 		};
